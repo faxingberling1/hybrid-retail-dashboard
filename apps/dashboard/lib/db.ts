@@ -1,3 +1,4 @@
+// lib/db.ts - UPDATED VERSION
 import { Pool } from 'pg'
 
 // Database connection pool
@@ -49,4 +50,35 @@ export async function queryOne(text: string, params?: any[]) {
   return result.rows[0] || null
 }
 
+// ADDED: connectDB function that your NotificationModel expects
+export async function connectDB() {
+  try {
+    const client = await pool.connect()
+    return client
+  } catch (error) {
+    console.error('Database connection error:', error)
+    throw error
+  }
+}
+
+// ADDED: testConnection function
+export async function testConnection(): Promise<boolean> {
+  const client = await connectDB()
+  try {
+    await client.query('SELECT 1')
+    return true
+  } catch (error) {
+    console.error('Database test failed:', error)
+    return false
+  } finally {
+    client.release()
+  }
+}
+
+// ADDED: getClient function (alternative to connectDB)
+export async function getClient() {
+  return await connectDB()
+}
+
+// Export the pool for direct access
 export default pool

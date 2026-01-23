@@ -8,13 +8,20 @@
     "start": "next start -p 3001",
     "lint": "next lint",
     "migrate": "tsx scripts/migrate.ts",
+    "migrate:notifications:complete": "tsx scripts/migrate-notifications-complete.ts",
+    "migrate:all": "npm run migrate && npm run migrate:notifications",
     "seed": "tsx scripts/seed.ts",
     "db:fix": "tsx scripts/fix-db.ts",
     "db:reset": "tsx scripts/reset-db.ts",
     "db:test": "tsx scripts/test-connection.ts",
     "db:setup": "npm run migrate && npm run seed",
     "db:create": "node scripts/create-db.js",
-    "clean": "rm -rf .next && rm -rf node_modules/.cache"
+    "db:check": "tsx scripts/test-db-connection.ts",
+    "migrate:quick": "tsx scripts/quick-migrate-notifications.ts",
+    "clean": "rm -rf .next && rm -rf node_modules/.cache",
+    "check:db": "tsx scripts/check-db.ts",
+    "test:notification-system": "tsx scripts/test-notification-system.ts",
+    "test:notification-api": "tsx scripts/test-notification-api.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
