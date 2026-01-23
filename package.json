@@ -1,0 +1,54 @@
+{
+  "name": "hybrid-retail-pos",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:website": "cd apps/website && npm run dev",
+    "dev:dashboard": "cd apps/dashboard && npm run dev",
+    "dev:all": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "build:website": "cd apps/website && npm run build",
+    "build:dashboard": "cd apps/dashboard && npm run build",
+    "build:shared": "cd packages/shared && npm run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker:build": "docker-compose -f docker-compose.dev.yml build",
+    "docker:down": "docker-compose -f docker-compose.dev.yml down",
+    "install:all": "npm install && turbo run install"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.9",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.4",
+    "jest": "^30.2.0",
+    "postcss": "^8.5.6",
+    "prisma": "^7.2.0",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0",
+    "turbo": "^1.10.16",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.19",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.562.0",
+    "next-auth": "^4.24.13",
+    "next-themes": "^0.4.6",
+    "recharts": "^3.6.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^3.4.19"
+  }
+}

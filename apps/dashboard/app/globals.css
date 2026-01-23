@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  #__next {
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .sidebar-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-lg transition-shadow duration-300;
+  }
+}
