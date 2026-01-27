@@ -12,14 +12,25 @@ dashboard
 │   │   │   │   ├── auth
 │   │   │   │   │   └── [...nextauth]
 │   │   │   │   │       └── route.js
+│   │   │   │   ├── database
+│   │   │   │   │   └── route.js
 │   │   │   │   └── notifications
 │   │   │   │       └── route.js
 │   │   │   ├── login
 │   │   │   │   ├── page.js
 │   │   │   │   └── page_client-reference-manifest.js
 │   │   │   └── super-admin
+│   │   │       ├── database
+│   │   │       │   ├── page.js
+│   │   │       │   └── page_client-reference-manifest.js
 │   │   │       ├── page.js
-│   │   │       └── page_client-reference-manifest.js
+│   │   │       ├── page_client-reference-manifest.js
+│   │   │       ├── settings
+│   │   │       │   ├── page.js
+│   │   │       │   └── page_client-reference-manifest.js
+│   │   │       └── system
+│   │   │           ├── page.js
+│   │   │           └── page_client-reference-manifest.js
 │   │   ├── app-paths-manifest.json
 │   │   ├── edge-runtime-webpack.js
 │   │   ├── middleware-build-manifest.js
@@ -73,19 +84,27 @@ dashboard
 │   │   │   ├── redux.js
 │   │   │   ├── reselect.js
 │   │   │   ├── sonner.js
+│   │   │   ├── tiny-invariant.js
 │   │   │   ├── use-sync-external-store.js
 │   │   │   ├── uuid.js
 │   │   │   └── victory-vendor.js
 │   │   └── webpack-runtime.js
 │   ├── static
 │   │   ├── chunks
+│   │   │   ├── _app-pages-browser_node_modules_recharts_es6_index_js.js
 │   │   │   ├── app
 │   │   │   │   ├── layout.js
 │   │   │   │   ├── login
 │   │   │   │   │   └── page.js
 │   │   │   │   └── super-admin
+│   │   │   │       ├── database
+│   │   │   │       │   └── page.js
 │   │   │   │       ├── layout.js
-│   │   │   │       └── page.js
+│   │   │   │       ├── page.js
+│   │   │   │       ├── settings
+│   │   │   │       │   └── page.js
+│   │   │   │       └── system
+│   │   │   │           └── page.js
 │   │   │   ├── app-pages-internals.js
 │   │   │   ├── main-app.js
 │   │   │   ├── polyfills.js
@@ -105,22 +124,19 @@ dashboard
 │   │   │   ├── df0a9ae256c0569c-s.woff2
 │   │   │   └── e4af272ccee01ff0-s.p.woff2
 │   │   └── webpack
-│   │       ├── 4111da13b276631b.webpack.hot-update.json
+│   │       ├── 37b503fd1a1f4e66.webpack.hot-update.json
 │   │       ├── 633457081244afec._.hot-update.json
-│   │       ├── 63a640539b304fc6.webpack.hot-update.json
-│   │       ├── 6a2d76884c7f92bf.webpack.hot-update.json
+│   │       ├── 83b3383f7fcd96c1.webpack.hot-update.json
 │   │       ├── app
-│   │       │   ├── layout.4111da13b276631b.hot-update.js
-│   │       │   ├── layout.63a640539b304fc6.hot-update.js
-│   │       │   ├── layout.6a2d76884c7f92bf.hot-update.js
-│   │       │   └── layout.cc8dba8e9f7ee974.hot-update.js
-│   │       ├── b955ff206c6dbaca.webpack.hot-update.json
-│   │       ├── cc8dba8e9f7ee974.webpack.hot-update.json
-│   │       ├── webpack.4111da13b276631b.hot-update.js
-│   │       ├── webpack.63a640539b304fc6.hot-update.js
-│   │       ├── webpack.6a2d76884c7f92bf.hot-update.js
-│   │       ├── webpack.b955ff206c6dbaca.hot-update.js
-│   │       └── webpack.cc8dba8e9f7ee974.hot-update.js
+│   │       │   └── layout.83b3383f7fcd96c1.hot-update.js
+│   │       ├── c2edfa2a9643994f.webpack.hot-update.json
+│   │       ├── d54b4b144e637d61.webpack.hot-update.json
+│   │       ├── d62ddd6022a4301d.webpack.hot-update.json
+│   │       ├── webpack.37b503fd1a1f4e66.hot-update.js
+│   │       ├── webpack.83b3383f7fcd96c1.hot-update.js
+│   │       ├── webpack.c2edfa2a9643994f.hot-update.js
+│   │       ├── webpack.d54b4b144e637d61.hot-update.js
+│   │       └── webpack.d62ddd6022a4301d.hot-update.js
 │   ├── trace
 │   └── types
 │       ├── app
@@ -128,14 +144,22 @@ dashboard
 │       │   │   ├── auth
 │       │   │   │   └── [...nextauth]
 │       │   │   │       └── route.ts
+│       │   │   ├── database
+│       │   │   │   └── route.ts
 │       │   │   └── notifications
 │       │   │       └── route.ts
 │       │   ├── layout.ts
 │       │   ├── login
 │       │   │   └── page.ts
 │       │   └── super-admin
+│       │       ├── database
+│       │       │   └── page.ts
 │       │       ├── layout.ts
-│       │       └── page.ts
+│       │       ├── page.ts
+│       │       ├── settings
+│       │       │   └── page.ts
+│       │       └── system
+│       │           └── page.ts
 │       └── package.json
 ├── README.md
 ├── app
@@ -148,6 +172,8 @@ dashboard
 │   │   ├── auth
 │   │   │   └── [...nextauth]
 │   │   │       └── route.ts
+│   │   ├── database
+│   │   │   └── route.ts
 │   │   ├── debug-session
 │   │   │   └── route.ts
 │   │   ├── notifications
@@ -208,10 +234,13 @@ dashboard
 │   │   └── user-sidebar.tsx
 │   ├── shared
 │   └── ui
-│       └── notification-dropdown.tsx
+│       ├── notification-dropdown.tsx
+│       └── tooltip.tsx
 ├── lib
 │   ├── api
-│   │   └── billing.ts
+│   │   ├── billing.ts
+│   │   └── database
+│   │       └── route.ts
 │   ├── auth-utils.ts
 │   ├── auth.ts
 │   ├── db
@@ -221,6 +250,8 @@ dashboard
 │   ├── db.ts
 │   ├── hooks
 │   │   └── use-notification.ts
+│   ├── middleware
+│   │   └── database-permissions.ts
 │   ├── models
 │   │   ├── index.ts
 │   │   ├── notification.model.ts
@@ -231,6 +262,7 @@ dashboard
 │   │   ├── index.ts
 │   │   └── user.repository.ts
 │   ├── services
+│   │   ├── database.service.ts
 │   │   └── notification.service.ts
 │   ├── types
 │   │   └── notification.ts
@@ -258,6 +290,7 @@ dashboard
 │   ├── setup-db.ts
 │   ├── test-auth.ts
 │   ├── test-connection.ts
+│   ├── test-db-final.ts
 │   ├── test-db.ts
 │   ├── test-notification-api.ts
 │   ├── test-notification-system.ts
