@@ -96,4 +96,4 @@ export default function UsageMetricsSection({ metrics }: UsageMetricsSectionProp
       </div>
     </div>
   );
-}
+}   
