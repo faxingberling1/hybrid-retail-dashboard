@@ -22,8 +22,49 @@ import {
   Globe as WorldIcon, Languages, Currency,
   Clock as TimeIcon, Calendar as CalendarIcon,
   FileBarChart, FileArchive, ShieldAlert,
-  AlertTriangle, CheckCircle2, X
+  AlertTriangle, CheckCircle2, X,
+  Bug, Search, Filter, BarChart
 } from "lucide-react"
+
+// Import all components
+import ProfileSection from "@/components/ui/general-settings/profile-section"
+import ThemeSection from "@/components/ui/general-settings/theme-section"
+import RegionalSection from "@/components/ui/general-settings/regional-section"
+import {
+  TwoFactorSection,
+  SessionSection,
+  IpWhitelistSection,
+  LoginSecuritySection,
+  PasswordManagementSection,
+  SecurityAuditSection
+} from "@/components/ui/security-settings"
+import {
+  EmailNotificationsSection,
+  PushNotificationsSection,
+  SmsNotificationsSection,
+  NotificationPreferencesSection,
+  NotificationChannelsSection,
+  NotificationTestSection
+} from "@/components/ui/notifications-settings"
+import {
+  CurrentPlanSection,
+  PaymentMethodSection,
+  BillingHistorySection,
+  UsageMetricsSection,
+  BillingActionsSection,
+  PlanComparisonSection
+} from "@/components/ui/billing-settings"
+import {
+  IntegrationsSection,
+  Integration,
+  AvailableIntegration
+} from "@/components/ui/integrations-settings"
+import {
+  AdvancedSection,
+  LogEntry,
+  DebugTool,
+  DangerZoneAction
+} from "@/components/ui/advanced-settings"
 
 interface UserProfile {
   id: string
@@ -88,15 +129,6 @@ interface BillingInfo {
   nextBillingDate: string
   paymentMethod: string
   billingCycle: 'monthly' | 'yearly'
-}
-
-interface Integration {
-  id: string
-  name: string
-  type: 'payment' | 'shipping' | 'analytics' | 'communication'
-  status: 'active' | 'inactive' | 'error'
-  apiKey: string
-  lastSynced: string
 }
 
 export default function SettingsPage() {
@@ -204,6 +236,327 @@ export default function SettingsPage() {
       status: 'inactive',
       apiKey: 'SG.***************',
       lastSynced: '2024-01-10 09:15:00'
+    },
+    {
+      id: 'INT-005',
+      name: 'FedEx',
+      type: 'shipping',
+      status: 'active',
+      apiKey: 'fedex_***************',
+      lastSynced: '2024-01-16 10:30:00'
+    },
+    {
+      id: 'INT-006',
+      name: 'Mailchimp',
+      type: 'communication',
+      status: 'error',
+      apiKey: 'mc_***************',
+      lastSynced: '2024-01-14 16:45:00'
+    }
+  ])
+
+  const [availableIntegrations] = useState<AvailableIntegration[]>([
+    {
+      id: 'EASY-001',
+      name: 'EasyPaisa',
+      type: 'payment',
+      description: 'Mobile payments integration for Pakistani users',
+      category: 'Payment Gateway',
+      isPopular: true
+    },
+    {
+      id: 'TEL-001',
+      name: 'Telenor',
+      type: 'payment',
+      description: 'Mobile banking integration',
+      category: 'Payment Gateway'
+    },
+    {
+      id: 'FED-001',
+      name: 'FedEx',
+      type: 'shipping',
+      description: 'Shipping and logistics integration',
+      category: 'Shipping',
+      isPopular: true
+    },
+    {
+      id: 'DHL-001',
+      name: 'DHL',
+      type: 'shipping',
+      description: 'Express shipping services',
+      category: 'Shipping'
+    },
+    {
+      id: 'MAIL-001',
+      name: 'Mailchimp',
+      type: 'communication',
+      description: 'Email marketing platform',
+      category: 'Marketing'
+    },
+    {
+      id: 'TWIL-001',
+      name: 'Twilio',
+      type: 'communication',
+      description: 'SMS and voice services',
+      category: 'Communication',
+      isNew: true
+    },
+    {
+      id: 'GOOG-001',
+      name: 'Google Drive',
+      type: 'cloud',
+      description: 'Cloud storage and file sharing',
+      category: 'Cloud Storage'
+    },
+    {
+      id: 'DROP-001',
+      name: 'Dropbox',
+      type: 'cloud',
+      description: 'File synchronization service',
+      category: 'Cloud Storage'
+    },
+    {
+      id: 'ZOOM-001',
+      name: 'Zoom',
+      type: 'communication',
+      description: 'Video conferencing platform',
+      category: 'Communication'
+    },
+    {
+      id: 'STRP-001',
+      name: 'Stripe',
+      type: 'payment',
+      description: 'Online payment processing',
+      category: 'Payment Gateway',
+      isPopular: true
+    },
+    {
+      id: 'PAYP-001',
+      name: 'PayPal',
+      type: 'payment',
+      description: 'Global online payments',
+      category: 'Payment Gateway'
+    },
+    {
+      id: 'UPS-001',
+      name: 'UPS',
+      type: 'shipping',
+      description: 'Package delivery services',
+      category: 'Shipping'
+    }
+  ])
+
+  // Advanced Settings State
+  const [autoBackup, setAutoBackup] = useState(true)
+  const [nextBackup, setNextBackup] = useState('Today at 02:00 AM')
+  const [apiToken, setApiToken] = useState('sk_live_***************')
+  const [apiUsage] = useState({
+    requestsToday: 1248,
+    requestsLimit: 10000,
+    resetTime: 'midnight'
+  })
+
+  const [systemInfo] = useState({
+    dashboardVersion: 'v2.1.4',
+    apiVersion: 'v3.0.1',
+    databaseVersion: 'PostgreSQL 14.6',
+    lastUpdated: '2024-01-15',
+    systemUptime: '99.9%',
+    serverLocation: 'AWS Frankfurt (eu-central-1)'
+  })
+
+  const [logs] = useState<LogEntry[]>([
+    {
+      id: '1',
+      timestamp: '2024-01-16 14:30:15',
+      level: 'info',
+      message: 'User login successful',
+      source: 'AuthService',
+      user: 'john.doe@example.com'
+    },
+    {
+      id: '2',
+      timestamp: '2024-01-16 14:25:42',
+      level: 'warning',
+      message: 'API rate limit warning',
+      source: 'APIGateway',
+      user: 'api-client-001'
+    },
+    {
+      id: '3',
+      timestamp: '2024-01-16 14:20:18',
+      level: 'info',
+      message: 'Database backup completed',
+      source: 'BackupService'
+    },
+    {
+      id: '4',
+      timestamp: '2024-01-16 14:15:33',
+      level: 'error',
+      message: 'Failed to sync with external service',
+      source: 'IntegrationService',
+      user: 'system'
+    },
+    {
+      id: '5',
+      timestamp: '2024-01-16 14:10:55',
+      level: 'info',
+      message: 'Cache cleared successfully',
+      source: 'CacheService'
+    },
+    {
+      id: '6',
+      timestamp: '2024-01-16 14:05:21',
+      level: 'info',
+      message: 'New user registered',
+      source: 'UserService',
+      user: 'alice.smith@example.com'
+    },
+    {
+      id: '7',
+      timestamp: '2024-01-16 14:00:47',
+      level: 'warning',
+      message: 'High memory usage detected',
+      source: 'SystemMonitor'
+    },
+    {
+      id: '8',
+      timestamp: '2024-01-16 13:55:12',
+      level: 'info',
+      message: 'Email notification sent',
+      source: 'NotificationService',
+      user: 'bob.johnson@example.com'
+    },
+    {
+      id: '9',
+      timestamp: '2024-01-16 13:50:38',
+      level: 'error',
+      message: 'Payment gateway timeout',
+      source: 'PaymentService'
+    },
+    {
+      id: '10',
+      timestamp: '2024-01-16 13:45:24',
+      level: 'info',
+      message: 'System health check passed',
+      source: 'HealthCheckService'
+    }
+  ])
+
+  const [debugTools] = useState<DebugTool[]>([
+    {
+      id: 'cache-clear',
+      title: 'Clear Cache',
+      description: 'Clear all cached data and sessions',
+      icon: <RefreshCw className="h-5 w-5" />,
+      onClick: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        alert('Cache cleared successfully')
+      },
+      variant: 'primary'
+    },
+    {
+      id: 'db-optimize',
+      title: 'Optimize Database',
+      description: 'Run database optimization and cleanup',
+      icon: <Database className="h-5 w-5" />,
+      onClick: async () => {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        alert('Database optimization completed')
+      },
+      variant: 'primary'
+    },
+    {
+      id: 'system-check',
+      title: 'System Health Check',
+      description: 'Run comprehensive system diagnostics',
+      icon: <Zap className="h-5 w-5" />,
+      onClick: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        alert('System health check completed. All systems operational.')
+      },
+      variant: 'secondary'
+    },
+    {
+      id: 'log-purge',
+      title: 'Purge Old Logs',
+      description: 'Remove logs older than 30 days',
+      icon: <Trash2 className="h-5 w-5" />,
+      onClick: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        alert('Old logs purged successfully')
+      },
+      variant: 'danger'
+    },
+    {
+      id: 'ssl-check',
+      title: 'Check SSL Certificate',
+      description: 'Verify SSL certificate validity',
+      icon: <Shield className="h-5 w-5" />,
+      onClick: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1200))
+        alert('SSL certificate is valid and up to date')
+      },
+      variant: 'secondary'
+    },
+    {
+      id: 'network-test',
+      title: 'Network Diagnostics',
+      description: 'Test network connectivity and speed',
+      icon: <Wifi className="h-5 w-5" />,
+      onClick: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1800))
+        alert('Network diagnostics completed successfully')
+      },
+      variant: 'secondary'
+    }
+  ])
+
+  const [dangerZoneActions] = useState<DangerZoneAction[]>([
+    {
+      id: 'delete-account',
+      title: 'Delete Account',
+      description: 'Permanently delete your account and all data',
+      icon: <Trash2 className="h-5 w-5" />,
+      onClick: () => {
+        alert('Account deletion requested (this is a demo)')
+        setShowDeleteModal(false)
+      },
+      variant: 'danger',
+      confirmationText: 'Are you sure you want to delete your account? This action cannot be undone.'
+    },
+    {
+      id: 'reset-settings',
+      title: 'Reset All Settings',
+      description: 'Reset all settings to factory defaults',
+      icon: <RefreshCw className="h-5 w-5" />,
+      onClick: () => {
+        alert('All settings reset to factory defaults (this is a demo)')
+      },
+      variant: 'warning',
+      confirmationText: 'Are you sure you want to reset all settings? This cannot be undone.'
+    },
+    {
+      id: 'purge-data',
+      title: 'Purge All Data',
+      description: 'Delete all user data and logs',
+      icon: <Database className="h-5 w-5" />,
+      onClick: () => {
+        alert('All data purged (this is a demo)')
+      },
+      variant: 'danger',
+      confirmationText: 'This will delete ALL user data. Are you absolutely sure?'
+    },
+    {
+      id: 'disable-system',
+      title: 'Disable System',
+      description: 'Temporarily disable all system functions',
+      icon: <Shield className="h-5 w-5" />,
+      onClick: () => {
+        alert('System disabled (this is a demo)')
+      },
+      variant: 'warning',
+      confirmationText: 'This will disable the system for all users. Continue?'
     }
   ])
 
@@ -249,6 +602,271 @@ export default function SettingsPage() {
     { value: 0, label: 'Never' }
   ]
 
+  // Notification preferences
+  const [notificationPreferences, setNotificationPreferences] = useState({
+    quietHoursStart: '22:00',
+    quietHoursEnd: '07:00',
+    notificationSound: 'default'
+  })
+
+  // Notification channels
+  const [notificationChannels] = useState([
+    {
+      id: 'email-channel',
+      name: 'Email',
+      type: 'email' as const,
+      status: 'active' as const,
+      description: 'Receive notifications via email',
+      icon: <Mail className="h-5 w-5" />
+    },
+    {
+      id: 'push-channel',
+      name: 'Push Notifications',
+      type: 'push' as const,
+      status: 'active' as const,
+      description: 'Browser and mobile push notifications',
+      icon: <Bell className="h-5 w-5" />
+    },
+    {
+      id: 'sms-channel',
+      name: 'SMS',
+      type: 'sms' as const,
+      status: 'inactive' as const,
+      description: 'Text message notifications',
+      icon: <Smartphone className="h-5 w-5" />
+    },
+    {
+      id: 'web-channel',
+      name: 'Web Dashboard',
+      type: 'web' as const,
+      status: 'active' as const,
+      description: 'In-app notifications',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      id: 'mobile-channel',
+      name: 'Mobile App',
+      type: 'mobile' as const,
+      status: 'active' as const,
+      description: 'Mobile app notifications',
+      icon: <Tablet className="h-5 w-5" />
+    },
+    {
+      id: 'slack-channel',
+      name: 'Slack',
+      type: 'push' as const,
+      status: 'inactive' as const,
+      description: 'Slack channel notifications',
+      icon: <Bell className="h-5 w-5" />
+    }
+  ])
+
+  // Billing data
+  const [paymentMethod] = useState({
+    method: 'Visa **** 4242',
+    type: 'Visa',
+    lastFour: '4242',
+    expiryDate: '12/25'
+  })
+
+  const [invoices] = useState([
+    {
+      id: 'INV-001',
+      date: '2024-01-15',
+      amount: '₨ 49,999',
+      status: 'paid' as const,
+      description: 'Enterprise Plan - January 2024'
+    },
+    {
+      id: 'INV-002',
+      date: '2023-12-15',
+      amount: '₨ 49,999',
+      status: 'paid' as const,
+      description: 'Enterprise Plan - December 2023'
+    },
+    {
+      id: 'INV-003',
+      date: '2023-11-15',
+      amount: '₨ 49,999',
+      status: 'paid' as const,
+      description: 'Enterprise Plan - November 2023'
+    },
+    {
+      id: 'INV-004',
+      date: '2023-10-15',
+      amount: '₨ 49,999',
+      status: 'paid' as const,
+      description: 'Enterprise Plan - October 2023'
+    }
+  ])
+
+  const [usageMetrics] = useState([
+    {
+      name: 'Users',
+      current: 42,
+      limit: 50,
+      unit: 'users',
+      trend: 'up' as const,
+      percentage: 84
+    },
+    {
+      name: 'Storage',
+      current: 24.5,
+      limit: 100,
+      unit: 'GB',
+      trend: 'up' as const,
+      percentage: 24.5
+    },
+    {
+      name: 'API Requests',
+      current: 1248,
+      limit: 10000,
+      unit: 'requests',
+      trend: 'stable' as const,
+      percentage: 12.48
+    },
+    {
+      name: 'Bandwidth',
+      current: 45.2,
+      limit: 100,
+      unit: 'GB',
+      trend: 'down' as const,
+      percentage: 45.2
+    }
+  ])
+
+  const [billingActions] = useState([
+    {
+      id: 'update-billing',
+      title: 'Update Billing Info',
+      description: 'Change billing address and details',
+      icon: <Receipt className="h-5 w-5" />,
+      onClick: () => alert('Update billing info clicked'),
+      variant: 'primary' as const
+    },
+    {
+      id: 'usage-reports',
+      title: 'Usage Reports',
+      description: 'View resource usage and costs',
+      icon: <FileBarChart className="h-5 w-5" />,
+      onClick: () => alert('Usage reports clicked'),
+      variant: 'primary' as const
+    },
+    {
+      id: 'export-invoices',
+      title: 'Export Invoices',
+      description: 'Download all billing history',
+      icon: <Download className="h-5 w-5" />,
+      onClick: () => alert('Export invoices clicked'),
+      variant: 'secondary' as const
+    },
+    {
+      id: 'request-refund',
+      title: 'Request Refund',
+      description: 'Submit a refund request',
+      icon: <Upload className="h-5 w-5" />,
+      onClick: () => alert('Request refund clicked'),
+      variant: 'secondary' as const
+    },
+    {
+      id: 'billing-support',
+      title: 'Billing Support',
+      description: 'Contact billing support team',
+      icon: <HelpCircle className="h-5 w-5" />,
+      onClick: () => alert('Billing support clicked'),
+      variant: 'secondary' as const
+    },
+    {
+      id: 'cancel-subscription',
+      title: 'Cancel Subscription',
+      description: 'Cancel your current plan',
+      icon: <XCircle className="h-5 w-5" />,
+      onClick: () => {
+        if (confirm('Are you sure you want to cancel your subscription?')) {
+          alert('Subscription cancellation requested');
+        }
+      },
+      variant: 'danger' as const
+    }
+  ])
+
+  const [plans] = useState([
+    {
+      id: 'basic',
+      name: 'Basic',
+      price: '₨ 9,999',
+      description: 'For small teams just getting started',
+      features: [
+        'Up to 10 users',
+        '50 GB storage',
+        'Basic analytics',
+        'Email support',
+        '7-day trial'
+      ],
+      popular: false
+    },
+    {
+      id: 'pro',
+      name: 'Professional',
+      price: '₨ 24,999',
+      description: 'For growing businesses',
+      features: [
+        'Up to 50 users',
+        '200 GB storage',
+        'Advanced analytics',
+        'Priority support',
+        'Custom integrations'
+      ],
+      popular: true
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: '₨ 49,999',
+      description: 'For large organizations',
+      features: [
+        'Unlimited users',
+        '1 TB storage',
+        'Enterprise analytics',
+        '24/7 dedicated support',
+        'Custom development',
+        'SLA guarantee'
+      ],
+      popular: false
+    }
+  ])
+
+  const [planFeatures] = useState([
+    { name: 'Number of Users', basic: true, pro: true, enterprise: true },
+    { name: 'Storage Space', basic: true, pro: true, enterprise: true },
+    { name: 'API Access', basic: true, pro: true, enterprise: true },
+    { name: 'Custom Integrations', basic: false, pro: true, enterprise: true },
+    { name: 'Priority Support', basic: false, pro: true, enterprise: true },
+    { name: 'Dedicated Account Manager', basic: false, pro: false, enterprise: true },
+    { name: 'Custom Development', basic: false, pro: false, enterprise: true },
+    { name: 'SLA Guarantee', basic: false, pro: false, enterprise: true },
+    { name: 'White Labeling', basic: false, pro: false, enterprise: true }
+  ])
+
+  // Security audit data
+  const [securityAudit] = useState({
+    lastLogin: '2 hours ago',
+    lastLoginIp: '192.168.1.105',
+    activeSessions: 3,
+    devices: [
+      { name: 'MacBook Pro 16"', lastActive: 'Now' },
+      { name: 'iPhone 15 Pro', lastActive: '5 minutes ago' },
+      { name: 'Windows Desktop', lastActive: '2 days ago' }
+    ]
+  })
+
+  // Regional settings state
+  const [regionalSettings, setRegionalSettings] = useState({
+    language: 'en-US',
+    currency: 'PKR',
+    timezone: 'Asia/Karachi'
+  })
+
   const saveSettings = () => {
     setIsLoading(true)
     // Simulate API call
@@ -284,6 +902,19 @@ export default function SettingsPage() {
     URL.revokeObjectURL(url)
   }
 
+  // Security handlers
+  const handleTwoFactorChange = (enabled: boolean) => {
+    setSecurity(prev => ({ ...prev, twoFactorAuth: enabled }))
+  }
+
+  const handleSessionTimeoutChange = (timeout: number) => {
+    setSecurity(prev => ({ ...prev, sessionTimeout: timeout }))
+  }
+
+  const handlePasswordExpiryChange = (expiry: number) => {
+    setSecurity(prev => ({ ...prev, passwordExpiry: expiry }))
+  }
+
   const addIpAddress = () => {
     const ip = prompt('Enter IP address or CIDR (e.g., 192.168.1.0/24):')
     if (ip) {
@@ -301,6 +932,86 @@ export default function SettingsPage() {
     }))
   }
 
+  const handleLoginNotificationsChange = (enabled: boolean) => {
+    setSecurity(prev => ({ ...prev, loginNotifications: enabled }))
+  }
+
+  const handleFailedLoginLockoutChange = (enabled: boolean) => {
+    setSecurity(prev => ({ ...prev, failedLoginLockout: enabled }))
+  }
+
+  const handleMaxLoginAttemptsChange = (attempts: number) => {
+    setSecurity(prev => ({ ...prev, maxLoginAttempts: attempts }))
+  }
+
+  const handleChangePassword = () => {
+    alert('Change password functionality would open here (this is a demo)')
+  }
+
+  const handleBiometricSetup = () => {
+    alert('Biometric setup would open here (this is a demo)')
+  }
+
+  // Notification handlers
+  const handleEmailNotificationsChange = (emailNotifications: NotificationPreferences['email']) => {
+    setNotifications(prev => ({
+      ...prev,
+      email: emailNotifications
+    }))
+  }
+
+  const handlePushNotificationsChange = (pushNotifications: NotificationPreferences['push']) => {
+    setNotifications(prev => ({
+      ...prev,
+      push: pushNotifications
+    }))
+  }
+
+  const handleSmsNotificationsChange = (smsNotifications: NotificationPreferences['sms']) => {
+    setNotifications(prev => ({
+      ...prev,
+      sms: smsNotifications
+    }))
+  }
+
+  const handleChannelToggle = (channelId: string) => {
+    alert(`Channel ${channelId} toggled (this is a demo)`)
+  }
+
+  const handleTestNotification = (type: 'email' | 'push' | 'sms') => {
+    alert(`Testing ${type} notification...`)
+  }
+
+  // Billing handlers
+  const handleUpgradePlan = () => {
+    alert('Plan upgrade dialog would open here')
+  }
+
+  const handleChangePaymentMethod = () => {
+    alert('Change payment method dialog would open here')
+  }
+
+  const handleViewAllInvoices = () => {
+    alert('View all invoices would open here')
+  }
+
+  const handleDownloadInvoice = (invoiceId: string) => {
+    alert(`Downloading invoice ${invoiceId}...`)
+  }
+
+  const handleSelectPlan = (planId: string) => {
+    alert(`Selected plan: ${planId}`)
+  }
+
+  // Integration handlers
+  const toggleIntegration = (integrationId: string) => {
+    setIntegrations(prev => prev.map(int => 
+      int.id === integrationId 
+        ? { ...int, status: int.status === 'active' ? 'inactive' : 'active' }
+        : int
+    ))
+  }
+
   const regenerateApiKey = (integrationId: string) => {
     if (confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
       setIntegrations(prev => prev.map(int => 
@@ -312,34 +1023,97 @@ export default function SettingsPage() {
     }
   }
 
-  const toggleIntegration = (integrationId: string) => {
-    setIntegrations(prev => prev.map(int => 
-      int.id === integrationId 
-        ? { ...int, status: int.status === 'active' ? 'inactive' : 'active' }
-        : int
-    ))
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800'
-      case 'inactive': return 'bg-gray-100 text-gray-800'
-      case 'error': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+  const removeIntegration = (integrationId: string) => {
+    if (confirm('Are you sure you want to remove this integration?')) {
+      setIntegrations(prev => prev.filter(int => int.id !== integrationId))
     }
   }
 
-  const getIntegrationIcon = (type: string) => {
-    switch (type) {
-      case 'payment': return <CreditCard className="h-5 w-5" />
-      case 'shipping': return <Truck className="h-5 w-5" />
-      case 'analytics': return <BarChart3 className="h-5 w-5" />
-      case 'communication': return <Mail className="h-5 w-5" />
-      default: return <Server className="h-5 w-5" />
+  const handleAddIntegration = () => {
+    alert('Add integration modal would open here')
+  }
+
+  const handleConnectIntegration = (integration: AvailableIntegration) => {
+    const newIntegration: Integration = {
+      id: `INT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      name: integration.name,
+      type: integration.type as any,
+      status: 'active',
+      apiKey: `${integration.name.toLowerCase()}_key_${Math.random().toString(36).substr(2, 9)}`,
+      lastSynced: new Date().toLocaleString(),
+      description: integration.description
+    }
+    setIntegrations(prev => [...prev, newIntegration])
+    alert(`${integration.name} integration added successfully!`)
+  }
+
+  // Advanced settings handlers
+  const handleAutoBackupChange = (enabled: boolean) => {
+    setAutoBackup(enabled)
+    if (enabled) {
+      setNextBackup('Today at 02:00 AM')
+    } else {
+      setNextBackup('Disabled')
     }
   }
 
-  // Add missing Truck icon import
+  const handleExportData = () => {
+    const data = {
+      userProfile,
+      organization,
+      security,
+      notifications,
+      theme,
+      billing,
+      integrations,
+      logs,
+      systemInfo,
+      timestamp: new Date().toISOString()
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `system-backup-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportData = () => {
+    alert('Data import dialog would open here')
+  }
+
+  const handleGenerateToken = () => {
+    const newToken = `sk_live_${Math.random().toString(36).substr(2, 24)}`
+    setApiToken(newToken)
+    alert('New API token generated successfully')
+  }
+
+  const handleSearchLogs = (query: string) => {
+    console.log('Searching logs for:', query)
+  }
+
+  const handleDownloadLogs = () => {
+    const logText = logs.map(log => 
+      `${log.timestamp} [${log.level.toUpperCase()}] ${log.message} (${log.source})`
+    ).join('\n')
+    
+    const blob = new Blob([logText], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `system-logs-${new Date().toISOString().split('T')[0]}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleClearLogs = () => {
+    if (confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+      alert('Logs cleared (this is a demo)')
+    }
+  }
+
+  // Add missing Truck icon component
   const Truck = ({ className }: { className: string }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -461,1051 +1235,181 @@ export default function SettingsPage() {
               {/* General Settings */}
               {activeTab === 'general' && (
                 <div className="space-y-8">
-                  {/* Profile Section */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
-                        <p className="text-sm text-gray-600">Update your personal details</p>
-                      </div>
-                      <User className="h-5 w-5 text-gray-400" />
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-6">
-                        <div className="mb-4 lg:mb-0">
-                          <div className="h-24 w-24 rounded-full bg-gradient-to-r from-purple-100 to-purple-200 flex items-center justify-center">
-                            <User className="h-12 w-12 text-purple-600" />
-                          </div>
-                        </div>
-                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Full Name
-                            </label>
-                            <input
-                              type="text"
-                              value={userProfile.name}
-                              onChange={(e) => setUserProfile(prev => ({ ...prev, name: e.target.value }))}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Email Address
-                            </label>
-                            <input
-                              type="email"
-                              value={userProfile.email}
-                              onChange={(e) => setUserProfile(prev => ({ ...prev, email: e.target.value }))}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Phone Number
-                            </label>
-                            <input
-                              type="tel"
-                              value={userProfile.phone}
-                              onChange={(e) => setUserProfile(prev => ({ ...prev, phone: e.target.value }))}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Role
-                            </label>
-                            <input
-                              type="text"
-                              value={userProfile.role}
-                              disabled
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
-                            />
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Bio
-                            </label>
-                            <textarea
-                              value={userProfile.bio}
-                              onChange={(e) => setUserProfile(prev => ({ ...prev, bio: e.target.value }))}
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Theme Settings */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Theme & Appearance</h2>
-                        <p className="text-sm text-gray-600">Customize the look and feel</p>
-                      </div>
-                      <Palette className="h-5 w-5 text-gray-400" />
-                    </div>
-
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-4">
-                          Theme Mode
-                        </label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {themeModes.map((mode) => {
-                            const Icon = mode.icon
-                            return (
-                              <button
-                                key={mode.id}
-                                onClick={() => setTheme(prev => ({ ...prev, mode: mode.id as any }))}
-                                className={`p-4 border rounded-lg text-left transition-colors ${
-                                  theme.mode === mode.id
-                                    ? 'border-purple-500 bg-purple-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                              >
-                                <Icon className="h-5 w-5 mb-2" />
-                                <div className="font-medium">{mode.label}</div>
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-4">
-                          Primary Color
-                        </label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                          {primaryColors.map((color) => (
-                            <button
-                              key={color.id}
-                              onClick={() => setTheme(prev => ({ ...prev, primaryColor: color.value }))}
-                              className={`p-3 border rounded-lg text-center ${
-                                theme.primaryColor === color.value
-                                  ? 'ring-2 ring-offset-2 ring-purple-500'
-                                  : 'border-gray-200'
-                              }`}
-                            >
-                              <div
-                                className="h-8 w-8 rounded-full mx-auto mb-2"
-                                style={{ backgroundColor: color.value }}
-                              />
-                              <div className="text-xs font-medium">{color.name}</div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Font Size
-                          </label>
-                          <select
-                            value={theme.fontSize}
-                            onChange={(e) => setTheme(prev => ({ ...prev, fontSize: e.target.value as any }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          >
-                            <option value="small">Small</option>
-                            <option value="medium">Medium</option>
-                            <option value="large">Large</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Density
-                          </label>
-                          <select
-                            value={theme.density}
-                            onChange={(e) => setTheme(prev => ({ ...prev, density: e.target.value as any }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          >
-                            <option value="comfortable">Comfortable</option>
-                            <option value="compact">Compact</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Animations</div>
-                          <div className="text-sm text-gray-600">Enable smooth transitions and animations</div>
-                        </div>
-                        <button
-                          onClick={() => setTheme(prev => ({ ...prev, animations: !prev.animations }))}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            theme.animations ? 'bg-purple-600' : 'bg-gray-200'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              theme.animations ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Regional Settings */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Regional Settings</h2>
-                        <p className="text-sm text-gray-600">Language, currency, and timezone</p>
-                      </div>
-                      <Globe className="h-5 w-5 text-gray-400" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Language
-                        </label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                          <option>English (US)</option>
-                          <option>English (UK)</option>
-                          <option>Urdu</option>
-                          <option>Arabic</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Currency
-                        </label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                          <option>PKR - Pakistani Rupee</option>
-                          <option>USD - US Dollar</option>
-                          <option>EUR - Euro</option>
-                          <option>GBP - British Pound</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Timezone
-                        </label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                          <option>Asia/Karachi (UTC+5)</option>
-                          <option>Asia/Dubai (UTC+4)</option>
-                          <option>America/New_York (UTC-5)</option>
-                          <option>Europe/London (UTC+0)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
+                  <ProfileSection
+                    profile={userProfile}
+                    onProfileChange={setUserProfile}
+                  />
+                  
+                  <ThemeSection
+                    theme={theme}
+                    onThemeChange={setTheme}
+                  />
+                  
+                  <RegionalSection
+                    settings={regionalSettings}
+                    onSettingsChange={setRegionalSettings}
+                  />
                 </div>
               )}
 
               {/* Security Settings */}
               {activeTab === 'security' && (
                 <div className="space-y-8">
-                  {/* Two-Factor Authentication */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Two-Factor Authentication</h2>
-                        <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
-                      </div>
-                      <ShieldCheck className="h-5 w-5 text-gray-400" />
-                    </div>
+                  <TwoFactorSection
+                    twoFactorAuth={security.twoFactorAuth}
+                    onTwoFactorChange={handleTwoFactorChange}
+                  />
 
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Enable 2FA</div>
-                          <div className="text-sm text-gray-600">Require a verification code when signing in</div>
-                        </div>
-                        <button
-                          onClick={() => setSecurity(prev => ({ ...prev, twoFactorAuth: !prev.twoFactorAuth }))}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            security.twoFactorAuth ? 'bg-green-600' : 'bg-gray-200'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              security.twoFactorAuth ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
+                  <SessionSection
+                    sessionTimeout={security.sessionTimeout}
+                    passwordExpiry={security.passwordExpiry}
+                    onSessionTimeoutChange={handleSessionTimeoutChange}
+                    onPasswordExpiryChange={handlePasswordExpiryChange}
+                    sessionTimeouts={sessionTimeouts}
+                    passwordExpiryOptions={passwordExpiryOptions}
+                  />
 
-                      {security.twoFactorAuth && (
-                        <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
-                          <div className="flex items-center">
-                            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                            <span className="text-green-800 font-medium">2FA is enabled</span>
-                          </div>
-                          <p className="text-sm text-green-700 mt-2">
-                            You'll need to enter a verification code from your authenticator app when signing in.
-                          </p>
-                          <button className="mt-3 text-sm font-medium text-green-700 hover:text-green-800">
-                            Manage authenticator apps →
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <IpWhitelistSection
+                    ipWhitelist={security.ipWhitelist}
+                    onAddIp={addIpAddress}
+                    onRemoveIp={removeIpAddress}
+                  />
 
-                  {/* Session Management */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Session Management</h3>
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Session Timeout
-                        </label>
-                        <select
-                          value={security.sessionTimeout}
-                          onChange={(e) => setSecurity(prev => ({ ...prev, sessionTimeout: Number(e.target.value) }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        >
-                          {sessionTimeouts.map(option => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                          ))}
-                        </select>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Automatically log out after period of inactivity
-                        </p>
-                      </div>
+                  <LoginSecuritySection
+                    loginNotifications={security.loginNotifications}
+                    failedLoginLockout={security.failedLoginLockout}
+                    maxLoginAttempts={security.maxLoginAttempts}
+                    onLoginNotificationsChange={handleLoginNotificationsChange}
+                    onFailedLoginLockoutChange={handleFailedLoginLockoutChange}
+                    onMaxLoginAttemptsChange={handleMaxLoginAttemptsChange}
+                  />
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Password Expiry
-                        </label>
-                        <select
-                          value={security.passwordExpiry}
-                          onChange={(e) => setSecurity(prev => ({ ...prev, passwordExpiry: Number(e.target.value) }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        >
-                          {passwordExpiryOptions.map(option => (
-                            <option key={option.value} value={option.value}>{option.label}</option>
-                          ))}
-                        </select>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Require password change after specified days
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <SecurityAuditSection
+                    lastLogin={securityAudit.lastLogin}
+                    lastLoginIp={securityAudit.lastLoginIp}
+                    activeSessions={securityAudit.activeSessions}
+                    devices={securityAudit.devices}
+                  />
 
-                  {/* IP Whitelist */}
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">IP Whitelist</h3>
-                        <p className="text-sm text-gray-600">Restrict access to specific IP addresses</p>
-                      </div>
-                      <button
-                        onClick={addIpAddress}
-                        className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add IP
-                      </button>
-                    </div>
-
-                    <div className="space-y-2">
-                      {security.ipWhitelist.map((ip, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center">
-                            <Network className="h-4 w-4 text-gray-400 mr-3" />
-                            <span className="font-mono text-sm">{ip}</span>
-                          </div>
-                          <button
-                            onClick={() => removeIpAddress(ip)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                      {security.ipWhitelist.length === 0 && (
-                        <div className="p-4 text-center text-gray-500 border border-dashed border-gray-300 rounded-lg">
-                          No IP addresses whitelisted. Click "Add IP" to add one.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Login Security */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Login Security</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Login Notifications</div>
-                          <div className="text-sm text-gray-600">Get notified when someone logs into your account</div>
-                        </div>
-                        <button
-                          onClick={() => setSecurity(prev => ({ ...prev, loginNotifications: !prev.loginNotifications }))}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            security.loginNotifications ? 'bg-purple-600' : 'bg-gray-200'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              security.loginNotifications ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">Failed Login Lockout</div>
-                          <div className="text-sm text-gray-600">Temporarily lock account after failed attempts</div>
-                        </div>
-                        <button
-                          onClick={() => setSecurity(prev => ({ ...prev, failedLoginLockout: !prev.failedLoginLockout }))}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            security.failedLoginLockout ? 'bg-purple-600' : 'bg-gray-200'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              security.failedLoginLockout ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-
-                      {security.failedLoginLockout && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Maximum Login Attempts
-                          </label>
-                          <input
-                            type="number"
-                            value={security.maxLoginAttempts}
-                            onChange={(e) => setSecurity(prev => ({ ...prev, maxLoginAttempts: Number(e.target.value) }))}
-                            min="1"
-                            max="10"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Password Management */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Password Management</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <button className="p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 transition-colors">
-                        <Key className="h-5 w-5 text-purple-600 mb-2" />
-                        <div className="font-medium text-gray-900">Change Password</div>
-                        <div className="text-sm text-gray-600 mt-1">Update your account password</div>
-                      </button>
-                      <button className="p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 transition-colors">
-                        <Fingerprint className="h-5 w-5 text-purple-600 mb-2" />
-                        <div className="font-medium text-gray-900">Biometric Login</div>
-                        <div className="text-sm text-gray-600 mt-1">Set up fingerprint or face ID</div>
-                      </button>
-                    </div>
-                  </div>
+                  <PasswordManagementSection
+                    onChangePassword={handleChangePassword}
+                    onBiometricSetup={handleBiometricSetup}
+                  />
                 </div>
               )}
 
               {/* Notifications Settings */}
               {activeTab === 'notifications' && (
                 <div className="space-y-8">
-                  {/* Email Notifications */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Email Notifications</h2>
-                        <p className="text-sm text-gray-600">Manage what emails you receive</p>
-                      </div>
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
+                  <EmailNotificationsSection
+                    emailNotifications={notifications.email}
+                    onEmailNotificationsChange={handleEmailNotificationsChange}
+                  />
 
-                    <div className="space-y-3">
-                      {Object.entries(notifications.email).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {key === 'marketing' && 'Product updates and promotional offers'}
-                              {key === 'security' && 'Security alerts and login notifications'}
-                              {key === 'updates' && 'System updates and maintenance notices'}
-                              {key === 'reports' && 'Weekly and monthly reports'}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => setNotifications(prev => ({
-                              ...prev,
-                              email: { ...prev.email, [key]: !value }
-                            }))}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                              value ? 'bg-purple-600' : 'bg-gray-200'
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                value ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <PushNotificationsSection
+                    pushNotifications={notifications.push}
+                    onPushNotificationsChange={handlePushNotificationsChange}
+                  />
 
-                  {/* Push Notifications */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Push Notifications</h2>
-                        <p className="text-sm text-gray-600">Control push notifications on your devices</p>
-                      </div>
-                      <BellRing className="h-5 w-5 text-gray-400" />
-                    </div>
+                  <SmsNotificationsSection
+                    smsNotifications={notifications.sms}
+                    onSmsNotificationsChange={handleSmsNotificationsChange}
+                  />
 
-                    <div className="space-y-3">
-                      {Object.entries(notifications.push).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {key === 'transactions' && 'Real-time transaction notifications'}
-                              {key === 'alerts' && 'Important system alerts'}
-                              {key === 'updates' && 'App updates and announcements'}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => setNotifications(prev => ({
-                              ...prev,
-                              push: { ...prev.push, [key]: !value }
-                            }))}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                              value ? 'bg-purple-600' : 'bg-gray-200'
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                value ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <NotificationPreferencesSection
+                    preferences={notificationPreferences}
+                    onPreferencesChange={setNotificationPreferences}
+                  />
 
-                  {/* SMS Notifications */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">SMS Notifications</h2>
-                        <p className="text-sm text-gray-600">Manage text message notifications</p>
-                      </div>
-                      <Smartphone className="h-5 w-5 text-gray-400" />
-                    </div>
+                  <NotificationChannelsSection
+                    channels={notificationChannels}
+                    onChannelToggle={handleChannelToggle}
+                  />
 
-                    <div className="space-y-3">
-                      {Object.entries(notifications.sms).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              {key.toUpperCase()} Notifications
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {key === 'alerts' && 'Critical alerts via SMS'}
-                              {key === 'otp' && 'One-time passwords for authentication'}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => setNotifications(prev => ({
-                              ...prev,
-                              sms: { ...prev.sms, [key]: !value }
-                            }))}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                              value ? 'bg-purple-600' : 'bg-gray-200'
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                value ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Notification Preferences */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Quiet Hours
-                        </label>
-                        <div className="flex space-x-2">
-                          <input
-                            type="time"
-                            defaultValue="22:00"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                          />
-                          <input
-                            type="time"
-                            defaultValue="07:00"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">No notifications during these hours</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Notification Sound
-                        </label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                          <option>Default</option>
-                          <option>Chime</option>
-                          <option>Bell</option>
-                          <option>None</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
+                  <NotificationTestSection
+                    onTestNotification={handleTestNotification}
+                  />
                 </div>
               )}
 
               {/* Billing Settings */}
               {activeTab === 'billing' && (
                 <div className="space-y-8">
-                  {/* Current Plan */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Current Plan</h2>
-                        <p className="text-sm text-gray-600">Manage your subscription and billing</p>
-                      </div>
-                      <CreditCard className="h-5 w-5 text-gray-400" />
-                    </div>
+                  <CurrentPlanSection
+                    plan={billing}
+                    onUpgradePlan={handleUpgradePlan}
+                  />
 
-                    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white">
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between">
-                        <div>
-                          <div className="text-xl font-bold">{billing.plan} Plan</div>
-                          <div className="text-purple-200 mt-1">
-                            {billing.billingCycle === 'monthly' ? 'Monthly' : 'Yearly'} billing
-                          </div>
-                          <div className="flex items-center mt-4">
-                            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              billing.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                            }`}>
-                              {billing.status.replace('_', ' ').toUpperCase()}
-                            </div>
-                            <div className="ml-4 text-sm">
-                              Next billing: {new Date(billing.nextBillingDate).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mt-4 lg:mt-0">
-                          <button className="px-6 py-2 bg-white text-purple-600 font-medium rounded-lg hover:bg-gray-100 transition-colors">
-                            Upgrade Plan
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                  <PaymentMethodSection
+                    paymentMethod={paymentMethod}
+                    onChangePaymentMethod={handleChangePaymentMethod}
+                  />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <div className="text-sm text-gray-600">Monthly Price</div>
-                        <div className="text-2xl font-bold text-gray-900 mt-1">₨ 49,999</div>
-                      </div>
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <div className="text-sm text-gray-600">Users Included</div>
-                        <div className="text-2xl font-bold text-gray-900 mt-1">50</div>
-                      </div>
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <div className="text-sm text-gray-600">Storage</div>
-                        <div className="text-2xl font-bold text-gray-900 mt-1">100 GB</div>
-                      </div>
-                    </div>
-                  </div>
+                  <BillingHistorySection
+                    invoices={invoices}
+                    onViewAll={handleViewAllInvoices}
+                    onDownloadInvoice={handleDownloadInvoice}
+                  />
 
-                  {/* Payment Method */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h3>
-                    <div className="p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="h-10 w-16 bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mr-4">
-                            <CardIcon className="h-6 w-6 text-blue-600" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900">{billing.paymentMethod}</div>
-                            <div className="text-sm text-gray-600">Primary payment method</div>
-                          </div>
-                        </div>
-                        <button className="text-purple-600 hover:text-purple-800 font-medium">
-                          Change
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <UsageMetricsSection
+                    metrics={usageMetrics}
+                  />
 
-                  {/* Billing History */}
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Billing History</h3>
-                      <button className="text-sm text-purple-600 hover:text-purple-800 font-medium">
-                        View All
-                      </button>
-                    </div>
+                  <BillingActionsSection
+                    actions={billingActions}
+                  />
 
-                    <div className="space-y-3">
-                      {[
-                        { date: '2024-01-15', amount: '₨ 49,999', status: 'Paid', invoice: 'INV-001' },
-                        { date: '2023-12-15', amount: '₨ 49,999', status: 'Paid', invoice: 'INV-002' },
-                        { date: '2023-11-15', amount: '₨ 49,999', status: 'Paid', invoice: 'INV-003' },
-                      ].map((invoice, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                          <div>
-                            <div className="font-medium text-gray-900">{invoice.invoice}</div>
-                            <div className="text-sm text-gray-600">{new Date(invoice.date).toLocaleDateString()}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-medium text-gray-900">{invoice.amount}</div>
-                            <div className={`text-sm ${
-                              invoice.status === 'Paid' ? 'text-green-600' : 'text-yellow-600'
-                            }`}>
-                              {invoice.status}
-                            </div>
-                          </div>
-                          <button className="text-purple-600 hover:text-purple-800">
-                            <Download className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Billing Actions */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Billing Actions</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <button className="p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 transition-colors">
-                        <Receipt className="h-5 w-5 text-purple-600 mb-2" />
-                        <div className="font-medium text-gray-900">Update Billing Info</div>
-                        <div className="text-sm text-gray-600 mt-1">Change billing address and details</div>
-                      </button>
-                      <button className="p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 transition-colors">
-                        <FileBarChart className="h-5 w-5 text-purple-600 mb-2" />
-                        <div className="font-medium text-gray-900">Usage Reports</div>
-                        <div className="text-sm text-gray-600 mt-1">View resource usage and costs</div>
-                      </button>
-                    </div>
-                  </div>
+                  <PlanComparisonSection
+                    plans={plans}
+                    features={planFeatures}
+                    onSelectPlan={handleSelectPlan}
+                  />
                 </div>
               )}
 
               {/* Integrations Settings */}
               {activeTab === 'integrations' && (
-                <div className="space-y-8">
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Connected Services</h2>
-                        <p className="text-sm text-gray-600">Manage your third-party integrations</p>
-                      </div>
-                      <button className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Integration
-                      </button>
-                    </div>
-
-                    <div className="space-y-4">
-                      {integrations.map((integration) => (
-                        <div key={integration.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                          <div className="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              {getIntegrationIcon(integration.type)}
-                              <div>
-                                <div className="font-medium text-gray-900">{integration.name}</div>
-                                <div className="text-sm text-gray-600">
-                                  {integration.type.charAt(0).toUpperCase() + integration.type.slice(1)} Integration
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(integration.status)}`}>
-                                {integration.status.toUpperCase()}
-                              </span>
-                              <button
-                                onClick={() => toggleIntegration(integration.id)}
-                                className="text-sm text-gray-600 hover:text-gray-900"
-                              >
-                                {integration.status === 'active' ? 'Disable' : 'Enable'}
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  API Key
-                                </label>
-                                <div className="flex items-center">
-                                  <input
-                                    type={showApiKey ? 'text' : 'password'}
-                                    value={integration.apiKey}
-                                    readOnly
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-l-lg text-sm bg-gray-50 font-mono"
-                                  />
-                                  <button
-                                    onClick={() => setShowApiKey(!showApiKey)}
-                                    className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-lg bg-gray-50 hover:bg-gray-100"
-                                  >
-                                    {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Last Synced
-                                </label>
-                                <div className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50">
-                                  {integration.lastSynced}
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-end space-x-3">
-                              <button
-                                onClick={() => regenerateApiKey(integration.id)}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                              >
-                                Regenerate Key
-                              </button>
-                              <button
-                                onClick={() => navigator.clipboard.writeText(integration.apiKey)}
-                                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
-                              >
-                                Copy Key
-                              </button>
-                              <button className="px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
-                                Remove
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Available Integrations */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Integrations</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {[
-                        { name: 'EasyPaisa', type: 'payment', description: 'Mobile payments integration' },
-                        { name: 'Telenor', type: 'payment', description: 'Mobile banking integration' },
-                        { name: 'FedEx', type: 'shipping', description: 'Shipping and logistics' },
-                        { name: 'DHL', type: 'shipping', description: 'Express shipping services' },
-                        { name: 'Mailchimp', type: 'communication', description: 'Email marketing platform' },
-                        { name: 'Twilio', type: 'communication', description: 'SMS and voice services' },
-                      ].map((service, index) => (
-                        <div key={index} className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 transition-colors">
-                          <div className="flex items-center space-x-3 mb-3">
-                            <div className="h-10 w-10 bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                              <Server className="h-5 w-5 text-gray-600" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{service.name}</div>
-                              <div className="text-xs text-gray-500">{service.type}</div>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-600 mb-3">{service.description}</p>
-                          <button className="w-full px-3 py-2 text-sm font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors">
-                            Connect
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <IntegrationsSection
+                  integrations={integrations}
+                  availableIntegrations={availableIntegrations}
+                  onToggleIntegration={toggleIntegration}
+                  onRegenerateKey={regenerateApiKey}
+                  onRemoveIntegration={removeIntegration}
+                  onAddIntegration={handleAddIntegration}
+                  onConnectIntegration={handleConnectIntegration}
+                />
               )}
 
               {/* Advanced Settings */}
               {activeTab === 'advanced' && (
-                <div className="space-y-8">
-                  {/* Data Management */}
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Data Management</h2>
-                        <p className="text-sm text-gray-600">Manage your data and backups</p>
-                      </div>
-                      <Database className="h-5 w-5 text-gray-400" />
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-gray-900">Auto Backup</div>
-                            <div className="text-sm text-gray-600">Daily automatic backups</div>
-                          </div>
-                          <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-purple-600">
-                            <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6" />
-                          </button>
-                        </div>
-                        <div className="mt-4 text-sm text-gray-500">
-                          Next backup: Today at 02:00 AM
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button className="p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 transition-colors">
-                          <Download className="h-5 w-5 text-purple-600 mb-2" />
-                          <div className="font-medium text-gray-900">Export Data</div>
-                          <div className="text-sm text-gray-600 mt-1">Download all your data</div>
-                        </button>
-
-                        <button className="p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 transition-colors">
-                          <Upload className="h-5 w-5 text-purple-600 mb-2" />
-                          <div className="font-medium text-gray-900">Import Data</div>
-                          <div className="text-sm text-gray-600 mt-1">Upload data from backup</div>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* API Access */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">API Access</h3>
-                    <div className="space-y-4">
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <div className="font-medium text-gray-900">API Access Token</div>
-                            <div className="text-sm text-gray-600">For programmatic access to your data</div>
-                          </div>
-                          <button className="px-4 py-2 text-sm font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50">
-                            Generate New
-                          </button>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="password"
-                            value="sk_live_***************"
-                            readOnly
-                            className="w-full px-3 py-2 border border-gray-300 rounded-l-lg text-sm bg-gray-50 font-mono"
-                          />
-                          <button className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-lg bg-gray-50 hover:bg-gray-100">
-                            <Copy className="h-4 w-4" />
-                          </button>
-                        </div>
-                        <div className="text-xs text-gray-500 mt-2">
-                          This token grants full access to your account. Keep it secure.
-                        </div>
-                      </div>
-
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <div className="font-medium text-gray-900 mb-2">API Usage</div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Requests Today</span>
-                            <span className="font-medium">1,248 / 10,000</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-green-500 h-2 rounded-full" style={{ width: '12.5%' }} />
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            Reset at midnight
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* System Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Dashboard Version</span>
-                          <span className="text-sm font-medium">v2.1.4</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">API Version</span>
-                          <span className="text-sm font-medium">v3.0.1</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Database Version</span>
-                          <span className="text-sm font-medium">PostgreSQL 14.6</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Last Updated</span>
-                          <span className="text-sm font-medium">2024-01-15</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">System Uptime</span>
-                          <span className="text-sm font-medium">99.9%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Danger Zone */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Danger Zone</h3>
-                        <p className="text-sm text-gray-600">Irreversible actions</p>
-                      </div>
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
-                    </div>
-
-                    <div className="space-y-4">
-                      <button
-                        onClick={() => setShowDeleteModal(true)}
-                        className="w-full p-4 border border-red-200 bg-red-50 rounded-lg text-left hover:bg-red-100 transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-red-900">Delete Account</div>
-                            <div className="text-sm text-red-700 mt-1">
-                              Permanently delete your account and all data
-                            </div>
-                          </div>
-                          <ChevronRight className="h-5 w-5 text-red-600" />
-                        </div>
-                      </button>
-
-                      <button className="w-full p-4 border border-yellow-200 bg-yellow-50 rounded-lg text-left hover:bg-yellow-100 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-yellow-900">Reset All Settings</div>
-                            <div className="text-sm text-yellow-700 mt-1">
-                              Reset all settings to factory defaults
-                            </div>
-                          </div>
-                          <ChevronRight className="h-5 w-5 text-yellow-600" />
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <AdvancedSection
+                  // Data Management
+                  autoBackup={autoBackup}
+                  onAutoBackupChange={handleAutoBackupChange}
+                  nextBackup={nextBackup}
+                  onExportData={handleExportData}
+                  onImportData={handleImportData}
+                  
+                  // API Access
+                  apiToken={apiToken}
+                  onGenerateToken={handleGenerateToken}
+                  apiUsage={apiUsage}
+                  
+                  // System Information
+                  systemInfo={systemInfo}
+                  
+                  // Logs
+                  logs={logs}
+                  onSearchLogs={handleSearchLogs}
+                  onDownloadLogs={handleDownloadLogs}
+                  onClearLogs={handleClearLogs}
+                  
+                  // Debug Tools
+                  debugTools={debugTools}
+                  
+                  // Danger Zone
+                  dangerZoneActions={dangerZoneActions}
+                />
               )}
 
               {/* Save Button */}
