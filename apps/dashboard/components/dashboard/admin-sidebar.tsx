@@ -31,8 +31,8 @@ export function AdminSidebar() {
   const { notifications } = useNotification()
 
   const navigationItems = [
-    { name: "Inventory Management", icon: <Package className="h-5 w-5" />, href: "/admin/inventory" },
     { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/admin" },
+    { name: "Inventory Management", icon: <Package className="h-5 w-5" />, href: "/admin/inventory" },
     { name: "Sales", icon: <ShoppingBag className="h-5 w-5" />, href: "/admin/sales" },
     { name: "Customers", icon: <Users className="h-5 w-5" />, href: "/admin/customers" },
     { name: "Staff", icon: <Users className="h-5 w-5" />, href: "/admin/staff" },

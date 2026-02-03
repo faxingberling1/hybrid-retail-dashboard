@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { 
-  Shield, ShoppingCart, CheckCircle, 
+import {
+  Shield, ShoppingCart, CheckCircle,
   Building, User, ArrowRight, Sparkles,
   Database, PlusCircle, Users, Zap,
   Briefcase, Palette, Globe, Lock,
@@ -41,7 +41,7 @@ export default function LoginPage() {
       features: ["System Monitoring", "All Organizations", "User Management", "Database Access"]
     },
     ADMIN: {
-      email: "admin@hybridpos.pk", 
+      email: "admin@hybridpos.pk",
       password: "demo123",
       name: "Store Admin",
       icon: <Building className="h-6 w-6" />,
@@ -61,8 +61,8 @@ export default function LoginPage() {
       gradient: "bg-gradient-to-br from-emerald-500 to-green-500",
       lightColor: "bg-emerald-100",
       textColor: "text-emerald-700",
-      redirect: "/user",
-      features: ["Point of Sale", "Customer Service", "Basic Operations", "Shift Management"]
+      redirect: "/user/inventory",
+      features: ["Inventory Management", "Point of Sale", "Customer Service", "Shift Management"]
     },
     NEW_ACCOUNT: {
       email: "",
@@ -78,7 +78,7 @@ export default function LoginPage() {
     }
   }
 
-  const handleLogin = async (role: "SUPER_ADMIN" | "ADMIN" | "USER") => {
+  const handleLogin = async (role: "SUPER_ADMIN" | "ADMIN" | "USER" | "NEW_ACCOUNT") => {
     if (role === "NEW_ACCOUNT") {
       router.push("/auth/signup")
       return
@@ -150,19 +150,19 @@ export default function LoginPage() {
               <p className="text-sm text-gray-600">Complete Business Management</p>
             </div>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium text-gray-700">Live Database</span>
               <Database className="h-4 w-4 text-blue-500" />
             </div>
-            <button 
-              onClick={() => router.push('/contact')}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            <Link
+              href={'/contact' as any}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium"
             >
               Contact Sales
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -183,7 +183,7 @@ export default function LoginPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-gray-600 mt-4 max-w-2xl">
-                  Everything you need to manage your business in one beautiful dashboard. 
+                  Everything you need to manage your business in one beautiful dashboard.
                   From inventory to analytics, we've got you covered.
                 </p>
               </div>
@@ -215,7 +215,7 @@ export default function LoginPage() {
                 { icon: <Calendar className="h-5 w-5" />, title: "Auto Scheduling", desc: "Smart automation" },
                 { icon: <Target className="h-5 w-5" />, title: "Goal Tracking", desc: "Achieve targets" }
               ].map((feature, idx) => (
-                <div 
+                <div
                   key={idx}
                   className="group bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200 hover:border-blue-200 transition-all duration-300 hover:shadow-lg cursor-pointer"
                 >
@@ -259,11 +259,10 @@ export default function LoginPage() {
                       onMouseEnter={() => setHoveredRole(role)}
                       onMouseLeave={() => setHoveredRole(null)}
                       onClick={() => handleLogin(role)}
-                      className={`group relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:-translate-y-1 ${
-                        selectedRole === role
-                          ? `${cred.color} border-transparent`
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
-                      } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`group relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer transform hover:-translate-y-1 ${selectedRole === role
+                        ? `${cred.color} border-transparent`
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {/* Hover Gradient Overlay */}
                       {hoveredRole === role && selectedRole !== role && (
@@ -272,30 +271,27 @@ export default function LoginPage() {
 
                       <div className="relative flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className={`p-3 rounded-xl transition-all duration-300 ${
-                            selectedRole === role
-                              ? 'bg-white/20 backdrop-blur-sm'
-                              : `${cred.lightColor} group-hover:scale-110`
-                          }`}>
+                          <div className={`p-3 rounded-xl transition-all duration-300 ${selectedRole === role
+                            ? 'bg-white/20 backdrop-blur-sm'
+                            : `${cred.lightColor} group-hover:scale-110`
+                            }`}>
                             <div className={selectedRole === role ? 'text-white' : cred.textColor}>
                               {cred.icon}
                             </div>
                           </div>
                           <div>
-                            <h3 className={`font-bold text-lg ${
-                              selectedRole === role ? 'text-white' : 'text-gray-900'
-                            }`}>
+                            <h3 className={`font-bold text-lg ${selectedRole === role ? 'text-white' : 'text-gray-900'
+                              }`}>
                               {cred.name}
                             </h3>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {cred.features.map((feature, idx) => (
                                 <span
                                   key={idx}
-                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    selectedRole === role
-                                      ? 'bg-white/30 text-white/90'
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${selectedRole === role
+                                    ? 'bg-white/30 text-white/90'
+                                    : 'bg-gray-100 text-gray-700'
+                                    }`}
                                 >
                                   {feature}
                                 </span>
@@ -303,21 +299,18 @@ export default function LoginPage() {
                             </div>
                           </div>
                         </div>
-                        
-                        <div className={`transition-all duration-300 ${
-                          selectedRole === role ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}>
+
+                        <div className={`transition-all duration-300 ${selectedRole === role ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                          }`}>
                           {selectedRole === role && isLoading ? (
                             <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
                           ) : (
-                            <div className={`p-2 rounded-lg ${
-                              selectedRole === role
-                                ? 'bg-white/20'
-                                : 'bg-gray-100 group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-cyan-500'
-                            }`}>
-                              <ArrowRight className={`h-5 w-5 transition-transform group-hover:translate-x-1 ${
-                                selectedRole === role ? 'text-white' : 'text-gray-600 group-hover:text-white'
-                              }`} />
+                            <div className={`p-2 rounded-lg ${selectedRole === role
+                              ? 'bg-white/20'
+                              : 'bg-gray-100 group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-cyan-500'
+                              }`}>
+                              <ArrowRight className={`h-5 w-5 transition-transform group-hover:translate-x-1 ${selectedRole === role ? 'text-white' : 'text-gray-600 group-hover:text-white'
+                                }`} />
                             </div>
                           )}
                         </div>
@@ -361,9 +354,9 @@ export default function LoginPage() {
             <div className="relative overflow-hidden group">
               {/* Animated Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 animate-gradient-x"></div>
-              
+
               {/* Content */}
-              <div 
+              <div
                 onClick={() => router.push('/auth/signup')}
                 className="relative bg-white/90 backdrop-blur-sm rounded-2xl border border-amber-200 p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
               >
@@ -413,7 +406,7 @@ export default function LoginPage() {
                       <span className="font-bold text-gray-900 ml-1">14 days</span>
                     </div>
                   </div>
-                  
+
                   <button className="group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
                     <span>Get Started Free</span>
                     <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -472,20 +465,20 @@ export default function LoginPage() {
                 Secure, scalable, and reliable database infrastructure
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-6">
-              <button className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+              <Link href="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
                 Privacy Policy
-              </button>
-              <button className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+              </Link>
+              <Link href="/terms" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
                 Terms of Service
-              </button>
-              <button className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+              </Link>
+              <Link href="/help" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
                 Help Center
-              </button>
+              </Link>
             </div>
           </div>
-          
+
           <div className="text-center mt-8">
             <p className="text-xs text-gray-500">
               © {new Date().getFullYear()} HybridPOS. All rights reserved.
