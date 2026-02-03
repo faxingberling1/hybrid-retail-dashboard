@@ -18,25 +18,29 @@ import {
   Store,
   CreditCard,
   Calendar,
-  Truck
+  Truck,
+  LifeBuoy
 } from "lucide-react"
 import { signOut } from "next-auth/react"
+import { useNotification } from "@/lib/hooks/use-notification"
 
 export function AdminSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { notifications } = useNotification()
 
   const navigationItems = [
+    { name: "Inventory Management", icon: <Package className="h-5 w-5" />, href: "/admin/inventory" },
     { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/admin" },
     { name: "Sales", icon: <ShoppingBag className="h-5 w-5" />, href: "/admin/sales" },
-    { name: "Inventory", icon: <Package className="h-5 w-5" />, href: "/admin/inventory" },
     { name: "Customers", icon: <Users className="h-5 w-5" />, href: "/admin/customers" },
     { name: "Staff", icon: <Users className="h-5 w-5" />, href: "/admin/staff" },
     { name: "Reports", icon: <BarChart3 className="h-5 w-5" />, href: "/admin/reports" },
     { name: "Transactions", icon: <CreditCard className="h-5 w-5" />, href: "/admin/transactions" },
     { name: "Suppliers", icon: <Truck className="h-5 w-5" />, href: "/admin/suppliers" },
     { name: "Schedule", icon: <Calendar className="h-5 w-5" />, href: "/admin/schedule" },
+    { name: "Support", icon: <LifeBuoy className="h-5 w-5" />, href: "/admin/support" },
     { name: "Store Settings", icon: <Settings className="h-5 w-5" />, href: "/admin/settings" },
   ]
 
@@ -87,10 +91,12 @@ export function AdminSidebar() {
           <ul className="space-y-1.5">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href
+              const hasSupportNotification = item.name === "Support" && notifications.some((n: any) => !n.read && (n.actionUrl?.includes('support') || n.title.toLowerCase().includes('ticket')));
+
               return (
                 <li key={item.name}>
                   <Link
-                    href={item.href}
+                    href={item.href as any}
                     className={`
                       group flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 font-medium text-sm
                       ${isActive
@@ -104,6 +110,9 @@ export function AdminSidebar() {
                       {item.icon}
                     </span>
                     <span>{item.name}</span>
+                    {hasSupportNotification && !isActive && (
+                      <div className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse ring-4 ring-red-500/20 shadow-lg shadow-red-500/40" />
+                    )}
                     {isActive && (
                       <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                     )}

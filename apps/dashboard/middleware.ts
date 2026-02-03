@@ -223,7 +223,9 @@ export async function middleware(request: NextRequest) {
       '/billing',
       '/billing',
       '/api/tickets',
-      '/api/notifications'
+      '/api/notifications',
+      '/api/inventory',
+      '/api/sales'
     ]
 
     const isAllowed = allowedPaths.some(path =>
@@ -256,7 +258,9 @@ export async function middleware(request: NextRequest) {
       '/profile',
       '/profile',
       '/api/tickets',
-      '/api/notifications'
+      '/api/notifications',
+      '/api/inventory',
+      '/api/sales'
     ]
 
     const isAllowed = allowedPaths.some(path =>
@@ -287,7 +291,9 @@ export async function middleware(request: NextRequest) {
       '/profile',
       '/profile',
       '/api/tickets',
-      '/api/notifications'
+      '/api/notifications',
+      '/api/inventory',
+      '/api/sales'
     ]
 
     const isAllowed = allowedPaths.some(path =>

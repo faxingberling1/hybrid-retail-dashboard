@@ -11,6 +11,10 @@ import {
 import { useSession } from "next-auth/react"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
+import { useNotification } from "@/lib/hooks/use-notification"
+import { Smile } from "lucide-react"
+
+const EMOJIS = ["😊", "👍", "👋", "🚀", "💡", "🛠️", "⚠️", "✅", "🙌", "🙏", "🔥", "✨"]
 
 interface Ticket {
     id: string
@@ -47,6 +51,8 @@ export default function UserSupportPage() {
     const [newReply, setNewReply] = useState("")
     const [isCreating, setIsCreating] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+    const { notifications, refresh: refreshNotifications } = useNotification()
 
     // Form state
     const [subject, setSubject] = useState("")
@@ -62,7 +68,12 @@ export default function UserSupportPage() {
         try {
             const res = await fetch('/api/tickets')
             const data = await res.json()
-            setTickets(data)
+            if (Array.isArray(data)) {
+                setTickets(data)
+            } else {
+                console.error("Tickets response is not an array:", data)
+                setTickets([])
+            }
         } catch (error) {
             toast.error("Failed to load tickets")
         } finally {
@@ -74,8 +85,29 @@ export default function UserSupportPage() {
         try {
             const res = await fetch(`/api/tickets/${id}`)
             const data = await res.json()
-            setSelectedTicket(data)
-            setReplies(data.replies || [])
+            if (data && data.id) {
+                setSelectedTicket(data)
+                setReplies(data.replies || [])
+
+                // Mark related notifications as read
+                const supportNotifications = notifications.filter(n =>
+                    !n.read &&
+                    n.metadata?.ticket_id === id
+                )
+
+                if (supportNotifications.length > 0) {
+                    await Promise.all(supportNotifications.map(n =>
+                        fetch('/api/notifications/read', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ notificationId: n.id })
+                        })
+                    ))
+                    refreshNotifications()
+                }
+            } else {
+                toast.error("Ticket not found")
+            }
         } catch (error) {
             toast.error("Failed to load ticket details")
         }
@@ -146,7 +178,7 @@ export default function UserSupportPage() {
         }
     }
 
-    const filteredTickets = tickets.filter(t =>
+    const filteredTickets = (Array.isArray(tickets) ? tickets : []).filter(t =>
         t.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.id.includes(searchQuery)
     )
@@ -236,33 +268,42 @@ export default function UserSupportPage() {
                                     <p className="text-xs text-gray-400 mt-2 font-medium px-8 leading-relaxed">Your support requests will appear here once initiated.</p>
                                 </div>
                             ) : (
-                                filteredTickets.map((ticket) => (
-                                    <button
-                                        key={ticket.id}
-                                        onClick={() => fetchTicketDetails(ticket.id)}
-                                        className={`w-full p-6 text-left hover:bg-gray-50/50 transition-all group relative border-l-[6px] ${selectedTicket?.id === ticket.id ? 'bg-green-50/30 border-green-600 scale-[0.98] rounded-2xl' : 'border-transparent'}`}
-                                    >
-                                        <div className="flex justify-between items-start mb-3">
-                                            <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${getStatusColor(ticket.status)}`}>
-                                                {ticket.status}
-                                            </span>
-                                            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
-                                                {formatDistanceToNow(new Date(ticket.created_at), { addSuffix: false })} ago
-                                            </span>
-                                        </div>
-                                        <h3 className="font-black text-gray-900 group-hover:text-green-700 transition-colors line-clamp-1 uppercase tracking-tight text-sm mb-3">{ticket.subject}</h3>
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                                <Clock className="h-3 w-3 mr-1.5 opacity-50" />
-                                                {ticket.category.replace('_', ' ')}
+                                filteredTickets.map((ticket) => {
+                                    const isUnread = notifications.some(n => !n.read && n.metadata?.ticket_id === ticket.id);
+                                    return (
+                                        <button
+                                            key={ticket.id}
+                                            onClick={() => fetchTicketDetails(ticket.id)}
+                                            className={`w-full p-6 text-left hover:bg-gray-50/50 transition-all group relative border-l-[6px] ${selectedTicket?.id === ticket.id ? 'bg-green-50/30 border-green-600 scale-[0.98] rounded-2xl' : 'border-transparent'} ${isUnread ? 'bg-blue-50/20' : ''}`}
+                                        >
+                                            {isUnread && (
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                                                    <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">New Message</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-start mb-3">
+                                                <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${getStatusColor(ticket.status || 'OPEN')}`}>
+                                                    {ticket.status || 'OPEN'}
+                                                </span>
+                                                <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                                                    {formatDistanceToNow(new Date(ticket.updated_at), { addSuffix: false })} ago
+                                                </span>
                                             </div>
-                                            <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${getPriorityColor(ticket.priority)}`}>
-                                                <div className="h-1.5 w-1.5 rounded-full bg-current mr-1.5 animate-pulse"></div>
-                                                {ticket.priority}
+                                            <h3 className="font-black text-gray-900 group-hover:text-green-700 transition-colors line-clamp-1 uppercase tracking-tight text-sm mb-3 pr-20">{ticket.subject}</h3>
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                                    <Clock className="h-3 w-3 mr-1.5 opacity-50" />
+                                                    {ticket.category.replace('_', ' ')}
+                                                </div>
+                                                <div className={`flex items-center text-[10px] font-black uppercase tracking-widest ${getPriorityColor(ticket.priority)}`}>
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-current mr-1.5 animate-pulse"></div>
+                                                    {ticket.priority}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </button>
-                                ))
+                                        </button>
+                                    )
+                                })
                             )}
                         </div>
                     </div>
@@ -288,6 +329,7 @@ export default function UserSupportPage() {
                                 initial={{ opacity: 0, scale: 0.98 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="flex flex-col h-full"
+                                {...({} as any)}
                             >
                                 {/* Active Header */}
                                 <div className="p-6 lg:p-8 border-b border-gray-50 bg-white">
@@ -301,12 +343,12 @@ export default function UserSupportPage() {
                                         <div className="flex-1">
                                             <div className="flex items-center gap-4 mb-2">
                                                 <h2 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">{selectedTicket.subject}</h2>
-                                                <span className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] ${getStatusColor(selectedTicket.status)}`}>
-                                                    {selectedTicket.status}
+                                                <span className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] ${getStatusColor(selectedTicket.status || 'OPEN')}`}>
+                                                    {selectedTicket.status || 'OPEN'}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <p className="text-[10px] text-gray-400 font-black tracking-[0.1em] uppercase opacity-60">Signature: {selectedTicket.id.split('-')[0].toUpperCase()}</p>
+                                                <p className="text-[10px] text-gray-400 font-black tracking-[0.1em] uppercase opacity-60">Signature: {selectedTicket.id?.split('-')[0].toUpperCase() || 'N/A'}</p>
                                                 <div className="h-1 w-1 bg-gray-200 rounded-full"></div>
                                                 <span className={`text-[10px] font-black uppercase tracking-widest ${getPriorityColor(selectedTicket.priority)}`}>
                                                     {selectedTicket.priority} Priority Tier
@@ -367,7 +409,39 @@ export default function UserSupportPage() {
                                                 value={newReply}
                                                 onChange={(e) => setNewReply(e.target.value)}
                                             />
-                                            <div className="absolute bottom-5 right-5 flex items-center gap-3">
+                                            <div className="bottom-5 right-5 flex items-center gap-2">
+                                                <div className="relative">
+                                                    <AnimatePresence>
+                                                        {showEmojiPicker && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                className="absolute bottom-full right-0 mb-4 p-3 bg-white rounded-2xl shadow-2xl border border-gray-100 flex gap-2 z-50 overflow-hidden min-w-[300px] flex-wrap justify-center backdrop-blur-xl bg-white/90"
+                                                                {...({} as any)}
+                                                            >
+                                                                {EMOJIS.map(emoji => (
+                                                                    <button
+                                                                        key={emoji}
+                                                                        onClick={() => {
+                                                                            setNewReply(prev => prev + emoji)
+                                                                            setShowEmojiPicker(false)
+                                                                        }}
+                                                                        className="p-2 hover:bg-gray-100 rounded-xl transition-all text-xl hover:scale-125 active:scale-95"
+                                                                    >
+                                                                        {emoji}
+                                                                    </button>
+                                                                ))}
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                    <button
+                                                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                                        className={`p-4 rounded-2xl transition-all shadow-sm hover:shadow-md ${showEmojiPicker ? 'bg-green-600 text-white shadow-green-500/20' : 'bg-white border border-gray-100 text-gray-400 hover:text-green-600'}`}
+                                                    >
+                                                        <Smile className="h-5 w-5" />
+                                                    </button>
+                                                </div>
                                                 <button className="p-4 bg-white border border-gray-100 text-gray-400 hover:text-green-600 rounded-2xl transition-all shadow-sm hover:shadow-md">
                                                     <Paperclip className="h-5 w-5" />
                                                 </button>
@@ -398,6 +472,7 @@ export default function UserSupportPage() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 30 }}
                             className="bg-white w-full max-w-2xl rounded-[48px] shadow-2xl overflow-hidden border border-white/20"
+                            {...({} as any)}
                         >
                             <div className="px-10 py-8 bg-gradient-to-r from-green-900 to-emerald-900 text-white flex items-center justify-between">
                                 <div>
@@ -492,6 +567,6 @@ export default function UserSupportPage() {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     )
 }

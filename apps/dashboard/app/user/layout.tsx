@@ -31,11 +31,14 @@ export default function UserLayout({
     if (status === "authenticated" && session.user) {
       console.log("✅ User Layout - User authenticated:", session.user.email)
 
-      if (session.user.role !== "USER") {
-        console.log("⛔ User Layout - Wrong role, redirecting")
+      const allowedRoles = ["USER", "ADMIN", "MANAGER", "SUPER_ADMIN", "SUPERADMIN"]
+      const userRole = session.user.role?.toUpperCase()
+
+      if (!allowedRoles.includes(userRole)) {
+        console.log("⛔ User Layout - Forbidden role:", userRole)
         router.push("/unauthorized")
       } else {
-        console.log("✅ User Layout - Role verified")
+        console.log("✅ User Layout - Role verified:", userRole)
         setLoading(false)
       }
     }
@@ -52,11 +55,10 @@ export default function UserLayout({
     )
   }
 
-  if (status === "unauthenticated" || !session) {
-    return null
-  }
+  const userRole = session?.user?.role?.toUpperCase()
+  const isAllowed = ["USER", "ADMIN", "MANAGER", "SUPER_ADMIN", "SUPERADMIN"].includes(userRole || "")
 
-  if (session.user?.role !== "USER") {
+  if (!isAllowed) {
     return null
   }
 

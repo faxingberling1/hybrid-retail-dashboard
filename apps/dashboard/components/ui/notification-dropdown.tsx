@@ -116,11 +116,13 @@ export function NotificationDropdown({ notifications, onClose }: NotificationDro
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className="absolute right-0 mt-3 w-[420px] bg-white rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 z-50 overflow-hidden flex flex-col max-h-[85vh]"
+      {...({
+        initial: { opacity: 0, y: 10, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 10, scale: 0.95 },
+        transition: { duration: 0.2 },
+        className: "absolute right-0 mt-3 w-[420px] bg-white rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 z-50 overflow-hidden flex flex-col max-h-[85vh]"
+      } as any)}
     >
       {/* Header */}
       <div className="p-5 border-b border-gray-100 bg-white sticky top-0 z-10">
@@ -192,13 +194,14 @@ export function NotificationDropdown({ notifications, onClose }: NotificationDro
                     const Icon = typeIcons[notification.type];
                     return (
                       <motion.div
-                        key={notification.id}
-                        layout
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className={`group relative p-5 transition-all hover:bg-gray-50/50 ${!notification.read ? 'bg-blue-50/10' : ''
-                          }`}
+                        {...({
+                          key: notification.id,
+                          layout: true,
+                          initial: { opacity: 0 },
+                          animate: { opacity: 1 },
+                          exit: { opacity: 0 },
+                          className: `group relative p-5 transition-all hover:bg-gray-50/50 ${!notification.read ? 'bg-blue-50/10' : ''}`
+                        } as any)}
                       >
                         {!notification.read && (
                           <div className="absolute left-0 top-6 w-1 h-8 bg-blue-500 rounded-r-full" />
@@ -226,7 +229,7 @@ export function NotificationDropdown({ notifications, onClose }: NotificationDro
                             <div className="flex items-center gap-3">
                               {notification.actionUrl && (
                                 <Link
-                                  href={notification.actionUrl as string}
+                                  href={(notification.actionUrl || "#") as any}
                                   onClick={onClose}
                                   className="text-[10px] font-black uppercase tracking-wider text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
                                 >

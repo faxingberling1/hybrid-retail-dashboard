@@ -31,11 +31,14 @@ export default function AdminLayout({
     if (status === "authenticated" && session.user) {
       console.log("✅ Admin Layout - User authenticated:", session.user.email)
 
-      if (session.user.role !== "ADMIN") {
-        console.log("⛔ Admin Layout - Wrong role, redirecting")
+      const allowedRoles = ["ADMIN", "SUPER_ADMIN", "SUPERADMIN"]
+      const userRole = session.user.role?.toUpperCase()
+
+      if (!allowedRoles.includes(userRole)) {
+        console.log("⛔ Admin Layout - Forbidden role:", userRole)
         router.push("/unauthorized")
       } else {
-        console.log("✅ Admin Layout - Role verified")
+        console.log("✅ Admin Layout - Role verified:", userRole)
         setLoading(false)
       }
     }
@@ -52,11 +55,10 @@ export default function AdminLayout({
     )
   }
 
-  if (status === "unauthenticated" || !session) {
-    return null
-  }
+  const userRole = session?.user?.role?.toUpperCase()
+  const isAllowed = ["ADMIN", "SUPER_ADMIN", "SUPERADMIN"].includes(userRole || "")
 
-  if (session.user?.role !== "ADMIN") {
+  if (!isAllowed) {
     return null
   }
 

@@ -17,14 +17,17 @@ import {
   Shield,
   Server,
   Database,
-  Globe
+  Globe,
+  LifeBuoy
 } from "lucide-react"
 import { signOut } from "next-auth/react"
+import { useNotification } from "@/lib/hooks/use-notification"
 
 export function SuperAdminSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { notifications } = useNotification()
 
   const navigationItems = [
     { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/super-admin" },
@@ -35,6 +38,7 @@ export function SuperAdminSidebar() {
     { name: "Database", icon: <Database className="h-5 w-5" />, href: "/super-admin/database" },
     { name: "Billing", icon: <Wallet className="h-5 w-5" />, href: "/super-admin/billing" },
     { name: "Audit Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
+    { name: "Support Hub", icon: <LifeBuoy className="h-5 w-5" />, href: "/super-admin/support" },
     { name: "Global Settings", icon: <Settings className="h-5 w-5" />, href: "/super-admin/settings" },
   ]
 
@@ -85,10 +89,12 @@ export function SuperAdminSidebar() {
           <ul className="space-y-1.5">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href
+              const hasSupportNotification = item.name === "Support Hub" && notifications.some((n: any) => !n.read && (n.actionUrl?.includes('support') || n.title.toLowerCase().includes('ticket')));
+
               return (
                 <li key={item.name}>
                   <Link
-                    href={item.href}
+                    href={item.href as any}
                     className={`
                       group flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 font-medium text-sm
                       ${isActive
@@ -102,6 +108,9 @@ export function SuperAdminSidebar() {
                       {item.icon}
                     </span>
                     <span>{item.name}</span>
+                    {hasSupportNotification && !isActive && (
+                      <div className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse ring-4 ring-red-500/20 shadow-lg shadow-red-500/40" />
+                    )}
                     {isActive && (
                       <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                     )}

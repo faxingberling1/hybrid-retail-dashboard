@@ -60,6 +60,12 @@ export async function POST(
             }
         });
 
+        // Always update parent ticket's updated_at for sorting
+        await (prisma as any).ticket.update({
+            where: { id: params.id },
+            data: { updated_at: new Date() }
+        });
+
         // Automatically update ticket status if super admin replies
         if (session.user.role === 'SUPER_ADMIN' || session.user.role === 'SUPERADMIN') {
             await (prisma as any).ticket.update({
@@ -77,7 +83,7 @@ export async function POST(
                     if (userRole === 'ADMIN') {
                         actionUrl = '/admin/support';
                     } else if (userRole === 'MANAGER') {
-                        actionUrl = '/manager/support';
+                        actionUrl = '/user/support';
                     }
 
                     await (prisma as any).notifications.create({
@@ -95,6 +101,33 @@ export async function POST(
                 } catch (notifyError) {
                     console.error('Failed to notify user about reply:', notifyError);
                 }
+            }
+        } else {
+            // User replied, notify Super Admins
+            try {
+                const superAdmins = await (prisma as any).user.findMany({
+                    where: { role: 'SUPER_ADMIN' },
+                    select: { id: true }
+                });
+
+                if (superAdmins.length > 0) {
+                    const notifications = superAdmins.map((admin: any) => ({
+                        user_id: admin.id,
+                        title: 'New Reply in Ticket',
+                        message: `${session.user.name || session.user.email} replied to "${ticket.subject}".`,
+                        type: 'info',
+                        priority: 'low',
+                        action_url: `/super-admin/support?ticketId=${ticket.id}`,
+                        action_label: 'View Reply',
+                        metadata: { ticket_id: ticket.id, reply_id: reply.id }
+                    }));
+
+                    await (prisma as any).notifications.createMany({
+                        data: notifications
+                    });
+                }
+            } catch (notifyError) {
+                console.error('Failed to notify super admins about reply:', notifyError);
             }
         }
 

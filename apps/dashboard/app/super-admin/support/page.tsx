@@ -10,8 +10,13 @@ import {
     Calendar, User as UserIcon, Building2
 } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { formatDistanceToNow } from "date-fns"
+import { useSearchParams } from "next/navigation"
+import { formatDistanceToNow, isSameDay } from "date-fns"
 import { toast } from "sonner"
+import { useNotification } from "@/lib/hooks/use-notification"
+import { Smile } from "lucide-react"
+
+const EMOJIS = ["😊", "👍", "👋", "🚀", "💡", "🛠️", "⚠️", "✅", "🙌", "🙏", "🔥", "✨"]
 
 interface Ticket {
     id: string
@@ -27,6 +32,12 @@ interface Ticket {
         id: string
         name: string
         email: string
+        organization?: {
+            id: string
+            name: string
+            plan: string
+            status?: string
+        }
     }
     _count?: {
         replies: number
@@ -53,16 +64,34 @@ export default function SuperAdminSupportPage() {
     const [newReply, setNewReply] = useState("")
     const [searchQuery, setSearchQuery] = useState("")
     const [statusFilter, setStatusFilter] = useState("ALL")
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+    const { notifications, refresh: refreshNotifications } = useNotification()
+    const searchParams = useSearchParams()
+    const ticketIdParam = searchParams.get('ticketId')
 
     useEffect(() => {
         fetchTickets()
     }, [])
 
+    useEffect(() => {
+        if (ticketIdParam && tickets.length > 0) {
+            const ticket = tickets.find(t => t.id === ticketIdParam)
+            if (ticket) {
+                fetchTicketDetails(ticketIdParam)
+            }
+        }
+    }, [ticketIdParam, tickets.length])
+
     const fetchTickets = async () => {
         try {
             const res = await fetch('/api/tickets')
             const data = await res.json()
-            setTickets(data)
+            if (Array.isArray(data)) {
+                setTickets(data)
+            } else {
+                console.error("Tickets response is not an array:", data)
+                setTickets([])
+            }
         } catch (error) {
             toast.error("Failed to load tickets")
         } finally {
@@ -74,8 +103,29 @@ export default function SuperAdminSupportPage() {
         try {
             const res = await fetch(`/api/tickets/${id}`)
             const data = await res.json()
-            setSelectedTicket(data)
-            setReplies(data.replies || [])
+            if (data && data.id) {
+                setSelectedTicket(data)
+                setReplies(data.replies || [])
+
+                // Mark related notifications as read
+                const supportNotifications = notifications.filter(n =>
+                    !n.read &&
+                    n.metadata?.ticket_id === id
+                )
+
+                if (supportNotifications.length > 0) {
+                    await Promise.all(supportNotifications.map(n =>
+                        fetch('/api/notifications/read', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ notificationId: n.id })
+                        })
+                    ))
+                    refreshNotifications()
+                }
+            } else {
+                toast.error("Ticket not found")
+            }
         } catch (error) {
             toast.error("Failed to load ticket details")
         }
@@ -166,19 +216,22 @@ export default function SuperAdminSupportPage() {
         }
     }
 
-    const filteredTickets = tickets.filter(t => {
+    const filteredTickets = (Array.isArray(tickets) ? tickets : []).filter(t => {
         const matchesSearch = t.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
             t.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             t.id.includes(searchQuery)
-        const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter
+        const currentStatus = t.status || 'OPEN'
+        const matchesStatus = statusFilter === 'ALL' || currentStatus === statusFilter
         return matchesSearch && matchesStatus
     })
 
     const stats = {
         total: tickets.length,
-        open: tickets.filter(t => t.status === 'OPEN').length,
+        open: tickets.filter(t => (t.status || 'OPEN') === 'OPEN').length,
         pending: tickets.filter(t => t.status === 'IN_PROGRESS').length,
-        resolved: tickets.filter(t => t.status === 'RESOLVED').length
+        resolved: tickets.filter(t => t.status === 'RESOLVED').length,
+        resolvedToday: tickets.filter(t => t.status === 'RESOLVED' && t.updated_at && isSameDay(new Date(t.updated_at), new Date())).length,
+        rate: tickets.length > 0 ? Math.round((tickets.filter(t => t.status === 'RESOLVED').length / tickets.length) * 100) : 0
     }
 
     return (
@@ -208,13 +261,16 @@ export default function SuperAdminSupportPage() {
                         </div>
                         <div className="relative">
                             <div className="h-14 w-14 rounded-full border-4 border-gray-50 flex items-center justify-center relative overflow-hidden group">
-                                <div className="absolute inset-0 bg-green-500 scale-x-[0.8] origin-left transition-transform duration-1000"></div>
-                                <div className="relative z-10 text-[10px] font-black text-gray-900">82%</div>
+                                <div
+                                    className="absolute inset-0 bg-green-500 origin-left transition-transform duration-1000"
+                                    style={{ transform: `scaleX(${stats.rate / 100})` }}
+                                ></div>
+                                <div className="relative z-10 text-[10px] font-black text-gray-900">{stats.rate}%</div>
                             </div>
                         </div>
                         <div>
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Resolved Today</p>
-                            <p className="text-3xl font-black text-green-600 tracking-tighter">{stats.resolved}</p>
+                            <p className="text-3xl font-black text-green-600 tracking-tighter">{stats.resolvedToday}</p>
                         </div>
                     </div>
                 </div>
@@ -263,37 +319,45 @@ export default function SuperAdminSupportPage() {
                                     <h3 className="font-black text-gray-200 uppercase tracking-widest text-xs">No Signal Detected</h3>
                                 </div>
                             ) : (
-                                filteredTickets.map((ticket) => (
-                                    <button
-                                        key={ticket.id}
-                                        onClick={() => fetchTicketDetails(ticket.id)}
-                                        className={`w-full p-6 text-left hover:bg-gray-50/80 transition-all group relative border-l-4 ${selectedTicket?.id === ticket.id ? 'bg-purple-50/20 border-purple-600' : 'border-transparent'}`}
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="flex items-center gap-2">
-                                                <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${getStatusColor(ticket.status)}`}>
-                                                    {ticket.status}
-                                                </span>
-                                                {ticket.priority === 'URGENT' && (
-                                                    <div className="h-1.5 w-1.5 rounded-full bg-red-600 animate-pulse shadow-sm shadow-red-500"></div>
-                                                )}
-                                            </div>
-                                            <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest opacity-60">
-                                                {formatDistanceToNow(new Date(ticket.created_at), { addSuffix: false })}
-                                            </span>
-                                        </div>
-                                        <h3 className="font-black text-gray-900 truncate group-hover:text-purple-700 transition-colors uppercase tracking-tight text-sm mb-2">{ticket.subject}</h3>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                                                <div className="h-5 w-5 rounded-lg bg-gray-900 flex items-center justify-center text-[9px] font-black text-white">
-                                                    {(ticket.user?.name || ticket.user?.email || 'U')[0].toUpperCase()}
+                                filteredTickets.map((ticket) => {
+                                    const isUnread = notifications.some(n => !n.read && n.metadata?.ticket_id === ticket.id);
+                                    return (
+                                        <button
+                                            key={ticket.id}
+                                            onClick={() => fetchTicketDetails(ticket.id)}
+                                            className={`w-full p-6 text-left hover:bg-gray-50/80 transition-all group relative border-l-4 ${selectedTicket?.id === ticket.id ? 'bg-purple-50/20 border-purple-600' : 'border-transparent'} ${isUnread ? 'bg-blue-50/10' : ''}`}
+                                        >
+                                            {isUnread && (
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
                                                 </div>
-                                                <span className="text-[10px] font-bold text-gray-500">{(ticket.user?.name || ticket.user?.email || 'Unknown').split(' ')[0]}</span>
+                                            )}
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${getStatusColor(ticket.status || 'OPEN')}`}>
+                                                        {ticket.status || 'OPEN'}
+                                                    </span>
+                                                    {ticket.priority === 'URGENT' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-red-600 animate-pulse shadow-sm shadow-red-500"></div>
+                                                    )}
+                                                </div>
+                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest opacity-60">
+                                                    {formatDistanceToNow(new Date(ticket.updated_at), { addSuffix: false })}
+                                                </span>
                                             </div>
-                                            <ChevronRight className={`h-3 w-3 text-gray-300 transition-transform ${selectedTicket?.id === ticket.id ? 'translate-x-1 text-purple-600' : ''}`} />
-                                        </div>
-                                    </button>
-                                ))
+                                            <h3 className="font-black text-gray-900 truncate group-hover:text-purple-700 transition-colors uppercase tracking-tight text-sm mb-2 pr-4">{ticket.subject}</h3>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                                    <div className="h-5 w-5 rounded-lg bg-gray-900 flex items-center justify-center text-[9px] font-black text-white">
+                                                        {(ticket.user?.name || ticket.user?.email || 'U')[0].toUpperCase()}
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-gray-500">{(ticket.user?.name || ticket.user?.email || 'Unknown').split(' ')[0]}</span>
+                                                </div>
+                                                <ChevronRight className={`h-3 w-3 text-gray-300 transition-transform ${selectedTicket?.id === ticket.id ? 'translate-x-1 text-purple-600' : ''}`} />
+                                            </div>
+                                        </button>
+                                    )
+                                })
                             )}
                         </div>
                     </div>
@@ -319,6 +383,7 @@ export default function SuperAdminSupportPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="flex flex-col h-full bg-white"
+                                {...({} as any)}
                             >
                                 {/* Header */}
                                 <div className="px-8 py-6 border-b border-gray-50 bg-white/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between">
@@ -336,7 +401,7 @@ export default function SuperAdminSupportPage() {
                                                     {selectedTicket.status}
                                                 </span>
                                                 <div className="h-1 w-1 bg-gray-200 rounded-full"></div>
-                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-60">ID: {selectedTicket.id.split('-')[0]}</span>
+                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-60">ID: {selectedTicket.id?.split('-')[0] || 'N/A'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -407,6 +472,38 @@ export default function SuperAdminSupportPage() {
                                             onChange={(e) => setNewReply(e.target.value)}
                                         />
                                         <div className="absolute bottom-5 right-5 flex items-center gap-4">
+                                            <div className="relative">
+                                                <AnimatePresence>
+                                                    {showEmojiPicker && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                            className="absolute bottom-full right-0 mb-4 p-3 bg-white rounded-2xl shadow-2xl border border-gray-100 flex gap-2 z-50 overflow-hidden min-w-[300px] flex-wrap justify-center backdrop-blur-xl bg-white/90"
+                                                            {...({} as any)}
+                                                        >
+                                                            {EMOJIS.map(emoji => (
+                                                                <button
+                                                                    key={emoji}
+                                                                    onClick={() => {
+                                                                        setNewReply(prev => prev + emoji)
+                                                                        setShowEmojiPicker(false)
+                                                                    }}
+                                                                    className="p-2 hover:bg-gray-100 rounded-xl transition-all text-xl hover:scale-125 active:scale-95"
+                                                                >
+                                                                    {emoji}
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                                <button
+                                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                                    className={`p-4 rounded-2xl transition-all shadow-sm hover:shadow-md ${showEmojiPicker ? 'bg-purple-600 text-white shadow-purple-500/20' : 'bg-white border border-gray-100 text-gray-400 hover:text-purple-600'}`}
+                                                >
+                                                    <Smile className="h-5 w-5" />
+                                                </button>
+                                            </div>
                                             <button className="p-4 bg-white border border-gray-100 text-gray-400 hover:text-purple-600 rounded-2xl transition-all shadow-sm hover:shadow-md">
                                                 <Paperclip className="h-5 w-5" />
                                             </button>
@@ -432,6 +529,7 @@ export default function SuperAdminSupportPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className={`w-full lg:w-80 flex-col gap-6 ${selectedTicket ? 'flex' : 'hidden'} lg:flex`}
+                    {...({} as any)}
                 >
                     {/* Status & Control Section */}
                     <div className="bg-gray-900 rounded-[32px] p-8 text-white shadow-2xl shadow-gray-900/20 relative overflow-hidden flex-shrink-0">
@@ -497,9 +595,10 @@ export default function SuperAdminSupportPage() {
                             <div className="grid grid-cols-1 gap-8">
                                 {[
                                     { icon: <Building2 className="h-4 w-4" />, label: 'Category', val: selectedTicket?.category || 'GENERAL' },
-                                    { icon: <Clock className="h-4 w-4" />, label: 'Established', val: selectedTicket ? new Date(selectedTicket.created_at).toLocaleDateString() : 'N/A' },
+                                    { icon: <Clock className="h-4 w-4" />, label: 'Established', val: selectedTicket?.created_at ? new Date(selectedTicket.created_at).toLocaleDateString() : 'N/A' },
                                     { icon: <Shield className="h-4 w-4" />, label: 'Registry ID', val: selectedTicket?.id?.split('-')[0] || 'N/A' },
-                                    { icon: <BarChart3 className="h-4 w-4" />, label: 'Store Type', val: 'Retail Enterprise' },
+                                    { icon: <Building2 className="h-4 w-4" />, label: 'Organization', val: selectedTicket?.user?.organization?.name || 'Retail Enterprise' },
+                                    { icon: <BarChart3 className="h-4 w-4" />, label: 'Plan Level', val: selectedTicket?.user?.organization?.plan || 'Standard' },
                                 ].map((item, i) => (
                                     <div key={i} className="flex gap-4">
                                         <div className="h-9 w-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100">
@@ -522,6 +621,6 @@ export default function SuperAdminSupportPage() {
                     </div>
                 </motion.div>
             </div>
-        </div>
+        </div >
     )
 }

@@ -19,19 +19,23 @@ import {
   Clock,
   User,
   TrendingUp,
-  LifeBuoy
+  LifeBuoy,
+  Factory
 } from "lucide-react"
 import { signOut } from "next-auth/react"
+import { useNotification } from "@/lib/hooks/use-notification"
 
 export function UserSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { notifications } = useNotification()
 
   const navigationItems = [
-    { name: "Point of Sale", icon: <ShoppingCart className="h-5 w-5" />, href: "/user" },
+    { name: "Inventory Management", icon: <Package className="h-5 w-5" />, href: "/user/inventory" },
     { name: "Quick Sale", icon: <QrCode className="h-5 w-5" />, href: "/user/quick-sale" },
-    { name: "View Inventory", icon: <Package className="h-5 w-5" />, href: "/user/inventory" },
+    { name: "Point of Sale", icon: <ShoppingCart className="h-5 w-5" />, href: "/user" },
+    { name: "Production", icon: <Factory className="h-5 w-5" />, href: "/user/production" },
     { name: "Customers", icon: <Users className="h-5 w-5" />, href: "/user/customers" },
     { name: "My Sales", icon: <TrendingUp className="h-5 w-5" />, href: "/user/my-sales" },
     { name: "Transactions", icon: <CreditCard className="h-5 w-5" />, href: "/user/transactions" },
@@ -106,10 +110,12 @@ export function UserSidebar() {
           <ul className="space-y-1.5">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href
+              const hasSupportNotification = item.name === "Support" && notifications.some(n => !n.read && (n.actionUrl?.includes('support') || n.title.toLowerCase().includes('ticket')));
+
               return (
                 <li key={item.name}>
                   <Link
-                    href={item.href}
+                    href={item.href as any}
                     className={`
                       group flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 font-medium text-sm
                       ${isActive
@@ -123,6 +129,9 @@ export function UserSidebar() {
                       {item.icon}
                     </span>
                     <span>{item.name}</span>
+                    {hasSupportNotification && !isActive && (
+                      <div className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse ring-4 ring-red-500/20 shadow-lg shadow-red-500/40" />
+                    )}
                     {isActive && (
                       <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                     )}

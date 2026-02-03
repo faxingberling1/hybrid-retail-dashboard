@@ -7,7 +7,7 @@ if (process.env.PG_DISABLE_NATIVE === 'true') {
 
 function getPoolConfig(): PoolConfig {
   if (process.env.DATABASE_URL) {
-    console.log('📡 Using DATABASE_URL');
+    console.log('📡 Using DATABASE_URL:', process.env.DATABASE_URL.replace(/:([^:@]+)@/, ':****@'));
 
     // Parse URL manually or let pg handle it.
     // We'll let pg handle it mostly, but we can inspect it for logging if needed.

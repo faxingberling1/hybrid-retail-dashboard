@@ -21,7 +21,7 @@ export async function GET(
                         id: true,
                         name: true,
                         email: true,
-                        role: true,
+                        role: true
                     }
                 },
                 replies: {
@@ -128,7 +128,7 @@ export async function PATCH(
                     if (userRole === 'ADMIN') {
                         actionUrl = '/admin/support';
                     } else if (userRole === 'MANAGER') {
-                        actionUrl = '/manager/support'; // Assuming this exists, otherwise fallback to user/admin
+                        actionUrl = '/user/support';
                     }
 
                     await (prisma as any).notifications.create({

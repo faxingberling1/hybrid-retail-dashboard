@@ -31,11 +31,13 @@ export default function SuperAdminLayout({
     if (status === "authenticated" && session.user) {
       console.log("✅ Super Admin Layout - User authenticated:", session.user.email)
 
-      if (session.user.role !== "SUPER_ADMIN") {
-        console.log("⛔ Super Admin Layout - Wrong role, redirecting")
+      const userRole = session.user.role?.toUpperCase()
+
+      if (userRole !== "SUPER_ADMIN" && userRole !== "SUPERADMIN") {
+        console.log("⛔ Super Admin Layout - Forbidden role:", userRole)
         router.push("/unauthorized")
       } else {
-        console.log("✅ Super Admin Layout - Role verified")
+        console.log("✅ Super Admin Layout - Role verified:", userRole)
         setLoading(false)
       }
     }
@@ -52,11 +54,10 @@ export default function SuperAdminLayout({
     )
   }
 
-  if (status === "unauthenticated" || !session) {
-    return null
-  }
+  const userRole = session?.user?.role?.toUpperCase()
+  const isAllowed = userRole === "SUPER_ADMIN" || userRole === "SUPERADMIN"
 
-  if (session.user?.role !== "SUPER_ADMIN") {
+  if (!isAllowed) {
     return null
   }
 

@@ -33,14 +33,14 @@ export async function GET(request: NextRequest) {
                     select: {
                         id: true,
                         name: true,
-                        email: true,
+                        email: true
                     }
                 },
                 _count: {
                     select: { replies: true }
                 }
             },
-            orderBy: { created_at: 'desc' }
+            orderBy: { updated_at: 'desc' }
         });
 
         return NextResponse.json(tickets);
