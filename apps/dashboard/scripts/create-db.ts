@@ -2,25 +2,43 @@ import { Pool } from 'pg'
 
 async function createDatabase() {
   console.log('🔧 Creating dashboard database...')
-  
+
   // First connect to default 'postgres' database
-  const pool = new Pool({
+  let config: any = {
     host: process.env.POSTGRES_HOST || 'localhost',
     port: parseInt(process.env.POSTGRES_PORT || '5432'),
     database: 'postgres', // Connect to default database
     user: process.env.POSTGRES_USER || 'postgres',
     password: process.env.POSTGRES_PASSWORD || 'AlexMurphy',
-  })
-  
+  };
+
+  if (process.env.DATABASE_URL) {
+    try {
+      const url = new URL(process.env.DATABASE_URL);
+      config = {
+        host: url.hostname,
+        port: parseInt(url.port || '5432'),
+        database: 'postgres',
+        user: url.username,
+        password: url.password,
+        ssl: url.searchParams.get('sslmode') === 'disable' ? false : undefined
+      };
+    } catch (e) {
+      console.warn('Failed to parse DATABASE_URL for creation, falling back to legacy vars');
+    }
+  }
+
+  const pool = new Pool(config)
+
   try {
     const client = await pool.connect()
     console.log('✅ Connected to PostgreSQL')
-    
+
     // Check if database already exists
     const checkResult = await client.query(
       "SELECT 1 FROM pg_database WHERE datname = 'dashboard_db'"
     )
-    
+
     if (checkResult.rows.length > 0) {
       console.log('📊 Database "dashboard_db" already exists')
     } else {
@@ -28,10 +46,10 @@ async function createDatabase() {
       await client.query('CREATE DATABASE dashboard_db')
       console.log('✅ Database "dashboard_db" created successfully')
     }
-    
+
     client.release()
     await pool.end()
-    
+
     return true
   } catch (error: any) {
     console.error('❌ Failed to create database:', error.message)

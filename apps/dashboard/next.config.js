@@ -1,17 +1,18 @@
 /** @type {import('next').NextConfig} */
+// Reload triggered at 2026-02-03 00:21
 const nextConfig = {
   reactStrictMode: true,
-  
+
   // Disable TypeScript errors during build (optional)
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+
   // Disable ESLint during build (optional)
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
+
   webpack: (config, { isServer, dev }) => {
     // Fix for nodemailer fs module error
     if (!isServer) {
@@ -35,28 +36,28 @@ const nextConfig = {
         vm: require.resolve('vm-browserify'),
       };
     }
-    
+
     // Fix for pg-native warnings
     if (isServer) {
       config.externals.push({
         'pg-native': 'commonjs pg-native',
       });
     }
-    
+
     // Optional: Add alias for problematic modules
     config.resolve.alias = {
       ...config.resolve.alias,
       // Add any problematic module aliases here if needed
     };
-    
+
     // Optional: Enable source maps in development
     if (dev) {
       config.devtool = 'eval-source-map';
     }
-    
+
     return config;
   },
-  
+
   // Experimental features (optional)
   experimental: {
     // Enable if you need server actions
@@ -64,11 +65,11 @@ const nextConfig = {
       allowedOrigins: ['localhost:3000', '*.vercel.app'],
     },
     // Improve build performance
-    optimizeCss: true,
+    optimizeCss: false,
     // Next.js 14 features
     typedRoutes: true,
   },
-  
+
   // Images configuration
   images: {
     remotePatterns: [
@@ -78,7 +79,7 @@ const nextConfig = {
       },
     ],
   },
-  
+
   // Headers for security
   async headers() {
     return [

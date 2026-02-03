@@ -2,46 +2,46 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { 
-  Database, 
-  Table, 
-  Activity, 
-  Shield, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  RefreshCw,
-  AlertCircle,
-  CheckCircle,
-  Server,
-  HardDrive,
-  Users,
-  Clock,
-  Search,
-  FileText,
-  ChevronRight,
-  ChevronDown,
-  ExternalLink,
-  Copy,
-  Play,
-  Eye,
+import {
   Database as DatabaseIcon,
-  Key,
+  Zap,
+  RefreshCw,
+  BarChart3,
+  Table,
+  Search,
+  ShieldCheck,
+  TrendingUp,
   Info,
+  Layers,
+  CheckCircle,
   AlertTriangle,
   XCircle,
-  Filter,
-  BarChart3,
-  TrendingUp,
+  Users,
+  AlertCircle,
+  FileText,
+  Activity,
+  HardDrive,
+  Clock,
   Cpu,
-  Zap,
-  Globe,
-  ShieldCheck,
-  Layers,
-  AreaChart
+  Filter,
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  Key,
+  Copy,
+  Shield,
+  Play,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+
+// Specialized UI Components
+import DashboardTab from '@/components/ui/database/dashboard-tab';
+import TablesTab from '@/components/ui/database/tables-tab';
+import QueryTab from '@/components/ui/database/query-tab';
+import HealthTab from '@/components/ui/database/health-tab';
 
 // Dynamically import charts to avoid SSR issues
 const LineChart = dynamic(() => import('recharts').then(mod => mod.LineChart), { ssr: false });
@@ -139,7 +139,7 @@ export default function DatabasePage() {
   });
   const [isLoadingTableData, setIsLoadingTableData] = useState(false);
   const [isExecutingQuery, setIsExecutingQuery] = useState(false);
-  
+
   // Real-time data
   const [liveUptime, setLiveUptime] = useState<string>('00:00:00');
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetric[]>([]);
@@ -150,12 +150,12 @@ export default function DatabasePage() {
   // Fetch initial data
   useEffect(() => {
     loadDatabaseInfo();
-    
+
     // Start live updates if auto-refresh is enabled
     if (autoRefresh) {
       startAutoRefresh();
     }
-    
+
     return () => {
       if (refreshInterval) {
         clearInterval(refreshInterval);
@@ -167,17 +167,17 @@ export default function DatabasePage() {
     if (refreshInterval) {
       clearInterval(refreshInterval);
     }
-    
+
     const interval = setInterval(() => {
       loadDatabaseInfo();
     }, 30000); // Refresh every 30 seconds
-    
+
     setRefreshInterval(interval);
   };
 
   const loadDatabaseInfo = async () => {
     console.log('📡 Loading database info from main API...');
-    
+
     try {
       // Load tables
       const tablesRes = await fetch('/api/database?action=tables');
@@ -185,12 +185,12 @@ export default function DatabasePage() {
         const errorData = await tablesRes.json().catch(() => ({}));
         throw new Error(`Tables API error: ${tablesRes.status} - ${errorData.error || tablesRes.statusText}`);
       }
-      
+
       const tablesData = await tablesRes.json();
-      
+
       if (tablesData.success) {
         setTables(tablesData.tables || []);
-        
+
         // Calculate table sizes for charts
         const sizes = (tablesData.tables || []).map((table: TableInfo) => ({
           name: table.tableName,
@@ -201,38 +201,38 @@ export default function DatabasePage() {
       } else {
         throw new Error(tablesData.error || 'Failed to load tables');
       }
-      
+
       // Load stats
       const statsRes = await fetch('/api/database?action=stats');
       if (!statsRes.ok) {
         const errorData = await statsRes.json().catch(() => ({}));
         throw new Error(`Stats API error: ${statsRes.status} - ${errorData.error || statsRes.statusText}`);
       }
-      
+
       const statsData = await statsRes.json();
-      
+
       if (statsData.success) {
         setStats(statsData.stats || null);
         updateLiveUptime(statsData.stats?.uptime);
       } else {
         throw new Error(statsData.error || 'Failed to load stats');
       }
-      
+
       // Load health
       const healthRes = await fetch('/api/database?action=health');
       if (!healthRes.ok) {
         const errorData = await healthRes.json().catch(() => ({}));
         throw new Error(`Health API error: ${healthRes.status} - ${errorData.error || healthRes.statusText}`);
       }
-      
+
       const healthData = await healthRes.json();
-      
+
       if (healthData.success) {
         setHealth(healthData.health || null);
       } else {
         throw new Error(healthData.error || 'Failed to load health status');
       }
-      
+
       // Update performance metrics
       const newMetric: PerformanceMetric = {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -240,16 +240,16 @@ export default function DatabasePage() {
         connections: statsData.stats?.activeConnections || 0,
         memoryUsage: Math.random() * 20 + 70 // Simulated data
       };
-      
+
       setPerformanceMetrics(prev => {
         const updated = [...prev, newMetric].slice(-20); // Keep last 20 points
         return updated;
       });
-      
+
       if (!loading) {
         toast.success('Database information refreshed');
       }
-      
+
     } catch (error: any) {
       console.error('❌ Failed to load database information:', error.message);
       if (!loading) {
@@ -262,19 +262,19 @@ export default function DatabasePage() {
 
   const updateLiveUptime = (uptimeString: string) => {
     if (!uptimeString || uptimeString === 'Unknown') return;
-    
+
     // Parse uptime string (e.g., "2d 5h 30m" or "5h 30m" or "30m")
     const daysMatch = uptimeString.match(/(\d+)d/);
     const hoursMatch = uptimeString.match(/(\d+)h/);
     const minutesMatch = uptimeString.match(/(\d+)m/);
-    
+
     const days = daysMatch ? parseInt(daysMatch[1]) : 0;
     const hours = hoursMatch ? parseInt(hoursMatch[1]) : 0;
     const minutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
-    
+
     // Convert everything to seconds for live updating
     const totalSeconds = days * 86400 + hours * 3600 + minutes * 60;
-    
+
     // Update every second
     const update = () => {
       const newSeconds = totalSeconds + 1;
@@ -282,7 +282,7 @@ export default function DatabasePage() {
       const h = Math.floor((newSeconds % 86400) / 3600);
       const m = Math.floor((newSeconds % 3600) / 60);
       const s = newSeconds % 60;
-      
+
       if (d > 0) {
         setLiveUptime(`${d}d ${h}h ${m}m ${s}s`);
       } else if (h > 0) {
@@ -293,10 +293,10 @@ export default function DatabasePage() {
         setLiveUptime(`${s}s`);
       }
     };
-    
+
     update();
     const interval = setInterval(update, 1000);
-    
+
     // Clear interval on component unmount
     return () => clearInterval(interval);
   };
@@ -314,12 +314,12 @@ export default function DatabasePage() {
           pageSize: tablePagination.pageSize
         })
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || `HTTP ${res.status}`);
       }
-      
+
       const data = await res.json();
       if (data.success) {
         setTableData(data.data);
@@ -368,15 +368,15 @@ export default function DatabasePage() {
           query: customQuery
         })
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || `HTTP ${res.status}`);
       }
-      
+
       const data = await res.json();
       setQueryResult(data);
-      
+
       if (data.success) {
         toast.success(data.message || `Query executed successfully in ${data.executionTime}`);
       } else {
@@ -489,11 +489,10 @@ export default function DatabasePage() {
         <div className="flex items-center space-x-2">
           <button
             onClick={toggleAutoRefresh}
-            className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              autoRefresh 
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-300'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
-            }`}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${autoRefresh
+              ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-300'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+              }`}
           >
             <Zap className={`w-4 h-4 mr-2 ${autoRefresh ? 'text-blue-600' : 'text-gray-500'}`} />
             {autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
@@ -511,13 +510,12 @@ export default function DatabasePage() {
 
       {/* Health Status Banner */}
       {health && (
-        <div className={`p-4 rounded-xl border shadow-sm ${
-          health.status === 'healthy' 
-            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
-            : health.status === 'warning' 
+        <div className={`p-4 rounded-xl border shadow-sm ${health.status === 'healthy'
+          ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
+          : health.status === 'warning'
             ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200'
             : 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200'
-        }`}>
+          }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
               <div className="relative">
@@ -562,11 +560,10 @@ export default function DatabasePage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`py-4 px-1 font-medium text-sm border-b-2 whitespace-nowrap transition-colors ${
-                activeTab === tab
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-1 font-medium text-sm border-b-2 whitespace-nowrap transition-colors ${activeTab === tab
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               <div className="flex items-center space-x-2">
                 {tab === 'dashboard' && <BarChart3 className="w-4 h-4" />}
@@ -683,12 +680,12 @@ export default function DatabasePage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={performanceMetrics}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis 
-                        dataKey="timestamp" 
+                      <XAxis
+                        dataKey="timestamp"
                         stroke="#666"
                         fontSize={12}
                       />
-                      <YAxis 
+                      <YAxis
                         stroke="#666"
                         fontSize={12}
                       />
@@ -701,20 +698,20 @@ export default function DatabasePage() {
                         }}
                       />
                       <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="queryTime" 
-                        name="Query Time (ms)" 
-                        stroke="#3b82f6" 
+                      <Line
+                        type="monotone"
+                        dataKey="queryTime"
+                        name="Query Time (ms)"
+                        stroke="#3b82f6"
                         strokeWidth={2}
                         dot={{ stroke: '#3b82f6', strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6 }}
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="connections" 
-                        name="Connections" 
-                        stroke="#10b981" 
+                      <Line
+                        type="monotone"
+                        dataKey="connections"
+                        name="Connections"
+                        stroke="#10b981"
                         strokeWidth={2}
                         dot={{ stroke: '#10b981', strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6 }}
@@ -796,7 +793,7 @@ export default function DatabasePage() {
                   <span>{stats.activeConnections}/100</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(stats.activeConnections, 100)}%` }}
                   ></div>
@@ -813,7 +810,7 @@ export default function DatabasePage() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Memory Usage</h3>
                   <p className="text-2xl font-bold text-gray-900">
-                    {performanceMetrics.length > 0 
+                    {performanceMetrics.length > 0
                       ? `${Math.round(performanceMetrics[performanceMetrics.length - 1].memoryUsage)}%`
                       : '--%'
                     }
@@ -826,7 +823,7 @@ export default function DatabasePage() {
                   <span>{performanceMetrics.length > 0 ? `${Math.round(performanceMetrics[performanceMetrics.length - 1].memoryUsage)}%` : '--%'}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-green-600 h-2 rounded-full transition-all duration-500"
                     style={{ width: `${performanceMetrics.length > 0 ? performanceMetrics[performanceMetrics.length - 1].memoryUsage : 0}%` }}
                   ></div>
@@ -843,7 +840,7 @@ export default function DatabasePage() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Avg Query Time</h3>
                   <p className="text-2xl font-bold text-gray-900">
-                    {performanceMetrics.length > 0 
+                    {performanceMetrics.length > 0
                       ? `${Math.round(performanceMetrics.reduce((sum, m) => sum + m.queryTime, 0) / performanceMetrics.length)}ms`
                       : '--ms'
                     }
@@ -928,7 +925,7 @@ export default function DatabasePage() {
                 </div>
               </div>
             </div>
-            
+
             {tables.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <Table className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -938,7 +935,7 @@ export default function DatabasePage() {
               <div className="divide-y">
                 {tables.map((table) => (
                   <div key={table.tableName} className="p-6 hover:bg-gray-50 transition-colors">
-                    <div 
+                    <div
                       className="flex items-center justify-between cursor-pointer"
                       onClick={() => toggleTableExpand(table.tableName)}
                     >
@@ -1030,11 +1027,10 @@ export default function DatabasePage() {
                                         </span>
                                       </td>
                                       <td className="px-4 py-3">
-                                        <span className={`px-2 py-1 text-xs font-medium rounded ${
-                                          column.isNullable 
-                                            ? 'bg-green-100 text-green-800' 
-                                            : 'bg-red-100 text-red-800'
-                                        }`}>
+                                        <span className={`px-2 py-1 text-xs font-medium rounded ${column.isNullable
+                                          ? 'bg-green-100 text-green-800'
+                                          : 'bg-red-100 text-red-800'
+                                          }`}>
                                           {column.isNullable ? 'Yes' : 'No'}
                                         </span>
                                       </td>
@@ -1228,11 +1224,10 @@ export default function DatabasePage() {
                             <button
                               key={pageNum}
                               onClick={() => loadTableData(selectedTable!, pageNum)}
-                              className={`w-10 h-10 text-sm font-medium rounded-lg transition-colors ${
-                                tablePagination.page === pageNum
-                                  ? 'bg-blue-600 text-white'
-                                  : 'text-gray-700 hover:bg-gray-100'
-                              }`}
+                              className={`w-10 h-10 text-sm font-medium rounded-lg transition-colors ${tablePagination.page === pageNum
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-700 hover:bg-gray-100'
+                                }`}
                             >
                               {pageNum}
                             </button>
@@ -1243,11 +1238,10 @@ export default function DatabasePage() {
                             <span className="px-2">...</span>
                             <button
                               onClick={() => loadTableData(selectedTable!, tablePagination.totalPages)}
-                              className={`w-10 h-10 text-sm font-medium rounded-lg transition-colors ${
-                                tablePagination.page === tablePagination.totalPages
-                                  ? 'bg-blue-600 text-white'
-                                  : 'text-gray-700 hover:bg-gray-100'
-                              }`}
+                              className={`w-10 h-10 text-sm font-medium rounded-lg transition-colors ${tablePagination.page === tablePagination.totalPages
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-700 hover:bg-gray-100'
+                                }`}
                             >
                               {tablePagination.totalPages}
                             </button>
@@ -1363,11 +1357,10 @@ export default function DatabasePage() {
                   <div>
                     <div className="flex items-center space-x-3">
                       <h2 className="text-lg font-semibold text-gray-900">Query Results</h2>
-                      <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        queryResult.success 
-                          ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800' 
-                          : 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800'
-                      }`}>
+                      <div className={`px-3 py-1 rounded-full text-xs font-semibold ${queryResult.success
+                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800'
+                        : 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800'
+                        }`}>
                         {queryResult.success ? 'SUCCESS' : 'FAILED'}
                       </div>
                     </div>
@@ -1384,7 +1377,7 @@ export default function DatabasePage() {
                   )}
                 </div>
               </div>
-              
+
               <div className="p-6">
                 {queryResult.error ? (
                   <div className="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-4">
@@ -1429,8 +1422,8 @@ export default function DatabasePage() {
                               <td key={cellIndex} className="px-6 py-4">
                                 <div className="group relative">
                                   <span className="text-sm text-gray-900 truncate block max-w-xs">
-                                    {typeof row[key] === 'object' 
-                                      ? JSON.stringify(row[key]) 
+                                    {typeof row[key] === 'object'
+                                      ? JSON.stringify(row[key])
                                       : String(row[key] || 'NULL')}
                                   </span>
                                   <button
@@ -1507,8 +1500,8 @@ export default function DatabasePage() {
                     icon: <Info className="w-5 h-5 text-orange-500" />
                   }
                 ].map((example, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="group bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-blue-200 transition-all duration-300 cursor-pointer"
                     onClick={() => {
                       setCustomQuery(example.query);
@@ -1556,13 +1549,12 @@ export default function DatabasePage() {
                     Current database health status and diagnostic information
                   </p>
                 </div>
-                <div className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-                  health.status === 'healthy' 
-                    ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800' 
-                    : health.status === 'warning'
+                <div className={`px-4 py-2 rounded-lg text-sm font-semibold ${health.status === 'healthy'
+                  ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800'
+                  : health.status === 'warning'
                     ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800'
                     : 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800'
-                }`}>
+                  }`}>
                   {health.status.toUpperCase()}
                 </div>
               </div>
@@ -1570,15 +1562,14 @@ export default function DatabasePage() {
             <div className="p-6">
               <div className="space-y-4">
                 {health.checks.map((check, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:shadow-sm ${
-                      check.status === 'pass' 
-                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300' 
-                        : check.status === 'warning'
+                  <div
+                    key={index}
+                    className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:shadow-sm ${check.status === 'pass'
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300'
+                      : check.status === 'warning'
                         ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200 hover:border-yellow-300'
                         : 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200 hover:border-red-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center space-x-4">
                       <div className="p-2 bg-white rounded-lg shadow-sm border">
@@ -1589,13 +1580,12 @@ export default function DatabasePage() {
                         <p className="text-sm text-gray-600">{check.message}</p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      check.status === 'pass' 
-                        ? 'bg-green-100 text-green-800' 
-                        : check.status === 'warning'
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${check.status === 'pass'
+                      ? 'bg-green-100 text-green-800'
+                      : check.status === 'warning'
                         ? 'bg-yellow-100 text-yellow-800'
                         : 'bg-red-100 text-red-800'
-                    }`}>
+                      }`}>
                       {check.status.toUpperCase()}
                     </span>
                   </div>
@@ -1776,18 +1766,18 @@ export default function DatabasePage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={performanceMetrics}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="timestamp" 
+                    <XAxis
+                      dataKey="timestamp"
                       stroke="#666"
                       fontSize={12}
                       tickMargin={10}
                     />
-                    <YAxis 
+                    <YAxis
                       stroke="#666"
                       fontSize={12}
-                      label={{ 
-                        value: 'Query Time (ms)', 
-                        angle: -90, 
+                      label={{
+                        value: 'Query Time (ms)',
+                        angle: -90,
                         position: 'insideLeft',
                         style: { textAnchor: 'middle' }
                       }}
@@ -1803,11 +1793,11 @@ export default function DatabasePage() {
                       formatter={(value: any) => [`${value} ms`, 'Query Time']}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="queryTime" 
-                      name="Query Time" 
-                      stroke="#3b82f6" 
+                    <Line
+                      type="monotone"
+                      dataKey="queryTime"
+                      name="Query Time"
+                      stroke="#3b82f6"
                       strokeWidth={3}
                       dot={{ stroke: '#3b82f6', strokeWidth: 2, r: 4 }}
                       activeDot={{ r: 6, strokeWidth: 2 }}
@@ -1848,10 +1838,10 @@ export default function DatabasePage() {
                         <div className="text-right">
                           <p className="font-semibold text-gray-900">{formatBytes(table.size)}</p>
                           <div className="w-32 h-2 bg-gray-200 rounded-full mt-1">
-                            <div 
+                            <div
                               className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-600"
-                              style={{ 
-                                width: `${(table.size / Math.max(...tableSizes.map(t => t.size))) * 100}%` 
+                              style={{
+                                width: `${(table.size / Math.max(...tableSizes.map(t => t.size))) * 100}%`
                               }}
                             ></div>
                           </div>
@@ -1885,53 +1875,53 @@ export default function DatabasePage() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">Average Query Time</span>
                       <span className="font-semibold text-gray-900">
-                        {performanceMetrics.length > 0 
+                        {performanceMetrics.length > 0
                           ? `${Math.round(performanceMetrics.reduce((sum, m) => sum + m.queryTime, 0) / performanceMetrics.length)}ms`
                           : '--ms'
                         }
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="h-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
-                        style={{ 
-                          width: performanceMetrics.length > 0 
+                        style={{
+                          width: performanceMetrics.length > 0
                             ? `${Math.min((performanceMetrics.reduce((sum, m) => sum + m.queryTime, 0) / performanceMetrics.length) / 2, 100)}%`
                             : '0%'
                         }}
                       ></div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">Memory Usage</span>
                       <span className="font-semibold text-gray-900">
-                        {performanceMetrics.length > 0 
+                        {performanceMetrics.length > 0
                           ? `${Math.round(performanceMetrics[performanceMetrics.length - 1].memoryUsage)}%`
                           : '--%'
                         }
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
-                        style={{ 
-                          width: performanceMetrics.length > 0 
+                        style={{
+                          width: performanceMetrics.length > 0
                             ? `${performanceMetrics[performanceMetrics.length - 1].memoryUsage}%`
                             : '0%'
                         }}
                       ></div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700">Active Connections</span>
                       <span className="font-semibold text-gray-900">{stats?.activeConnections || 0}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all duration-500"
                         style={{ width: `${Math.min((stats?.activeConnections || 0) * 10, 100)}%` }}
                       ></div>

@@ -7,7 +7,8 @@ import { UserRole } from "@/lib/types/notification"
 
 // Helper function to check if a string is a valid UserRole
 function isValidUserRole(role: string): role is UserRole {
-  return role === 'SUPER_ADMIN' || role === 'ADMIN' || role === 'USER'
+  const upperRole = role.toUpperCase();
+  return upperRole === 'SUPER_ADMIN' || upperRole === 'ADMIN' || upperRole === 'USER'
 }
 
 // Helper function to check if a string is a filter role (includes 'all')
@@ -35,10 +36,13 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type")
     const roleParam = searchParams.get("role")
 
+    // Normalize user role from session
+    const userRole = session.user.role.toUpperCase() as UserRole;
+
     // Get notifications based on user's role
     const result = await NotificationService.getNotificationsByUserRole(
       session.user.id,
-      session.user.role as UserRole,
+      userRole,
       {
         limit,
         offset,
@@ -48,15 +52,16 @@ export async function GET(request: NextRequest) {
 
     // Apply additional filters
     let filteredNotifications = result.notifications;
-    
+
     if (type && type !== 'all') {
       filteredNotifications = filteredNotifications.filter(n => n.type === type);
     }
-    
+
     // Fix: Check if roleParam is a valid filter role and not 'all'
     if (roleParam && roleParam !== 'all' && isValidUserRole(roleParam)) {
-      filteredNotifications = filteredNotifications.filter(n => 
-        n.metadata?.role === roleParam
+      const upperRoleParam = roleParam.toUpperCase();
+      filteredNotifications = filteredNotifications.filter(n =>
+        n.metadata?.role?.toUpperCase() === upperRoleParam
       );
     }
 
@@ -74,11 +79,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Failed to fetch notifications:", error)
     return NextResponse.json(
-      { 
+      {
         notifications: [],
         unreadCount: 0,
         roleBasedCounts: { all: 0 },
-        error: "Failed to fetch notifications" 
+        error: "Failed to fetch notifications"
       },
       { status: 500 }
     )

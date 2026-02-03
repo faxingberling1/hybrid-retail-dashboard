@@ -49,4 +49,14 @@ export class UserRepository {
       [userId]
     )
   }
+
+  async findAll(): Promise<User[]> {
+    const result = await pool.query(
+      `SELECT id, organization_id, email, first_name, last_name, role, phone, 
+       avatar_url, is_active, is_verified, last_login_at, two_factor_enabled,
+       email_verified_at, phone_verified_at, created_at, updated_at
+       FROM users WHERE deleted_at IS NULL`
+    )
+    return result.rows
+  }
 }

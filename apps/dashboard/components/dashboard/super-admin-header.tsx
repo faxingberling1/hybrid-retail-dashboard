@@ -15,54 +15,32 @@ export function SuperAdminHeader() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      <div className="px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center">
-          <button className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 supports-[backdrop-filter]:bg-white/60">
+      <div className="px-8 h-20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
             <Menu className="h-6 w-6" />
           </button>
-          
-          <div className="hidden lg:block ml-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+
+          <div className="hidden lg:block">
+            <div className="relative group">
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-purple-500 transition-colors" />
               <input
                 type="text"
                 placeholder="Search platform..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-64 bg-gray-100 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="pl-10 pr-4 py-2.5 w-72 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/50 focus:bg-white transition-all shadow-sm"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-6">
+          <div className="h-8 w-px bg-gray-200/50 hidden sm:block"></div>
+
           {/* Notification Bell with Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setIsNotificationOpen(!isNotificationOpen)
-                setIsUserMenuOpen(false)
-              }}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg relative transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 h-5 w-5 rounded-full bg-red-500 text-xs text-white flex items-center justify-center font-medium">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </button>
-            
-            {isNotificationOpen && (
-              <div className="absolute right-0 mt-2">
-                <NotificationDropdown
-                  notifications={notifications.slice(0, 5)} // Show only 5 latest
-                  onClose={() => setIsNotificationOpen(false)}
-                />
-              </div>
-            )}
-          </div>
+          <NotificationBell />
 
           {/* User Menu */}
           <div className="relative">
@@ -71,22 +49,18 @@ export function SuperAdminHeader() {
                 setIsUserMenuOpen(!isUserMenuOpen)
                 setIsNotificationOpen(false)
               }}
-              className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 transition-colors"
+              className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-all border border-transparent hover:border-gray-200 pr-3 group"
             >
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium text-gray-900">
+              <div className="hidden sm:block text-right mr-2">
+                <p className="text-sm font-bold text-gray-900 leading-none mb-1">
                   {session?.user?.name || "Super Admin"}
                 </p>
-                <p className="text-xs text-gray-500">Platform Administrator</p>
+                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Administrator</p>
               </div>
-              <div className="flex items-center space-x-1">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
-                  <Shield className="h-4 w-4 text-white" />
-                </div>
-                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${
-                  isUserMenuOpen ? "rotate-180" : ""
-                }`} />
+              <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-md ring-2 ring-white group-hover:ring-gray-100 transition-all">
+                <Shield className="h-4 w-4 text-white" />
               </div>
+              <ChevronDown className={`h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""}`} />
             </button>
 
             {/* User Dropdown Menu */}
@@ -103,7 +77,7 @@ export function SuperAdminHeader() {
                     Super Admin Account
                   </p>
                 </div>
-                
+
                 <div className="py-1">
                   <a
                     href="/profile"
@@ -129,7 +103,7 @@ export function SuperAdminHeader() {
                     Settings
                   </a>
                 </div>
-                
+
                 <div className="py-1 border-t">
                   <a
                     href="/system/audit-logs"
@@ -144,7 +118,7 @@ export function SuperAdminHeader() {
                     System Health
                   </a>
                 </div>
-                
+
                 <div className="py-1 border-t">
                   <a
                     href="/api/auth/signout"

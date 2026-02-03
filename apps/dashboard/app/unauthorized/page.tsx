@@ -14,7 +14,7 @@ export default function UnauthorizedPage() {
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Access Denied</h1>
         <p className="text-gray-600 mb-6">
-          You don't have permission to access the Super Admin dashboard.
+          You don't have permission to access this page.
           Please contact your system administrator if you believe this is an error.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

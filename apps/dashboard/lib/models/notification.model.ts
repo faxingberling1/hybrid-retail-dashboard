@@ -1,4 +1,4 @@
-import { connectDB } from '@/lib/db';
+import { query, queryOne, queryAll } from '@/lib/db';
 import { Notification, UserRole } from '@/lib/types/notification';
 
 export class NotificationModel {
@@ -6,15 +6,14 @@ export class NotificationModel {
    * Create a new notification
    */
   static async create(data: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification> {
-    const pool = await connectDB();
-    const query = `
+    const sql = `
       INSERT INTO notifications 
       (id, user_id, title, message, type, priority, read, metadata, expires_at, action_url, action_label, created_at)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
       RETURNING *
     `;
-    
-    const result = await pool.query(query, [
+
+    const result = await query(sql, [
       data.userId,
       data.title,
       data.message,
@@ -26,7 +25,7 @@ export class NotificationModel {
       data.actionUrl,
       data.actionLabel
     ]);
-    
+
     return this.mapNotification(result.rows[0]);
   }
 
@@ -34,7 +33,7 @@ export class NotificationModel {
    * Find notifications for a specific user with filters
    */
   static async findByUser(
-    userId: string, 
+    userId: string,
     options?: {
       limit?: number;
       offset?: number;
@@ -47,86 +46,84 @@ export class NotificationModel {
       endDate?: Date;
     }
   ): Promise<Notification[]> {
-    const pool = await connectDB();
-    let query = 'SELECT * FROM notifications WHERE user_id = $1';
+    let sql = 'SELECT * FROM notifications WHERE user_id = $1';
     const params: any[] = [userId];
     let paramCount = 2;
 
     if (options?.unreadOnly) {
-      query += ` AND read = false`;
+      sql += ` AND read = false`;
     }
 
     if (options?.types?.length) {
-      query += ` AND type = ANY($${paramCount})`;
+      sql += ` AND type = ANY($${paramCount})`;
       params.push(options.types);
       paramCount++;
     }
 
     // Filter by role in metadata
     if (options?.role) {
-      query += ` AND metadata->>'role' = $${paramCount}`;
+      sql += ` AND UPPER(metadata->>'role') = UPPER($${paramCount})`;
       params.push(options.role);
       paramCount++;
     }
 
     // Filter by dashboard in metadata
     if (options?.dashboard) {
-      query += ` AND metadata->>'dashboard' = $${paramCount}`;
+      sql += ` AND metadata->>'dashboard' = $${paramCount}`;
       params.push(options.dashboard);
       paramCount++;
     }
 
     // Filter by priority
     if (options?.priority) {
-      query += ` AND priority = $${paramCount}`;
+      sql += ` AND priority = $${paramCount}`;
       params.push(options.priority);
       paramCount++;
     }
 
     // Filter by date range
     if (options?.startDate) {
-      query += ` AND created_at >= $${paramCount}`;
+      sql += ` AND created_at >= $${paramCount}`;
       params.push(options.startDate);
       paramCount++;
     }
 
     if (options?.endDate) {
-      query += ` AND created_at <= $${paramCount}`;
+      sql += ` AND created_at <= $${paramCount}`;
       params.push(options.endDate);
       paramCount++;
     }
 
-    query += ' ORDER BY created_at DESC';
+    sql += ' ORDER BY created_at DESC';
 
     if (options?.limit) {
-      query += ` LIMIT $${paramCount}`;
+      sql += ` LIMIT $${paramCount}`;
       params.push(options.limit);
       paramCount++;
     }
 
     if (options?.offset) {
-      query += ` OFFSET $${paramCount}`;
+      sql += ` OFFSET $${paramCount}`;
       params.push(options.offset);
     }
 
-    const result = await pool.query(query, params);
-    return result.rows.map(row => this.mapNotification(row));
+    const rows = await queryAll(sql, params);
+    return rows.map(row => this.mapNotification(row));
   }
 
   /**
    * Get users by role
    */
   static async getUsersByRole(role: UserRole): Promise<string[]> {
-    const pool = await connectDB();
     try {
-      const result = await pool.query(
+      const rows = await queryAll(
         'SELECT id FROM users WHERE role = $1',
         [role]
       );
-      return result.rows.map(row => row.id);
+      return rows.map((row: any) => row.id);
     } catch (error) {
       console.error('Error getting users by role:', error);
-      
+
       // Fallback: Return mock data for development
       if (process.env.NODE_ENV === 'development') {
         console.log('Using mock user IDs for development');
@@ -137,7 +134,7 @@ export class NotificationModel {
         };
         return mockUsers[role] || [];
       }
-      
+
       throw error;
     }
   }
@@ -146,18 +143,17 @@ export class NotificationModel {
    * Get unread count for a user filtered by role
    */
   static async getUnreadCountByUserAndRole(userId: string, role?: UserRole): Promise<number> {
-    const pool = await connectDB();
     try {
-      let query = 'SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND read = false';
+      let sql = 'SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND read = false';
       const params: any[] = [userId];
 
       if (role) {
-        query += ` AND (metadata->>'role' = $2 OR metadata->>'role' IS NULL)`;
+        sql += ` AND (metadata->>'role' = $2 OR metadata->>'role' IS NULL)`;
         params.push(role);
       }
 
-      const result = await pool.query(query, params);
-      return parseInt(result.rows[0].count) || 0;
+      const row = await queryOne(sql, params);
+      return parseInt(row?.count) || 0;
     } catch (error) {
       console.error('Error getting unread count:', error);
       return 0;
@@ -174,22 +170,20 @@ export class NotificationModel {
     byRole: Record<string, number>;
     byPriority: Record<string, number>;
   }> {
-    const pool = await connectDB();
-    
     try {
       // Get total and unread counts
-      const totalResult = await pool.query(
+      const totalResult = await query(
         'SELECT COUNT(*) FROM notifications WHERE user_id = $1',
         [userId]
       );
-      
-      const unreadResult = await pool.query(
+
+      const unreadResult = await query(
         'SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND read = false',
         [userId]
       );
 
       // Get counts by type
-      const typeResult = await pool.query(`
+      const typeResult = await query(`
         SELECT type, COUNT(*) as count 
         FROM notifications 
         WHERE user_id = $1 
@@ -197,7 +191,7 @@ export class NotificationModel {
       `, [userId]);
 
       // Get counts by role from metadata
-      const roleResult = await pool.query(`
+      const roleResult = await query(`
         SELECT metadata->>'role' as role, COUNT(*) as count 
         FROM notifications 
         WHERE user_id = $1 
@@ -206,7 +200,7 @@ export class NotificationModel {
       `, [userId]);
 
       // Get counts by priority
-      const priorityResult = await pool.query(`
+      const priorityResult = await query(`
         SELECT priority, COUNT(*) as count 
         FROM notifications 
         WHERE user_id = $1 
@@ -214,17 +208,17 @@ export class NotificationModel {
       `, [userId]);
 
       const byType: Record<string, number> = {};
-      typeResult.rows.forEach(row => {
+      typeResult.rows.forEach((row: any) => {
         byType[row.type] = parseInt(row.count);
       });
 
       const byRole: Record<string, number> = {};
-      roleResult.rows.forEach(row => {
+      roleResult.rows.forEach((row: any) => {
         byRole[row.role] = parseInt(row.count);
       });
 
       const byPriority: Record<string, number> = {};
-      priorityResult.rows.forEach(row => {
+      priorityResult.rows.forEach((row: any) => {
         byPriority[row.priority] = parseInt(row.count);
       });
 
@@ -251,16 +245,15 @@ export class NotificationModel {
    * Mark notification as read
    */
   static async markAsRead(notificationId: string, userId?: string): Promise<void> {
-    const pool = await connectDB();
-    let query = 'UPDATE notifications SET read = true WHERE id = $1';
+    let sql = 'UPDATE notifications SET read = true WHERE id = $1';
     const params: any[] = [notificationId];
 
     if (userId) {
-      query += ' AND user_id = $2';
+      sql += ' AND user_id = $2';
       params.push(userId);
     }
 
-    await pool.query(query, params);
+    await query(sql, params);
   }
 
   /**
@@ -270,39 +263,37 @@ export class NotificationModel {
     role?: UserRole;
     type?: string;
   }): Promise<void> {
-    const pool = await connectDB();
-    let query = 'UPDATE notifications SET read = true WHERE user_id = $1';
+    let sql = 'UPDATE notifications SET read = true WHERE user_id = $1';
     const params: any[] = [userId];
     let paramCount = 2;
 
     if (options?.role) {
-      query += ` AND metadata->>'role' = $${paramCount}`;
+      sql += ` AND metadata->>'role' = $${paramCount}`;
       params.push(options.role);
       paramCount++;
     }
 
     if (options?.type) {
-      query += ` AND type = $${paramCount}`;
+      sql += ` AND type = $${paramCount}`;
       params.push(options.type);
     }
 
-    await pool.query(query, params);
+    await query(sql, params);
   }
 
   /**
    * Delete a notification
    */
   static async delete(notificationId: string, userId?: string): Promise<void> {
-    const pool = await connectDB();
-    let query = 'DELETE FROM notifications WHERE id = $1';
+    let sql = 'DELETE FROM notifications WHERE id = $1';
     const params: any[] = [notificationId];
 
     if (userId) {
-      query += ' AND user_id = $2';
+      sql += ' AND user_id = $2';
       params.push(userId);
     }
 
-    await pool.query(query, params);
+    await query(sql, params);
   }
 
   /**
@@ -312,30 +303,28 @@ export class NotificationModel {
     readOnly?: boolean;
     role?: UserRole;
   }): Promise<void> {
-    const pool = await connectDB();
-    let query = 'DELETE FROM notifications WHERE user_id = $1';
+    let sql = 'DELETE FROM notifications WHERE user_id = $1';
     const params: any[] = [userId];
     let paramCount = 2;
 
     if (options?.readOnly) {
-      query += ` AND read = true`;
+      sql += ` AND read = true`;
     }
 
     if (options?.role) {
-      query += ` AND metadata->>'role' = $${paramCount}`;
+      sql += ` AND metadata->>'role' = $${paramCount}`;
       params.push(options.role);
     }
 
-    await pool.query(query, params);
+    await query(sql, params);
   }
 
   /**
    * Clean up expired notifications
    */
   static async cleanupExpired(): Promise<number> {
-    const pool = await connectDB();
     try {
-      const result = await pool.query(
+      const result = await query(
         'DELETE FROM notifications WHERE expires_at < NOW() RETURNING id'
       );
       return result.rows.length;
@@ -355,8 +344,7 @@ export class NotificationModel {
       offset?: number;
     }
   ): Promise<Notification[]> {
-    const pool = await connectDB();
-    let query = 'SELECT * FROM notifications WHERE ';
+    let sql = 'SELECT * FROM notifications WHERE ';
     const params: any[] = [];
     let paramCount = 1;
 
@@ -367,36 +355,35 @@ export class NotificationModel {
       return condition;
     });
 
-    query += conditions.join(' AND ');
+    sql += conditions.join(' AND ');
 
     if (options?.limit) {
-      query += ` LIMIT $${paramCount}`;
+      sql += ` LIMIT $${paramCount}`;
       params.push(options.limit);
       paramCount++;
     }
 
     if (options?.offset) {
-      query += ` OFFSET $${paramCount}`;
+      sql += ` OFFSET $${paramCount}`;
       params.push(options.offset);
     }
 
-    query += ' ORDER BY created_at DESC';
+    sql += ' ORDER BY created_at DESC';
 
-    const result = await pool.query(query, params);
-    return result.rows.map(row => this.mapNotification(row));
+    const result = await query(sql, params);
+    return result.rows.map((row: any) => this.mapNotification(row));
   }
 
   /**
    * Get recent notifications across all users (for super admin)
    */
   static async getRecentNotifications(limit: number = 50): Promise<Notification[]> {
-    const pool = await connectDB();
     try {
-      const result = await pool.query(
+      const result = await query(
         'SELECT * FROM notifications ORDER BY created_at DESC LIMIT $1',
         [limit]
       );
-      return result.rows.map(row => this.mapNotification(row));
+      return result.rows.map((row: any) => this.mapNotification(row));
     } catch (error) {
       console.error('Error getting recent notifications:', error);
       return [];
@@ -407,35 +394,32 @@ export class NotificationModel {
    * Get notification by ID
    */
   static async findById(notificationId: string, userId?: string): Promise<Notification | null> {
-    const pool = await connectDB();
-    let query = 'SELECT * FROM notifications WHERE id = $1';
+    let sql = 'SELECT * FROM notifications WHERE id = $1';
     const params: any[] = [notificationId];
 
     if (userId) {
-      query += ' AND user_id = $2';
+      sql += ' AND user_id = $2';
       params.push(userId);
     }
 
-    const result = await pool.query(query, params);
-    
-    if (result.rows.length === 0) {
+    const row = await queryOne(sql, params);
+
+    if (!row) {
       return null;
     }
 
-    return this.mapNotification(result.rows[0]);
+    return this.mapNotification(row);
   }
 
   /**
    * Update notification
    */
   static async update(
-    notificationId: string, 
+    notificationId: string,
     updates: Partial<Omit<Notification, 'id' | 'userId' | 'createdAt'>>
   ): Promise<Notification | null> {
-    const pool = await connectDB();
-    
-    const fields = [];
-    const values = [];
+    const fields: string[] = [];
+    const values: any[] = [];
     let paramCount = 1;
 
     Object.entries(updates).forEach(([key, value]) => {
@@ -456,16 +440,16 @@ export class NotificationModel {
     }
 
     values.push(notificationId);
-    
-    const query = `
+
+    const sql = `
       UPDATE notifications 
       SET ${fields.join(', ')}, updated_at = NOW()
       WHERE id = $${paramCount}
       RETURNING *
     `;
 
-    const result = await pool.query(query, values);
-    
+    const result = await query(sql, values);
+
     if (result.rows.length === 0) {
       return null;
     }
@@ -477,22 +461,20 @@ export class NotificationModel {
    * Create multiple notifications at once
    */
   static async createBatch(notifications: Omit<Notification, 'id' | 'createdAt'>[]): Promise<void> {
-    const pool = await connectDB();
-    
     if (notifications.length === 0) {
       return;
     }
 
-    const values = [];
-    const params = [];
+    const valuesStrings: string[] = [];
+    const params: any[] = [];
     let paramCount = 1;
 
-    notifications.forEach((notification, index) => {
+    notifications.forEach((notification) => {
       const valuePlaceholders = [];
-      
+
       // Generate UUID for each notification
       valuePlaceholders.push(`gen_random_uuid()`);
-      
+
       // Add user_id
       valuePlaceholders.push(`$${paramCount}`);
       params.push(notification.userId);
@@ -543,16 +525,16 @@ export class NotificationModel {
       params.push(notification.actionLabel || null);
       paramCount++;
 
-      values.push(`(${valuePlaceholders.join(', ')}, NOW())`);
+      valuesStrings.push(`(${valuePlaceholders.join(', ')}, NOW())`);
     });
 
-    const query = `
+    const sql = `
       INSERT INTO notifications 
       (id, user_id, title, message, type, priority, read, metadata, expires_at, action_url, action_label, created_at)
-      VALUES ${values.join(', ')}
+      VALUES ${valuesStrings.join(', ')}
     `;
 
-    await pool.query(query, params);
+    await query(sql, params);
   }
 
   /**
@@ -597,7 +579,7 @@ export class NotificationModel {
     totalPages: number;
   }> {
     const offset = (page - 1) * pageSize;
-    
+
     const notifications = await this.findByUser(userId, {
       limit: pageSize,
       offset,
@@ -608,7 +590,6 @@ export class NotificationModel {
     });
 
     // Get total count with same filters
-    const pool = await connectDB();
     let countQuery = 'SELECT COUNT(*) FROM notifications WHERE user_id = $1';
     const countParams: any[] = [userId];
     let paramCount = 2;
@@ -634,8 +615,8 @@ export class NotificationModel {
       countParams.push(filters.priority);
     }
 
-    const countResult = await pool.query(countQuery, countParams);
-    const total = parseInt(countResult.rows[0].count) || 0;
+    const countRow = await queryOne(countQuery, countParams);
+    const total = parseInt(countRow?.count) || 0;
 
     return {
       notifications,

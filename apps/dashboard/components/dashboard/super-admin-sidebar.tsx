@@ -3,14 +3,14 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  FileText, 
-  Wallet, 
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  BarChart3,
+  Settings,
+  FileText,
+  Wallet,
   LogOut,
   Menu,
   X,
@@ -47,7 +47,7 @@ export function SuperAdminSidebar() {
     <>
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -55,34 +55,34 @@ export function SuperAdminSidebar() {
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 
+        fixed inset-y-0 left-0 z-40 w-72 bg-white/80 backdrop-blur-xl border-r border-gray-200/50 
         transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:relative lg:translate-x-0
-        flex flex-col
-        transition-transform duration-300 ease-in-out
+        lg:translate-x-0 lg:static lg:block
+        flex flex-col h-screen
+        transition-all duration-300 ease-out shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)]
       `}>
         {/* Logo & Title */}
-        <div className="flex h-16 items-center px-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg">
+        <div className="flex h-20 items-center px-8 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl shadow-lg shadow-purple-500/20 ring-1 ring-black/5">
               <Shield className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-gray-900">HybridPOS</h1>
-              <p className="text-xs text-gray-500">Platform Admin</p>
+              <h1 className="font-bold text-gray-900 text-lg tracking-tight">HybridPOS</h1>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">Super Admin</span>
             </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="ml-auto lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+            className="ml-auto lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
           >
             <X className="h-5 w-5 text-gray-500" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 overflow-y-auto">
-          <ul className="space-y-1">
+        <nav className="flex-1 px-4 py-8 overflow-y-auto custom-scrollbar">
+          <ul className="space-y-1.5">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -90,18 +90,21 @@ export function SuperAdminSidebar() {
                   <Link
                     href={item.href}
                     className={`
-                      flex items-center px-4 py-3 rounded-lg transition-colors
-                      ${isActive 
-                        ? 'bg-purple-50 text-purple-700 border-l-4 border-purple-600' 
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'
+                      group flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 font-medium text-sm
+                      ${isActive
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xl shadow-purple-500/20 translate-x-1'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50/80 hover:translate-x-1'
                       }
                     `}
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <span className={`mr-3 ${isActive ? 'text-purple-600' : 'text-gray-500'}`}>
+                    <span className={`mr-3.5 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-purple-600'}`}>
                       {item.icon}
                     </span>
-                    <span className="font-medium">{item.name}</span>
+                    <span>{item.name}</span>
+                    {isActive && (
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+                    )}
                   </Link>
                 </li>
               )
@@ -110,22 +113,26 @@ export function SuperAdminSidebar() {
         </nav>
 
         {/* User Profile */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center justify-between px-2 py-3">
-            <div className="flex items-center">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+        <div className="p-4 bg-gray-50/50 border-t border-gray-100">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-gray-900 to-gray-700 flex items-center justify-center ring-2 ring-white shadow-md">
+                  <Shield className="h-4 w-4 text-white" />
+                </div>
+                <div className="absolute right-0 bottom-0 h-2.5 w-2.5 bg-green-500 rounded-full ring-2 ring-white"></div>
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">Super Admin</p>
-                <p className="text-xs text-gray-500">Full Access</p>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-gray-900">Super Admin</span>
+                <span className="text-[10px] font-medium text-gray-400">Full Access</span>
               </div>
             </div>
-            <button 
+            <button
               onClick={handleLogout}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+              title="Logout"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>

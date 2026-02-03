@@ -1,0 +1,6 @@
+﻿Checking .env.local...
+Found DATABASE_URL in .env.local
+Appended connect_timeout=30
+Detected port: 5432
+Connecting to: postgresql://postgres:****@localhost:5432/dashboard_db?sslmode=disable&connect_timeout=30
+Running: npx prisma db pull

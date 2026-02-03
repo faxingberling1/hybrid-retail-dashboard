@@ -6,17 +6,25 @@ import { Client } from 'pg'
 async function migrate() {
   console.log('🚀 Starting database migration...')
 
-  const client = new Client({
-    host: process.env.POSTGRES_HOST,
-    port: parseInt(process.env.POSTGRES_PORT || '5432'),
-    database: process.env.POSTGRES_DATABASE,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-  })
+  const config = process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+      host: process.env.POSTGRES_HOST,
+      port: parseInt(process.env.POSTGRES_PORT || '5432'),
+      database: process.env.POSTGRES_DATABASE,
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+    };
+
+  const client = new Client(config)
 
   try {
     await client.connect()
     console.log('✅ Connected to PostgreSQL')
+
+    // Enable pgcrypto for gen_random_uuid()
+    await client.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto"')
+    console.log('✅ Enabled pgcrypto extension')
 
     // Drop and recreate users table to ensure correct schema
     await client.query('DROP TABLE IF EXISTS users CASCADE')
@@ -25,11 +33,15 @@ async function migrate() {
     // Create users table with correct schema
     await client.query(`
       CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
+        first_name VARCHAR(255),
+        last_name VARCHAR(255),
         name VARCHAR(255),
         role VARCHAR(50) NOT NULL DEFAULT 'USER',
+        is_active BOOLEAN DEFAULT TRUE,
+        is_verified BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         deleted_at TIMESTAMP DEFAULT NULL

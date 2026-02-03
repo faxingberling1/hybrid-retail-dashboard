@@ -13,26 +13,20 @@
     "seed": "tsx scripts/seed.ts",
     "db:fix": "tsx scripts/fix-db.ts",
     "db:reset": "tsx scripts/reset-db.ts",
-    "db:test": "tsx scripts/test-supabase-correct.ts",
-    "db:setup": "npm run supabase:setup",
     "db:create": "node scripts/create-db.js",
     "db:check": "tsx scripts/test-db-connection.ts",
     "db:health": "tsx -e \"import { healthCheck } from './lib/db'; healthCheck().then(console.log).catch(console.error)\"",
-    "db:info": "tsx scripts/supabase-info.ts",
-    "supabase:setup": "tsx scripts/supabase-quick-setup.ts",
-    "supabase:test": "tsx scripts/test-supabase-connection-fix.ts",
-    "supabase:connect": "tsx scripts/test-supabase-correct.ts",
-    "supabase:verify": "tsx scripts/verify-supabase.ts",
-    "migrate:quick": "tsx scripts/quick-migrate-notifications.ts",
     "clean": "rm -rf .next && rm -rf node_modules/.cache",
     "check:db": "tsx scripts/check-db.ts",
     "test:notification-system": "tsx scripts/test-notification-system.ts",
     "test:notification-api": "tsx scripts/test-notification-api.ts",
     "test:auth": "tsx scripts/test-auth-api.ts",
     "dev:clean": "npm run clean && npm run dev",
-    "setup:full": "npm run supabase:setup && npm run dev"
+    "setup:full": "npm run dev"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/react-query": "^5.90.19",
     "autoprefixer": "^10.4.23",
@@ -84,6 +78,7 @@
     "@typescript-eslint/parser": "^6.19.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.3",
+    "prisma": "^7.3.0",
     "typescript": "^5.3.3"
   },
   "engines": {

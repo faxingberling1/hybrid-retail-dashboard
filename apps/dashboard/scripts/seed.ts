@@ -7,13 +7,17 @@ import { Client } from 'pg'
 async function seed() {
   console.log('🌱 Starting database seeding...')
 
-  const client = new Client({
-    host: process.env.POSTGRES_HOST,
-    port: parseInt(process.env.POSTGRES_PORT || '5432'),
-    database: process.env.POSTGRES_DATABASE,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-  })
+  const config = process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+      host: process.env.POSTGRES_HOST,
+      port: parseInt(process.env.POSTGRES_PORT || '5432'),
+      database: process.env.POSTGRES_DATABASE,
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+    };
+
+  const client = new Client(config)
 
   try {
     await client.connect()
@@ -34,8 +38,7 @@ async function seed() {
         role: 'SUPER_ADMIN',
         password_hash: passwordHash,
         is_active: true,
-        is_verified: true,
-        two_factor_enabled: false
+        is_verified: true
       },
       {
         email: 'admin@hybridpos.pk',
@@ -44,8 +47,7 @@ async function seed() {
         role: 'ADMIN',
         password_hash: passwordHash,
         is_active: true,
-        is_verified: true,
-        two_factor_enabled: false
+        is_verified: true
       },
       {
         email: 'user@hybridpos.pk',
@@ -54,8 +56,7 @@ async function seed() {
         role: 'USER',
         password_hash: passwordHash,
         is_active: true,
-        is_verified: true,
-        two_factor_enabled: false
+        is_verified: true
       }
     ]
 
@@ -79,7 +80,6 @@ async function seed() {
               password_hash = $5,
               is_active = $6,
               is_verified = $7,
-              two_factor_enabled = $8,
               updated_at = CURRENT_TIMESTAMP
             WHERE email = $1
           `, [
@@ -89,8 +89,7 @@ async function seed() {
             user.role,
             user.password_hash,
             user.is_active,
-            user.is_verified,
-            user.two_factor_enabled
+            user.is_verified
           ])
           console.log(`🔄 Updated existing user: ${user.email} (${user.role})`)
         } else {
@@ -98,9 +97,9 @@ async function seed() {
           await client.query(`
             INSERT INTO users (
               email, first_name, last_name, role, password_hash,
-              is_active, is_verified, two_factor_enabled
+              is_active, is_verified
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
           `, [
             user.email,
             user.first_name,
@@ -108,12 +107,11 @@ async function seed() {
             user.role,
             user.password_hash,
             user.is_active,
-            user.is_verified,
-            user.two_factor_enabled
+            user.is_verified
           ])
           console.log(`✅ Created new user: ${user.email} (${user.role})`)
         }
-        
+
       } catch (error: any) {
         console.error(`❌ Failed to process user ${user.email}:`, error.message)
         console.error('SQL error details:', error)

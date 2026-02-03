@@ -11,9 +11,8 @@ export class NotificationService {
       ...data,
       userId: data.userId,
       read: false,
-      createdAt: new Date(),
-      expiresAt: data.expiresIn ? 
-        new Date(Date.now() + data.expiresIn * 60 * 60 * 1000) : 
+      expiresAt: data.expiresIn ?
+        new Date(Date.now() + data.expiresIn * 60 * 60 * 1000) :
         new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days default
     });
   }
@@ -23,7 +22,7 @@ export class NotificationService {
    */
   static async sendToRole(data: CreateNotificationDTO & { role: UserRole }): Promise<void> {
     const userIds = await NotificationModel.getUsersByRole(data.role);
-    
+
     const promises = userIds.map(userId =>
       NotificationModel.create({
         ...data,
@@ -33,13 +32,12 @@ export class NotificationService {
           role: data.role
         },
         read: false,
-        createdAt: new Date(),
-        expiresAt: data.expiresIn ? 
-          new Date(Date.now() + data.expiresIn * 60 * 60 * 1000) : 
+        expiresAt: data.expiresIn ?
+          new Date(Date.now() + data.expiresIn * 60 * 60 * 1000) :
           new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       })
     );
-    
+
     await Promise.all(promises);
   }
 
@@ -53,7 +51,7 @@ export class NotificationService {
     priority: 'low' | 'medium' | 'high' = 'medium'
   ): Promise<void> {
     const allUsers = await UserRepository.findAll();
-    
+
     const promises = allUsers.map(user =>
       NotificationModel.create({
         userId: user.id,
@@ -66,11 +64,10 @@ export class NotificationService {
           dashboard: 'system'
         },
         read: false,
-        createdAt: new Date(),
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
       })
     );
-    
+
     await Promise.all(promises);
   }
 
@@ -166,20 +163,20 @@ export class NotificationService {
   }> {
     // Get all notifications for user
     const allNotifications = await NotificationModel.findByUser(userId, options);
-    
+
     // Get notifications filtered by user's role
-    const roleNotifications = allNotifications.filter(n => 
-      !n.metadata?.role || n.metadata.role === userRole
+    const roleNotifications = allNotifications.filter(n =>
+      !n.metadata?.role || n.metadata.role.toUpperCase() === userRole.toUpperCase()
     );
 
     // Get unread counts for each role
     const unreadCount = await NotificationModel.getUnreadCountByUserAndRole(userId, userRole);
-    
+
     // Count notifications by role
     const roleBasedCounts = {
-      superAdmin: allNotifications.filter(n => n.metadata?.role === 'SUPER_ADMIN').length,
-      admin: allNotifications.filter(n => n.metadata?.role === 'ADMIN').length,
-      user: allNotifications.filter(n => n.metadata?.role === 'USER').length,
+      superAdmin: allNotifications.filter(n => n.metadata?.role?.toUpperCase() === 'SUPER_ADMIN').length,
+      admin: allNotifications.filter(n => n.metadata?.role?.toUpperCase() === 'ADMIN').length,
+      user: allNotifications.filter(n => n.metadata?.role?.toUpperCase() === 'USER').length,
       all: allNotifications.length
     };
 

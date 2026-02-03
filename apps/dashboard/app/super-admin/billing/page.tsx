@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { 
-  Search, Filter, Plus, Download, MoreVertical, 
+import {
+  Search, Filter, Plus, Download, MoreVertical,
   DollarSign, Calendar, CheckCircle, XCircle, Clock,
   Send, Eye, FileText, CreditCard, Receipt,
   TrendingUp, TrendingDown, RefreshCw, Bell,
@@ -13,8 +13,12 @@ import {
   Smartphone, Tag, Trash2, Edit, PrinterIcon,
   History, ArrowLeft, ArrowRight, Zap,
   Calculator, Briefcase, Shield, Wifi,
-  Check, X, Minus, Plus as PlusIcon
+  Check, X, Minus, Plus as PlusIcon,
 } from "lucide-react"
+import {
+  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, BarChart, Bar, Legend
+} from 'recharts'
 
 // Add-ons configuration
 const availableAddons = [
@@ -263,11 +267,27 @@ const billingStats = [
 ]
 
 const paymentMethods = [
-  { name: "Bank Transfer", count: 42, percentage: 60 },
-  { name: "Credit Card", count: 18, percentage: 25 },
-  { name: "JazzCash", count: 6, percentage: 8 },
-  { name: "Easypaisa", count: 4, percentage: 5 },
-  { name: "Other", count: 2, percentage: 2 },
+  { name: "Bank Transfer", count: 42, percentage: 60, color: '#8884d8' },
+  { name: "Credit Card", count: 18, percentage: 25, color: '#82ca9d' },
+  { name: "JazzCash", count: 6, percentage: 8, color: '#ffc658' },
+  { name: "Easypaisa", count: 4, percentage: 5, color: '#ff8042' },
+  { name: "Other", count: 2, percentage: 2, color: '#0088fe' },
+]
+
+const revenueData = [
+  { name: 'Aug', revenue: 4200000, expenses: 2100000 },
+  { name: 'Sep', revenue: 4800000, expenses: 2300000 },
+  { name: 'Oct', revenue: 5100000, expenses: 2400000 },
+  { name: 'Nov', revenue: 5900000, expenses: 2800000 },
+  { name: 'Dec', revenue: 7200000, expenses: 3100000 },
+  { name: 'Jan', revenue: 8400000, expenses: 3400000 },
+]
+
+const planDistributionData = [
+  { name: 'Starter', value: 15 },
+  { name: 'Business', value: 35 },
+  { name: 'Pro', value: 30 },
+  { name: 'Enterprise', value: 20 },
 ]
 
 export default function BillingPage() {
@@ -308,7 +328,7 @@ export default function BillingPage() {
 
   const filteredBilling = billingHistory.filter(item => {
     const matchesSearch = item.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.invoiceId.toLowerCase().includes(searchQuery.toLowerCase())
+      item.invoiceId.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesStatus = selectedStatus === "all" || item.status === selectedStatus
     return matchesSearch && matchesStatus
   })
@@ -388,29 +408,120 @@ export default function BillingPage() {
       </div>
 
       {/* Stats */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-  {billingStats.map((stat, index) => (
-    <motion.div
-      key={stat.title}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${stat.color}`}>
-          {stat.icon}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {billingStats.map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-lg ${stat.color}`}>
+                {stat.icon}
+              </div>
+              <div className={`flex items-center ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                {stat.change.startsWith('+') ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
+                <span className="text-sm font-medium">{stat.change}</span>
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+            <p className="text-gray-600 text-sm">{stat.title}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Revenue Overview</h3>
+              <p className="text-sm text-gray-500">6-month revenue and expenses trend</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="flex items-center text-xs font-medium text-gray-500">
+                <div className="w-2 h-2 rounded-full bg-purple-600 mr-1"></div> Revenue
+              </span>
+              <span className="flex items-center text-xs font-medium text-gray-500">
+                <div className="w-2 h-2 rounded-full bg-gray-400 mr-1"></div> Expenses
+              </span>
+              <select className="ml-4 text-xs font-medium border-gray-200 rounded-lg focus:ring-purple-500 focus:border-purple-500 py-1">
+                <option>Last 6 Months</option>
+                <option>Last Year</option>
+              </select>
+            </div>
+          </div>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={revenueData}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} tickFormatter={(val) => `₨${val / 1000000}M`} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  formatter={(value: number | undefined) => [`₨ ${(value || 0 / 1000).toLocaleString()}k`, '']}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                <Area type="monotone" dataKey="expenses" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" fill="transparent" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-        <div className={`flex items-center ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-          {stat.change.startsWith('+') ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
-          <span className="text-sm font-medium">{stat.change}</span>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Plan Distribution</h3>
+          <p className="text-sm text-gray-500 mb-6">Active subscriptions by plan type</p>
+          <div className="h-[220px] w-full flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={planDistributionData}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={8}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {planDistributionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'][index % 4]} className="focus:outline-none" />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute flex flex-col items-center">
+              <span className="text-2xl font-bold text-gray-900">124</span>
+              <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total Orgs</span>
+            </div>
+          </div>
+          <div className="mt-6 space-y-3">
+            {planDistributionData.map((item, index) => (
+              <div key={item.name} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-2.5 h-2.5 rounded-full mr-3 shadow-sm" style={{ backgroundColor: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'][index % 4] }}></div>
+                  <span className="text-sm font-semibold text-gray-600">{item.name}</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-xs font-bold text-gray-900 mr-2">{item.value}%</span>
+                  <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${item.value}%`, backgroundColor: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'][index % 4] }}></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
-      <p className="text-gray-600 text-sm">{stat.title}</p>
-    </motion.div>
-  ))}
-</div>
 
       {/* Tabs */}
       <div className="bg-white rounded-xl border border-gray-200 p-1">
@@ -472,9 +583,9 @@ export default function BillingPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-3">
-                <select 
+                <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -484,8 +595,8 @@ export default function BillingPage() {
                   <option value="pending">Pending</option>
                   <option value="overdue">Overdue</option>
                 </select>
-                
-                <select 
+
+                <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
                   className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -512,7 +623,7 @@ export default function BillingPage() {
                 </button>
               </div>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -549,7 +660,7 @@ export default function BillingPage() {
                       <td className="px-6 py-4">
                         <div className="font-semibold text-gray-900">{item.formattedAmount}</div>
                         <div className="text-xs text-gray-500">
-                          {item.breakdown.addons.length > 0 
+                          {item.breakdown.addons.length > 0
                             ? `Includes ${item.breakdown.addons.length} add-ons`
                             : 'Base plan only'
                           }
@@ -667,7 +778,7 @@ export default function BillingPage() {
               {organizations.map((org) => {
                 const addonTotal = calculateAddonTotal(org.addons)
                 const totalAmount = org.basePrice + addonTotal
-                
+
                 return (
                   <div key={org.id} className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 transition-colors">
                     <div className="flex items-start justify-between mb-4">
@@ -681,11 +792,10 @@ export default function BillingPage() {
                             <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
                               {org.plan} Plan
                             </span>
-                            <span className={`px-2 py-1 text-xs font-medium rounded ${
-                              org.status === 'active' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
+                            <span className={`px-2 py-1 text-xs font-medium rounded ${org.status === 'active'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                              }`}>
                               {org.status}
                             </span>
                           </div>
@@ -777,30 +887,32 @@ export default function BillingPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {availableAddons.map((addon) => (
-                <div key={addon.id} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 hover:shadow-sm transition-all">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="h-10 w-10 flex-shrink-0 bg-gradient-to-r from-purple-100 to-purple-200 rounded-lg flex items-center justify-center">
-                      {addon.icon}
-                    </div>
-                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                <div key={addon.id} className="group relative bg-white border border-gray-200 rounded-2xl p-5 hover:border-purple-500 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                  <div className="absolute top-0 right-0 p-3">
+                    <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-purple-50 text-purple-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                       {addon.category}
                     </span>
                   </div>
-                  
-                  <h3 className="font-semibold text-gray-900 mb-1">{addon.name}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{addon.description}</p>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-lg font-bold text-gray-900">{formatCurrency(addon.price)}</div>
-                      <div className="text-xs text-gray-500">{addon.period}</div>
+                  <div className="h-12 w-12 flex-shrink-0 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 transform group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="text-white">
+                      {addon.icon}
                     </div>
                   </div>
-                  
-                  <button className="w-full py-2 text-sm font-medium text-purple-600 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
-                    View Details
+
+                  <h3 className="font-bold text-gray-900 mb-1 leading-tight">{addon.name}</h3>
+                  <p className="text-xs text-gray-500 mb-6 line-clamp-2 leading-relaxed">{addon.description}</p>
+
+                  <div className="flex items-end justify-between mb-4">
+                    <div>
+                      <div className="text-xl font-black text-gray-900 leading-none">{formatCurrency(addon.price)}</div>
+                      <div className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">{addon.period}</div>
+                    </div>
+                  </div>
+
+                  <button className="w-full py-2.5 text-xs font-bold uppercase tracking-widest text-white bg-gray-900 rounded-xl hover:bg-purple-600 transition-all shadow-md group-hover:shadow-purple-200">
+                    Add to Org
                   </button>
                 </div>
               ))}
@@ -829,21 +941,29 @@ export default function BillingPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold text-gray-900">Add-on Revenue Trend</h3>
-                <select className="px-3 py-1.5 text-sm bg-gray-100 border border-gray-300 rounded-lg">
+            <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="font-bold text-gray-900">Monthly Add-on Revenue</h3>
+                  <p className="text-xs text-gray-500 mt-1">Breakdown of revenue from optional value-added services</p>
+                </div>
+                <select className="text-xs font-bold border-gray-200 rounded-lg py-1 px-3">
                   <option>Last 6 Months</option>
-                  <option>Last Year</option>
-                  <option>All Time</option>
                 </select>
               </div>
-              <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div className="text-center text-gray-500">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                  <p>Revenue chart will appear here</p>
-                  <p className="text-sm">(Interactive chart implementation)</p>
-                </div>
+              <div className="h-[260px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} tickFormatter={(val) => `₨${val / 1000}k`} />
+                    <Tooltip
+                      cursor={{ fill: '#f8fafc' }}
+                      contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    />
+                    <Bar dataKey="revenue" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
@@ -855,12 +975,12 @@ export default function BillingPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowSendReminderModal(false)} />
-            
+
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="px-6 py-4 bg-white border-b border-gray-200">
                 <h3 className="text-lg font-medium text-gray-900">Send Payment Reminder</h3>
               </div>
-              
+
               <div className="px-6 py-4">
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
@@ -871,7 +991,7 @@ export default function BillingPage() {
                     Invoice: {selectedInvoice.invoiceId} • Due: {selectedInvoice.dueDate}
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -880,29 +1000,27 @@ export default function BillingPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => setReminderType("email")}
-                        className={`p-3 border rounded-lg flex items-center justify-center ${
-                          reminderType === "email" 
-                            ? "border-purple-500 bg-purple-50" 
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
+                        className={`p-3 border rounded-lg flex items-center justify-center ${reminderType === "email"
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-300 hover:border-gray-400"
+                          }`}
                       >
                         <Mail className="h-5 w-5 mr-2" />
                         <span>Email</span>
                       </button>
                       <button
                         onClick={() => setReminderType("sms")}
-                        className={`p-3 border rounded-lg flex items-center justify-center ${
-                          reminderType === "sms" 
-                            ? "border-purple-500 bg-purple-50" 
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
+                        className={`p-3 border rounded-lg flex items-center justify-center ${reminderType === "sms"
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-300 hover:border-gray-400"
+                          }`}
                       >
                         <MessageSquare className="h-5 w-5 mr-2" />
                         <span>SMS</span>
                       </button>
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Message
@@ -915,14 +1033,14 @@ export default function BillingPage() {
                       placeholder="Type your reminder message here..."
                     />
                   </div>
-                  
+
                   <div className="flex items-center text-sm text-gray-600">
                     <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />
                     This message will be sent to the organization's registered contact
                   </div>
                 </div>
               </div>
-              
+
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
                 <button
                   onClick={() => setShowSendReminderModal(false)}
@@ -948,7 +1066,7 @@ export default function BillingPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowPaymentDetailsModal(false)} />
-            
+
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="px-6 py-4 bg-white border-b border-gray-200">
                 <div className="flex items-center justify-between">
@@ -967,7 +1085,7 @@ export default function BillingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="px-6 py-4">
                 <div className="space-y-6">
                   {/* Organization Info */}
@@ -980,7 +1098,7 @@ export default function BillingPage() {
                       <p className="text-sm text-gray-500">{selectedInvoice.organizationId}</p>
                     </div>
                   </div>
-                  
+
                   {/* Invoice Details */}
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -993,7 +1111,7 @@ export default function BillingPage() {
                         <div className="text-sm font-medium">{selectedInvoice.plan}</div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <div className="text-sm font-medium text-gray-700 mb-2">Add-ons Breakdown</div>
                       <div className="space-y-2">
@@ -1016,7 +1134,7 @@ export default function BillingPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Actions */}
                   {selectedInvoice.status !== 'paid' && (
                     <div className="p-4 bg-blue-50 rounded-lg">
@@ -1037,10 +1155,10 @@ export default function BillingPage() {
                   )}
                 </div>
               </div>
-              
+
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
                 <div className="flex items-center space-x-2">
-                  <button 
+                  <button
                     onClick={() => handleViewFullInvoice(selectedInvoice)}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center"
                   >
@@ -1067,7 +1185,7 @@ export default function BillingPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowInvoiceModal(false)} />
-            
+
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
               {/* Invoice Header */}
               <div className="px-8 py-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
@@ -1082,7 +1200,7 @@ export default function BillingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="px-8 py-6">
                 {/* Company & Client Info */}
                 <div className="grid grid-cols-2 gap-8 mb-8">
@@ -1102,7 +1220,7 @@ export default function BillingPage() {
                       <p>+92 300 123 4567</p>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3">Bill To</h4>
                     <div className="text-sm text-gray-600 space-y-1">
@@ -1113,7 +1231,7 @@ export default function BillingPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Invoice Items */}
                 <div className="mb-8">
                   <table className="w-full">
@@ -1136,7 +1254,7 @@ export default function BillingPage() {
                         <td className="px-4 py-3 text-gray-900">{formatCurrency(selectedInvoice.breakdown.basePlan)}</td>
                         <td className="px-4 py-3 font-semibold text-gray-900">{formatCurrency(selectedInvoice.breakdown.basePlan)}</td>
                       </tr>
-                      
+
                       {/* Add-ons */}
                       {selectedInvoice.breakdown.addons.map((addon: any, index: number) => (
                         <tr key={index}>
@@ -1152,7 +1270,7 @@ export default function BillingPage() {
                     </tbody>
                   </table>
                 </div>
-                
+
                 {/* Totals */}
                 <div className="flex justify-end">
                   <div className="w-64">
@@ -1182,27 +1300,43 @@ export default function BillingPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Payment Status */}
-                <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between">
+                <div className="relative mt-8 p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden">
+                  {selectedInvoice.status === 'paid' && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 opacity-10 pointer-events-none">
+                      <h1 className="text-9xl font-black text-green-600 border-8 border-green-600 p-4 rounded-3xl">PAID</h1>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between relative z-10">
                     <div>
-                      <div className="font-medium text-gray-900">Payment Status</div>
-                      <div className="text-sm text-gray-600">
-                        {selectedInvoice.status === 'paid' 
-                          ? `Paid on ${selectedInvoice.paymentDate} via ${selectedInvoice.paymentMethod}`
-                          : `Due on ${selectedInvoice.dueDate}`
+                      <div className="font-bold text-gray-900 mb-1">Payment Information</div>
+                      <div className="text-sm text-gray-600 leading-relaxed">
+                        {selectedInvoice.status === 'paid'
+                          ? `This invoice was fully settled on ${selectedInvoice.paymentDate} via ${selectedInvoice.paymentMethod}. Thank you for your business!`
+                          : `Please settle this invoice by ${selectedInvoice.dueDate}. Unpaid invoices may lead to temporary service disruption.`
                         }
                       </div>
                     </div>
-                    <span className={`px-4 py-2 inline-flex items-center text-sm font-semibold rounded-full ${getStatusColor(selectedInvoice.status)}`}>
-                      {getStatusIcon(selectedInvoice.status)}
-                      <span className="ml-2">{selectedInvoice.status.toUpperCase()}</span>
-                    </span>
+                    <div className="text-right">
+                      <span className={`px-4 py-2 inline-flex items-center text-xs font-bold uppercase tracking-widest rounded-full shadow-sm ${getStatusColor(selectedInvoice.status)}`}>
+                        {getStatusIcon(selectedInvoice.status)}
+                        <span className="ml-2">{selectedInvoice.status}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center">
+                  <p className="text-sm text-gray-400">If you have any questions regarding this invoice, please contact our support team at support@hybridpos.pk</p>
+                  <div className="mt-4 flex items-center justify-center space-x-4">
+                    <div className="h-px bg-gray-200 w-12"></div>
+                    <span className="text-xs font-bold text-gray-300 uppercase tracking-[0.2em]">End of Invoice</span>
+                    <div className="h-px bg-gray-200 w-12"></div>
                   </div>
                 </div>
               </div>
-              
+
               {/* Footer Actions */}
               <div className="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
                 <div className="text-sm text-gray-600">
@@ -1235,7 +1369,7 @@ export default function BillingPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowAddonModal(false)} />
-            
+
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
               <div className="px-6 py-4 bg-white border-b border-gray-200">
                 <div className="flex items-center justify-between">
@@ -1256,7 +1390,7 @@ export default function BillingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="px-6 py-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Current Add-ons */}
@@ -1308,7 +1442,7 @@ export default function BillingPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Available Add-ons */}
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-4">Available Add-ons</h4>
@@ -1348,7 +1482,7 @@ export default function BillingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
                 <div className="text-sm text-gray-600">
                   Changes will apply from next billing cycle

@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { AdminSidebar } from "@/components/dashboard/admin-sidebar"
-import { Header } from "@/components/dashboard/header"
+import { AdminHeader } from "@/components/dashboard/admin-header"
 
 export default function AdminLayout({
   children,
@@ -30,7 +30,7 @@ export default function AdminLayout({
 
     if (status === "authenticated" && session.user) {
       console.log("✅ Admin Layout - User authenticated:", session.user.email)
-      
+
       if (session.user.role !== "ADMIN") {
         console.log("⛔ Admin Layout - Wrong role, redirecting")
         router.push("/unauthorized")
@@ -61,12 +61,12 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex overflow-hidden">
       <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <AdminHeader />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto space-y-6">
             {children}
           </div>
         </main>
