@@ -384,9 +384,8 @@ export default function SuperAdminPage() {
                 key={stat.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-              >
+                transition={{ delay: index * 0.1 }}>
+                
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg ${stat.color}`}>
                     {stat.icon}
@@ -499,23 +498,23 @@ export default function SuperAdminPage() {
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPieChart>
-                        <Pie
-                          data={revenueData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {revenueData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => [`${value}%`, 'Share']} />
-                        <Legend />
-                      </RechartsPieChart>
+                          <Pie
+                            data={revenueData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {revenueData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value) => [`${value}%`, 'Share']} />
+                          <Legend />
+                        </RechartsPieChart>
                     </ResponsiveContainer>
                   </div>
                 </div>

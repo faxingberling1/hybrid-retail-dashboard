@@ -5,6 +5,16 @@ import { NotificationService } from "@/lib/services/notification.service"
 import { NotificationModel } from "@/lib/models/notification.model"
 import { UserRole } from "@/lib/types/notification"
 
+// Helper function to check if a string is a valid UserRole
+function isValidUserRole(role: string): role is UserRole {
+  return role === 'SUPER_ADMIN' || role === 'ADMIN' || role === 'USER'
+}
+
+// Helper function to check if a string is a filter role (includes 'all')
+function isFilterRole(role: string): boolean {
+  return role === 'all' || isValidUserRole(role)
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -23,7 +33,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get("offset") || "0")
     const unreadOnly = searchParams.get("unreadOnly") === "true"
     const type = searchParams.get("type")
-    const role = searchParams.get("role") as UserRole | null
+    const roleParam = searchParams.get("role")
 
     // Get notifications based on user's role
     const result = await NotificationService.getNotificationsByUserRole(
@@ -43,9 +53,10 @@ export async function GET(request: NextRequest) {
       filteredNotifications = filteredNotifications.filter(n => n.type === type);
     }
     
-    if (role && role !== 'all') {
+    // Fix: Check if roleParam is a valid filter role and not 'all'
+    if (roleParam && roleParam !== 'all' && isValidUserRole(roleParam)) {
       filteredNotifications = filteredNotifications.filter(n => 
-        n.metadata?.role === role
+        n.metadata?.role === roleParam
       );
     }
 

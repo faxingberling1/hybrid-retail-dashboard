@@ -1215,9 +1215,8 @@ export default function SettingsPage() {
             {showSaveSuccess && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="m-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between"
-              >
+                animate={{ opacity: 1, y: 0 }}>
+                
                 <div className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
                   <span className="text-green-800 font-medium">Settings saved successfully!</span>
@@ -1234,21 +1233,13 @@ export default function SettingsPage() {
             <div className="p-6">
               {/* General Settings */}
               {activeTab === 'general' && (
-                <div className="space-y-8">
-                  <ProfileSection
-                    profile={userProfile}
-                    onProfileChange={setUserProfile}
-                  />
+                 <div className="space-y-8">
+                  {/* ProfileSection doesn't need any props */}
+                  <ProfileSection />
+                                    
+                  <ThemeSection />
                   
-                  <ThemeSection
-                    theme={theme}
-                    onThemeChange={setTheme}
-                  />
-                  
-                  <RegionalSection
-                    settings={regionalSettings}
-                    onSettingsChange={setRegionalSettings}
-                  />
+                  <RegionalSection/>
                 </div>
               )}
 
@@ -1446,9 +1437,8 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl max-w-md w-full"
-          >
+            animate={{ opacity: 1, scale: 1 }}>
+            
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <AlertTriangle className="h-6 w-6 text-red-600 mr-3" />

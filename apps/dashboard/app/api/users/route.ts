@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { pool } from '@/lib/db' // Add this import
 import { UserRepository } from '@/lib/repositories/user.repository'
 
 const userRepository = new UserRepository()
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
       const result = await pool.query(
         `SELECT u.*, o.name as organization_name 
          FROM users u 
-         JOIN organizations o ON u.organization_id = o.id 
+         LEFT JOIN organizations o ON u.organization_id = o.id 
          WHERE u.organization_id = $1 AND u.deleted_at IS NULL 
          ORDER BY u.created_at DESC`,
         [organizationId]
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
       const result = await pool.query(
         `SELECT u.*, o.name as organization_name 
          FROM users u 
-         JOIN organizations o ON u.organization_id = o.id 
+         LEFT JOIN organizations o ON u.organization_id = o.id 
          WHERE u.deleted_at IS NULL 
          ORDER BY u.created_at DESC 
          LIMIT 100`

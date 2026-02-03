@@ -14,22 +14,80 @@ import {
   LogOut,
   Menu,
   X,
-  Shield
+  Shield,
+  Store,
+  ShoppingCart,
+  Package,
+  Receipt,
+  User
 } from "lucide-react"
 
-export function Sidebar() {
+interface SidebarProps {
+  userRole?: string
+}
+
+export function Sidebar({ userRole = 'USER' }: SidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
 
-  const navigationItems = [
-    { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/super-admin" },
-    { name: "Organizations", icon: <Building2 className="h-5 w-5" />, href: "/super-admin/organizations" },
-    { name: "Users", icon: <Users className="h-5 w-5" />, href: "/super-admin/users" },
-    { name: "Analytics", icon: <BarChart3 className="h-5 w-5" />, href: "/super-admin/analytics" },
-    { name: "Billing", icon: <Wallet className="h-5 w-5" />, href: "/super-admin/billing" },
-    { name: "Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
-    { name: "Settings", icon: <Settings className="h-5 w-5" />, href: "/super-admin/settings" },
-  ]
+  // Define navigation items based on role
+  const getNavigationItems = () => {
+    const baseItems = [
+      { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/" },
+    ]
+
+    if (userRole === 'SUPER_ADMIN') {
+      return [
+        ...baseItems,
+        { name: "Organizations", icon: <Building2 className="h-5 w-5" />, href: "/super-admin/organizations" },
+        { name: "Users", icon: <Users className="h-5 w-5" />, href: "/super-admin/users" },
+        { name: "Analytics", icon: <BarChart3 className="h-5 w-5" />, href: "/super-admin/analytics" },
+        { name: "Billing", icon: <Wallet className="h-5 w-5" />, href: "/super-admin/billing" },
+        { name: "Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
+        { name: "Settings", icon: <Settings className="h-5 w-5" />, href: "/super-admin/settings" },
+      ]
+    }
+
+    if (userRole === 'ADMIN') {
+      return [
+        ...baseItems,
+        { name: "Products", icon: <Package className="h-5 w-5" />, href: "/admin/products" },
+        { name: "Orders", icon: <ShoppingCart className="h-5 w-5" />, href: "/admin/orders" },
+        { name: "Customers", icon: <Users className="h-5 w-5" />, href: "/admin/customers" },
+        { name: "Reports", icon: <BarChart3 className="h-5 w-5" />, href: "/admin/reports" },
+        { name: "Settings", icon: <Settings className="h-5 w-5" />, href: "/admin/settings" },
+      ]
+    }
+
+    // USER role
+    return [
+      ...baseItems,
+      { name: "Point of Sale", icon: <ShoppingCart className="h-5 w-5" />, href: "/user" },
+      { name: "Products", icon: <Package className="h-5 w-5" />, href: "/user/products" },
+      { name: "Customers", icon: <Users className="h-5 w-5" />, href: "/user/customers" },
+      { name: "Transactions", icon: <Receipt className="h-5 w-5" />, href: "/user/transactions" },
+    ]
+  }
+
+  const navigationItems = getNavigationItems()
+
+  const getRoleDisplayName = () => {
+    switch(userRole) {
+      case 'SUPER_ADMIN': return 'Super Admin'
+      case 'ADMIN': return 'Store Admin'
+      case 'USER': return 'Staff User'
+      default: return 'User'
+    }
+  }
+
+  const getRoleIcon = () => {
+    switch(userRole) {
+      case 'SUPER_ADMIN': return <Shield className="h-6 w-6 text-white" />
+      case 'ADMIN': return <Building2 className="h-6 w-6 text-white" />
+      case 'USER': return <User className="h-6 w-6 text-white" />
+      default: return <User className="h-6 w-6 text-white" />
+    }
+  }
 
   return (
     <>
@@ -53,11 +111,11 @@ export function Sidebar() {
         <div className="flex h-16 items-center px-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg">
-              <Shield className="h-6 w-6 text-white" />
+              {getRoleIcon()}
             </div>
             <div>
               <h1 className="font-bold text-gray-900">HybridPOS</h1>
-              <p className="text-xs text-gray-500">Super Admin</p>
+              <p className="text-xs text-gray-500">{getRoleDisplayName()}</p>
             </div>
           </div>
           <button
@@ -102,10 +160,12 @@ export function Sidebar() {
           <div className="flex items-center justify-between px-2 py-3">
             <div className="flex items-center">
               <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
-                <span className="text-white font-semibold">SA</span>
+                <span className="text-white font-semibold">
+                  {getRoleDisplayName().split(' ').map((n: string) => n[0]).join('')}
+                </span>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">Super Admin</p>
+                <p className="text-sm font-medium text-gray-900">{getRoleDisplayName()}</p>
                 <button 
                   onClick={() => {
                     localStorage.removeItem("userRole")

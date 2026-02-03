@@ -316,29 +316,30 @@ export default function UsersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${stat.color}`}>
-                {stat.icon}
-              </div>
-              <div className={`flex items-center ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                <TrendingUp className="h-4 w-4 mr-1" />
-                <span className="text-sm font-medium">{stat.change}</span>
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
-            <p className="text-gray-600 text-sm">{stat.title}</p>
-          </motion.div>
-        ))}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  {stats.map((stat, index) => (
+    <motion.div
+      key={stat.title}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+    >
+      <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className={`p-3 rounded-lg ${stat.color}`}>
+            {stat.icon}
+          </div>
+          <div className={`flex items-center ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+            <TrendingUp className="h-4 w-4 mr-1" />
+            <span className="text-sm font-medium">{stat.change}</span>
+          </div>
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+        <p className="text-gray-600 text-sm">{stat.title}</p>
       </div>
+    </motion.div>
+  ))}
+</div>
 
       {/* Filters & Search */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -785,7 +786,7 @@ export default function UsersPage() {
                   <div className="flex items-center">
                     <div className={`h-16 w-16 rounded-full ${selectedUser.avatarColor} flex items-center justify-center`}>
                       <span className="text-white text-xl font-bold">
-                        {selectedUser.name.split(' ').map(n => n[0]).join('')}
+                        {selectedUser.name.split(' ').map((n: string) => n[0]).join('')}
                       </span>
                     </div>
                     <div className="ml-4">

@@ -1,0 +1,991 @@
+{
+  "metadata": {
+    "exportedAt": "2026-01-28T13:00:28.897Z",
+    "database": "dashboard_db",
+    "tableCount": 9
+  },
+  "tables": {
+    "activity_logs": {
+      "structure": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "organization_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "action",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "entity_type",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "entity_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "details",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "ip_address",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "user_agent",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": "'success'::character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "data": [],
+      "rowCount": 0
+    },
+    "notification_overview": {
+      "structure": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "user_email",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "user_role",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "type",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "priority",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "read",
+          "data_type": "boolean",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "notification_role",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "dashboard",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "entity_type",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "entity_id",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "data": [
+        {
+          "id": "7623b463-69a9-4c04-a1e7-918186929888",
+          "user_id": "0d84911d-2a64-4ae0-95be-00c19c2e4f63",
+          "user_email": "superadmin@hybridpos.pk",
+          "user_role": "super_admin",
+          "title": "System Health Report",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "created_at": "2026-01-23T18:33:18.956Z",
+          "notification_role": "SUPER_ADMIN",
+          "dashboard": "super-admin/system",
+          "entity_type": "system",
+          "entity_id": null
+        },
+        {
+          "id": "d076ad5e-1583-41f3-8225-2e7eb89ca722",
+          "user_id": "4afef20b-2007-4bb2-b2f6-682552ba627d",
+          "user_email": "admin@hybridpos.pk",
+          "user_role": "admin",
+          "title": "Daily Sales Summary",
+          "type": "success",
+          "priority": "low",
+          "read": false,
+          "created_at": "2026-01-23T18:33:18.956Z",
+          "notification_role": "ADMIN",
+          "dashboard": "admin/dashboard",
+          "entity_type": "system",
+          "entity_id": null
+        },
+        {
+          "id": "1bea6720-f212-490a-9fc8-b4aa016edf2e",
+          "user_id": "a6807197-f624-4864-bd9f-c48c62badca9",
+          "user_email": "user@hybridpos.pk",
+          "user_role": "user",
+          "title": "Task Assignment",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "created_at": "2026-01-23T18:33:18.956Z",
+          "notification_role": "USER",
+          "dashboard": "user/tasks",
+          "entity_type": "system",
+          "entity_id": null
+        },
+        {
+          "id": "42006612-d827-4012-8649-f720757d6c1d",
+          "user_id": "0d84911d-2a64-4ae0-95be-00c19c2e4f63",
+          "user_email": "superadmin@hybridpos.pk",
+          "user_role": "super_admin",
+          "title": "Test Notification for SUPER_ADMIN",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "created_at": "2026-01-23T18:48:42.203Z",
+          "notification_role": "SUPER_ADMIN",
+          "dashboard": null,
+          "entity_type": null,
+          "entity_id": null
+        },
+        {
+          "id": "fcbf76b3-92b2-456a-baea-461cf52fa401",
+          "user_id": "4afef20b-2007-4bb2-b2f6-682552ba627d",
+          "user_email": "admin@hybridpos.pk",
+          "user_role": "admin",
+          "title": "Test Notification for ADMIN",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "created_at": "2026-01-23T18:48:42.225Z",
+          "notification_role": "ADMIN",
+          "dashboard": null,
+          "entity_type": null,
+          "entity_id": null
+        },
+        {
+          "id": "ed4b1e06-e5a0-466c-ac5c-a1b81140f192",
+          "user_id": "a6807197-f624-4864-bd9f-c48c62badca9",
+          "user_email": "user@hybridpos.pk",
+          "user_role": "user",
+          "title": "Test Notification for USER",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "created_at": "2026-01-23T18:48:42.246Z",
+          "notification_role": "USER",
+          "dashboard": null,
+          "entity_type": null,
+          "entity_id": null
+        }
+      ],
+      "rowCount": 6
+    },
+    "notification_preferences": {
+      "structure": [
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "email_notifications",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "true"
+        },
+        {
+          "column_name": "push_notifications",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "true"
+        },
+        {
+          "column_name": "desktop_notifications",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "true"
+        },
+        {
+          "column_name": "mute_until",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "excluded_types",
+          "data_type": "ARRAY",
+          "is_nullable": "YES",
+          "column_default": "'{}'::character varying[]"
+        },
+        {
+          "column_name": "digest_frequency",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'realtime'::character varying"
+        },
+        {
+          "column_name": "role_specific_filters",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        }
+      ],
+      "data": [
+        {
+          "user_id": "0d84911d-2a64-4ae0-95be-00c19c2e4f63",
+          "email_notifications": true,
+          "push_notifications": true,
+          "desktop_notifications": true,
+          "mute_until": null,
+          "excluded_types": [
+            "info"
+          ],
+          "digest_frequency": "realtime",
+          "role_specific_filters": {}
+        },
+        {
+          "user_id": "4afef20b-2007-4bb2-b2f6-682552ba627d",
+          "email_notifications": true,
+          "push_notifications": true,
+          "desktop_notifications": true,
+          "mute_until": null,
+          "excluded_types": [
+            "info"
+          ],
+          "digest_frequency": "realtime",
+          "role_specific_filters": {}
+        },
+        {
+          "user_id": "a6807197-f624-4864-bd9f-c48c62badca9",
+          "email_notifications": true,
+          "push_notifications": true,
+          "desktop_notifications": true,
+          "mute_until": null,
+          "excluded_types": [
+            "info"
+          ],
+          "digest_frequency": "realtime",
+          "role_specific_filters": {}
+        }
+      ],
+      "rowCount": 3
+    },
+    "notification_type_distribution": {
+      "structure": [
+        {
+          "column_name": "type",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "priority",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "count",
+          "data_type": "bigint",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "unread_count",
+          "data_type": "bigint",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "avg_hours_old",
+          "data_type": "numeric",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "data": [
+        {
+          "type": "info",
+          "priority": "medium",
+          "count": "5",
+          "unread_count": "5",
+          "avg_hours_old": "114.30"
+        },
+        {
+          "type": "success",
+          "priority": "low",
+          "count": "1",
+          "unread_count": "1",
+          "avg_hours_old": "114.45"
+        }
+      ],
+      "rowCount": 2
+    },
+    "notifications": {
+      "structure": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "message",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "type",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'info'::character varying"
+        },
+        {
+          "column_name": "priority",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'medium'::character varying"
+        },
+        {
+          "column_name": "read",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "false"
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "expires_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "action_url",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "action_label",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "data": [
+        {
+          "id": "7623b463-69a9-4c04-a1e7-918186929888",
+          "user_id": "0d84911d-2a64-4ae0-95be-00c19c2e4f63",
+          "title": "System Health Report",
+          "message": "All systems are operating normally. Last 24h uptime: 99.9%",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "metadata": {
+            "role": "SUPER_ADMIN",
+            "dashboard": "super-admin/system",
+            "timestamp": 1769193198.956693,
+            "entityType": "system"
+          },
+          "expires_at": null,
+          "action_url": "/super-admin/system",
+          "action_label": "View System Dashboard",
+          "created_at": "2026-01-23T18:33:18.956Z",
+          "updated_at": null
+        },
+        {
+          "id": "d076ad5e-1583-41f3-8225-2e7eb89ca722",
+          "user_id": "4afef20b-2007-4bb2-b2f6-682552ba627d",
+          "title": "Daily Sales Summary",
+          "message": "Your store processed 156 orders totaling $12,450 yesterday",
+          "type": "success",
+          "priority": "low",
+          "read": false,
+          "metadata": {
+            "role": "ADMIN",
+            "dashboard": "admin/dashboard",
+            "timestamp": 1769193198.956693,
+            "entityType": "system"
+          },
+          "expires_at": null,
+          "action_url": "/admin/dashboard",
+          "action_label": "Go to Dashboard",
+          "created_at": "2026-01-23T18:33:18.956Z",
+          "updated_at": null
+        },
+        {
+          "id": "1bea6720-f212-490a-9fc8-b4aa016edf2e",
+          "user_id": "a6807197-f624-4864-bd9f-c48c62badca9",
+          "title": "Task Assignment",
+          "message": "You have been assigned 3 new tasks for today",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "metadata": {
+            "role": "USER",
+            "dashboard": "user/tasks",
+            "timestamp": 1769193198.956693,
+            "entityType": "system"
+          },
+          "expires_at": null,
+          "action_url": "/user/tasks",
+          "action_label": "View Tasks",
+          "created_at": "2026-01-23T18:33:18.956Z",
+          "updated_at": null
+        },
+        {
+          "id": "42006612-d827-4012-8649-f720757d6c1d",
+          "user_id": "0d84911d-2a64-4ae0-95be-00c19c2e4f63",
+          "title": "Test Notification for SUPER_ADMIN",
+          "message": "This is a test notification created at 1/23/2026, 1:48:42 PM",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "metadata": {
+            "role": "SUPER_ADMIN",
+            "test": true,
+            "email": "superadmin@hybridpos.pk",
+            "timestamp": 1769194122181
+          },
+          "expires_at": null,
+          "action_url": null,
+          "action_label": null,
+          "created_at": "2026-01-23T18:48:42.203Z",
+          "updated_at": null
+        },
+        {
+          "id": "fcbf76b3-92b2-456a-baea-461cf52fa401",
+          "user_id": "4afef20b-2007-4bb2-b2f6-682552ba627d",
+          "title": "Test Notification for ADMIN",
+          "message": "This is a test notification created at 1/23/2026, 1:48:42 PM",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "metadata": {
+            "role": "ADMIN",
+            "test": true,
+            "email": "admin@hybridpos.pk",
+            "timestamp": 1769194122205
+          },
+          "expires_at": null,
+          "action_url": null,
+          "action_label": null,
+          "created_at": "2026-01-23T18:48:42.225Z",
+          "updated_at": null
+        },
+        {
+          "id": "ed4b1e06-e5a0-466c-ac5c-a1b81140f192",
+          "user_id": "a6807197-f624-4864-bd9f-c48c62badca9",
+          "title": "Test Notification for USER",
+          "message": "This is a test notification created at 1/23/2026, 1:48:42 PM",
+          "type": "info",
+          "priority": "medium",
+          "read": false,
+          "metadata": {
+            "role": "USER",
+            "test": true,
+            "email": "user@hybridpos.pk",
+            "timestamp": 1769194122227
+          },
+          "expires_at": null,
+          "action_url": null,
+          "action_label": null,
+          "created_at": "2026-01-23T18:48:42.246Z",
+          "updated_at": null
+        }
+      ],
+      "rowCount": 6
+    },
+    "organizations": {
+      "structure": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "slug",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "plan",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'basic'::character varying"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'active'::character varying"
+        },
+        {
+          "column_name": "billing_email",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "phone",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "address",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "country",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "timezone",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": "'Asia/Karachi'::character varying"
+        },
+        {
+          "column_name": "currency",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": "'PKR'::character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "deleted_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "data": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "name": "Platform Super Admin",
+          "slug": "super-admin-platform",
+          "plan": "enterprise",
+          "status": "active",
+          "billing_email": "admin@platform.com",
+          "phone": null,
+          "address": null,
+          "country": null,
+          "timezone": "Asia/Karachi",
+          "currency": "PKR",
+          "created_at": "2026-01-22T20:29:31.008Z",
+          "updated_at": "2026-01-22T20:29:31.008Z",
+          "deleted_at": null
+        }
+      ],
+      "rowCount": 1
+    },
+    "transactions": {
+      "structure": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "organization_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "amount",
+          "data_type": "numeric",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "currency",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": "'PKR'::character varying"
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'pending'::character varying"
+        },
+        {
+          "column_name": "payment_method",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "description",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "data": [],
+      "rowCount": 0
+    },
+    "unread_notifications_summary": {
+      "structure": [
+        {
+          "column_name": "role",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "total_unread",
+          "data_type": "bigint",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "critical_unread",
+          "data_type": "bigint",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "high_unread",
+          "data_type": "bigint",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "error_unread",
+          "data_type": "bigint",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "data": [
+        {
+          "role": "super_admin",
+          "total_unread": "2",
+          "critical_unread": "0",
+          "high_unread": "0",
+          "error_unread": "0"
+        },
+        {
+          "role": "user",
+          "total_unread": "2",
+          "critical_unread": "0",
+          "high_unread": "0",
+          "error_unread": "0"
+        },
+        {
+          "role": "admin",
+          "total_unread": "2",
+          "critical_unread": "0",
+          "high_unread": "0",
+          "error_unread": "0"
+        }
+      ],
+      "rowCount": 3
+    },
+    "users": {
+      "structure": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "organization_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "email",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "password_hash",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "first_name",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "last_name",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "role",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "column_default": "'user'::character varying"
+        },
+        {
+          "column_name": "phone",
+          "data_type": "character varying",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "avatar_url",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean",
+          "is_nullable": "YES",
+          "column_default": "true"
+        },
+        {
+          "column_name": "is_verified",
+          "data_type": "boolean",
+          "is_nullable": "YES",
+          "column_default": "false"
+        },
+        {
+          "column_name": "last_login_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "two_factor_enabled",
+          "data_type": "boolean",
+          "is_nullable": "YES",
+          "column_default": "false"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "deleted_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "data": [
+        {
+          "id": "0d84911d-2a64-4ae0-95be-00c19c2e4f63",
+          "organization_id": null,
+          "email": "superadmin@hybridpos.pk",
+          "password_hash": "$2a$10$K9oI83nd6DHKaovZleBcS.3VnF7p7G.8nH5QN.5L2LwF8rQ2vY5zW",
+          "first_name": "Super",
+          "last_name": "Admin",
+          "role": "super_admin",
+          "phone": null,
+          "avatar_url": null,
+          "is_active": true,
+          "is_verified": true,
+          "last_login_at": null,
+          "two_factor_enabled": false,
+          "created_at": "2026-01-22T21:53:02.648Z",
+          "updated_at": "2026-01-27T20:54:34.163Z",
+          "deleted_at": null
+        },
+        {
+          "id": "4afef20b-2007-4bb2-b2f6-682552ba627d",
+          "organization_id": null,
+          "email": "admin@hybridpos.pk",
+          "password_hash": "$2a$10$K9oI83nd6DHKaovZleBcS.3VnF7p7G.8nH5QN.5L2LwF8rQ2vY5zW",
+          "first_name": "Store",
+          "last_name": "Admin",
+          "role": "admin",
+          "phone": null,
+          "avatar_url": null,
+          "is_active": true,
+          "is_verified": true,
+          "last_login_at": null,
+          "two_factor_enabled": false,
+          "created_at": "2026-01-22T21:53:02.654Z",
+          "updated_at": "2026-01-27T20:54:34.163Z",
+          "deleted_at": null
+        },
+        {
+          "id": "a6807197-f624-4864-bd9f-c48c62badca9",
+          "organization_id": null,
+          "email": "user@hybridpos.pk",
+          "password_hash": "$2a$10$K9oI83nd6DHKaovZleBcS.3VnF7p7G.8nH5QN.5L2LwF8rQ2vY5zW",
+          "first_name": "Staff",
+          "last_name": "User",
+          "role": "user",
+          "phone": null,
+          "avatar_url": null,
+          "is_active": true,
+          "is_verified": true,
+          "last_login_at": null,
+          "two_factor_enabled": false,
+          "created_at": "2026-01-22T21:53:02.656Z",
+          "updated_at": "2026-01-27T20:54:34.163Z",
+          "deleted_at": null
+        }
+      ],
+      "rowCount": 3
+    }
+  }
+}

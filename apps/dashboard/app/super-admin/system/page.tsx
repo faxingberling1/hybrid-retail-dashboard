@@ -38,10 +38,12 @@ import {
   PieChart, Pie, Cell
 } from 'recharts'
 
+type TabType = 'overview' | 'services' | 'security' | 'logs'
+
 export default function SystemHealthPage() {
   const [loading, setLoading] = useState(false)
   const [lastUpdate, setLastUpdate] = useState(new Date())
-  const [activeTab, setActiveTab] = useState<'overview' | 'services' | 'security' | 'logs'>('overview')
+  const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   // Mock data for charts
@@ -104,7 +106,7 @@ export default function SystemHealthPage() {
     { id: 5, type: 'success', message: 'All systems operational', time: '12 hours ago' },
   ]
 
-  const tabs = [
+  const tabs: { id: TabType; label: string; icon: any }[] = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'services', label: 'Services', icon: Server },
     { id: 'security', label: 'Security', icon: Shield },
@@ -272,9 +274,8 @@ export default function SystemHealthPage() {
                     key={metric.name}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
-                  >
+                    transition={{ delay: index * 0.1 }}>
+                    
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-3 rounded-lg ${metric.color}`}>
                         {metric.icon}
@@ -355,7 +356,7 @@ export default function SystemHealthPage() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"

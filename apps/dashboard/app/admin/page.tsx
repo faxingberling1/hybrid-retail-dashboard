@@ -88,7 +88,7 @@ export default function AdminPage() {
       title: "Today's Sales", 
       value: "₨ 72,000", 
       change: "+15%", 
-      icon: <DollarSign className="h-5 w-5" />, 
+      icon: <DollarSign className="h-5 w-5" />,
       color: "bg-green-100 text-green-600",
       trend: "up"
     },
@@ -228,22 +228,23 @@ export default function AdminPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${stat.color}`}>
-                {stat.icon}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`p-3 rounded-lg ${stat.color}`}>
+                  {stat.icon}
+                </div>
+                <div className={`flex items-center ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                  {stat.trend === 'up' ? 
+                    <TrendingUp className="h-4 w-4 mr-1" /> : 
+                    <TrendingUp className="h-4 w-4 mr-1 transform rotate-180" />
+                  }
+                  <span className="text-sm font-medium">{stat.change}</span>
+                </div>
               </div>
-              <div className={`flex items-center ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                {stat.trend === 'up' ? 
-                  <TrendingUp className="h-4 w-4 mr-1" /> : 
-                  <TrendingUp className="h-4 w-4 mr-1 transform rotate-180" />
-                }
-                <span className="text-sm font-medium">{stat.change}</span>
-              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+              <p className="text-gray-600 text-sm">{stat.title}</p>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
-            <p className="text-gray-600 text-sm">{stat.title}</p>
           </motion.div>
         ))}
       </div>
@@ -387,7 +388,7 @@ export default function AdminPage() {
 
           {activeTab === 'inventory' && (
             <div className="space-y-8">
-              {/* Inventory Distribution */}
+              {/* Inventory Distribution - FIXED: Simplified label */}
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div>
@@ -405,7 +406,7 @@ export default function AdminPage() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={(entry: any) => `${entry.category}: ${entry.value}%`}
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"

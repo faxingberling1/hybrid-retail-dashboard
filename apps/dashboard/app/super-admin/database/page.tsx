@@ -37,7 +37,8 @@ import {
   Zap,
   Globe,
   ShieldCheck,
-  Layers
+  Layers,
+  AreaChart
 } from 'lucide-react';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
@@ -294,7 +295,10 @@ export default function DatabasePage() {
     };
     
     update();
-    setInterval(update, 1000);
+    const interval = setInterval(update, 1000);
+    
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
   };
 
   const loadTableData = async (tableName: string, page: number = 1) => {
@@ -732,7 +736,7 @@ export default function DatabasePage() {
                   <h3 className="text-lg font-semibold text-gray-900">Table Size Distribution</h3>
                   <p className="text-sm text-gray-600">Top tables by size</p>
                 </div>
-                <PieChart className="w-6 h-6 text-purple-500" />
+                <BarChart3 className="w-6 h-6 text-purple-500" />
               </div>
               {tableSizes.length > 0 ? (
                 <div className="h-64">
@@ -747,7 +751,7 @@ export default function DatabasePage() {
                         fill="#8884d8"
                         dataKey="size"
                         nameKey="name"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                       >
                         {tableSizes.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
@@ -1214,9 +1218,13 @@ export default function DatabasePage() {
                         Previous
                       </button>
                       <div className="flex items-center space-x-1">
-                        {[...Array(Math.min(5, tablePagination.totalPages)).keys()].map(i => {
-                          const pageNum = i + 1;
-                          return (
+                        {(() => {
+                          const maxPages = Math.min(5, tablePagination.totalPages);
+                          const pageNumbers = [];
+                          for (let i = 1; i <= maxPages; i++) {
+                            pageNumbers.push(i);
+                          }
+                          return pageNumbers.map(pageNum => (
                             <button
                               key={pageNum}
                               onClick={() => loadTableData(selectedTable!, pageNum)}
@@ -1228,8 +1236,8 @@ export default function DatabasePage() {
                             >
                               {pageNum}
                             </button>
-                          );
-                        })}
+                          ));
+                        })()}
                         {tablePagination.totalPages > 5 && (
                           <>
                             <span className="px-2">...</span>
