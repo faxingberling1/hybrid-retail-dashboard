@@ -1,0 +1,10 @@
+{
+  "orgId": "your-org-id",
+  "projectId": "your-project-id",
+  "settings": {
+    "buildCommand": "cd ../.. && npx turbo run build --filter=dashboard",
+    "installCommand": "cd ../.. && npm install",
+    "outputDirectory": "apps/dashboard/.next",
+    "framework": "nextjs"
+  }
+}
