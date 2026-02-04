@@ -1,8 +1,15 @@
 {
   "version": 2,
   "framework": null,
-  "ignoreCommand": "echo 'Using custom vercel.json'",
+  "builds": [
+    {
+      "src": "apps/dashboard/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
   "installCommand": "cd apps/dashboard && npm install",
-  "buildCommand": "cd apps/dashboard && npx prisma generate && next build",
-  "outputDirectory": "apps/dashboard/.next"
+  "buildCommand": "cd apps/dashboard && npx prisma generate && next build"
 }
