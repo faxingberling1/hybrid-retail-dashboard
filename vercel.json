@@ -1,16 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "apps/dashboard/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
-    }
-  ],
-  "routes": [],
-  "buildCommand": "cd apps/dashboard && npm run build",
-  "installCommand": "cd apps/dashboard && npm install",
+  "installCommand": "cd apps/dashboard && npm ci --legacy-peer-deps",
+  "buildCommand": "cd apps/dashboard && npx prisma generate && next build",
   "outputDirectory": "apps/dashboard/.next"
 }
