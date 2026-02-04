@@ -261,14 +261,14 @@ export class DatabaseService {
           EXTRACT(EPOCH FROM (current_timestamp - pg_postmaster_start_time())) as uptime_seconds
       `);
       const uptimeSeconds = parseInt(uptimeResult.rows[0]?.uptime_seconds) || 0;
-      
+
       // Format uptime nicely
       let uptime = 'Unknown';
       if (uptimeSeconds > 0) {
         const days = Math.floor(uptimeSeconds / 86400);
         const hours = Math.floor((uptimeSeconds % 86400) / 3600);
         const minutes = Math.floor((uptimeSeconds % 3600) / 60);
-        
+
         if (days > 0) {
           uptime = `${days}d ${hours}h ${minutes}m`;
         } else if (hours > 0) {
@@ -297,7 +297,7 @@ export class DatabaseService {
    */
   static async executeQuery(queryText: string): Promise<QueryResult> {
     const startTime = Date.now();
-    
+
     try {
       // Safety check - block dangerous operations
       const upperQuery = queryText.toUpperCase().trim();
@@ -317,7 +317,7 @@ export class DatabaseService {
         '\\c ', // Connect to another database
         'COPY FROM'
       ];
-      
+
       if (dangerousPatterns.some(pattern => upperQuery.includes(pattern))) {
         return {
           success: false,
@@ -346,8 +346,8 @@ export class DatabaseService {
    * Get table data with pagination
    */
   static async getTableData(
-    tableName: string, 
-    page: number = 1, 
+    tableName: string,
+    page: number = 1,
     pageSize: number = 10
   ): Promise<TableDataResult> {
     try {
@@ -359,17 +359,17 @@ export class DatabaseService {
       // Get total count
       const countResult = await query(`SELECT COUNT(*) as count FROM "${tableName}"`);
       const total = parseInt(countResult.rows[0]?.count) || 0;
-      
+
       // Calculate offset
       const offset = (page - 1) * pageSize;
-      
+
       // Get paginated data with proper ordering
       let orderClause = '';
       try {
         // Try to order by created_at or id if they exist
         const hasCreatedAt = await this.columnExists(tableName, 'created_at');
         const hasId = await this.columnExists(tableName, 'id');
-        
+
         if (hasCreatedAt) {
           orderClause = 'ORDER BY created_at DESC';
         } else if (hasId) {
@@ -378,12 +378,12 @@ export class DatabaseService {
       } catch {
         // If we can't determine columns, don't specify order
       }
-      
+
       const dataResult = await query(
         `SELECT * FROM "${tableName}" ${orderClause} LIMIT $1 OFFSET $2`,
         [pageSize, offset]
       );
-      
+
       return {
         data: dataResult.rows,
         total,
@@ -411,7 +411,7 @@ export class DatabaseService {
             AND table_schema = 'public'
         ) as exists
       `, [tableName, columnName]);
-      
+
       return result.rows[0]?.exists || false;
     } catch {
       return false;
@@ -433,7 +433,7 @@ export class DatabaseService {
 
       const columns = Object.keys(data);
       const values = Object.values(data);
-      
+
       if (columns.length === 0) {
         return {
           success: false,
@@ -442,15 +442,15 @@ export class DatabaseService {
       }
 
       const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
-      
+
       const queryText = `
         INSERT INTO "${tableName}" (${columns.map(c => `"${c}"`).join(', ')})
         VALUES (${placeholders})
         RETURNING *
       `;
-      
+
       const result = await query(queryText, values);
-      
+
       return {
         success: true,
         insertedId: result.rows[0]?.id || result.rows[0]
@@ -468,8 +468,8 @@ export class DatabaseService {
    * Update data in a table
    */
   static async updateData(
-    tableName: string, 
-    id: any, 
+    tableName: string,
+    id: any,
     data: Record<string, any>,
     idColumn: string = 'id'
   ): Promise<UpdateResult> {
@@ -492,16 +492,16 @@ export class DatabaseService {
       const updates = Object.keys(data).map((key, i) => `"${key}" = $${i + 1}`).join(', ');
       const values = Object.values(data);
       values.push(id);
-      
+
       const queryText = `
         UPDATE "${tableName}"
         SET ${updates}, updated_at = NOW()
         WHERE "${idColumn}" = $${values.length}
         RETURNING *
       `;
-      
+
       const result = await query(queryText, values);
-      
+
       return {
         success: true,
         updatedRows: result.rowCount || 0
@@ -519,8 +519,8 @@ export class DatabaseService {
    * Delete data from a table
    */
   static async deleteData(
-    tableName: string, 
-    id: any, 
+    tableName: string,
+    id: any,
     idColumn: string = 'id'
   ): Promise<DeleteResult> {
     try {
@@ -544,9 +544,9 @@ export class DatabaseService {
         WHERE "${idColumn}" = $1
         RETURNING *
       `;
-      
+
       const result = await query(queryText, [id]);
-      
+
       return {
         success: true,
         deletedRows: result.rowCount || 0
@@ -564,8 +564,12 @@ export class DatabaseService {
    * Get database health status
    */
   static async getHealthStatus(): Promise<HealthStatus> {
-    const checks = [];
-    
+    const checks: Array<{
+      name: string;
+      status: 'pass' | 'fail' | 'warning';
+      message: string;
+    }> = [];
+
     // Check database connection
     try {
       await query('SELECT 1');
@@ -581,7 +585,7 @@ export class DatabaseService {
         message: 'Failed to connect to database'
       });
     }
-    
+
     // Check for locks
     try {
       const locksResult = await query(`
@@ -589,7 +593,7 @@ export class DatabaseService {
         FROM pg_locks
         WHERE granted = false
       `);
-      
+
       const lockCount = parseInt(locksResult.rows[0]?.lock_count) || 0;
       if (lockCount > 10) {
         checks.push({
@@ -611,7 +615,7 @@ export class DatabaseService {
         message: 'Failed to check locks'
       });
     }
-    
+
     // Check table accessibility
     try {
       const tablesResult = await query(`
@@ -620,7 +624,7 @@ export class DatabaseService {
         WHERE schemaname = 'public'
       `);
       const tableCount = parseInt(tablesResult.rows[0]?.table_count) || 0;
-      
+
       if (tableCount > 0) {
         checks.push({
           name: 'Table Access',
@@ -641,14 +645,14 @@ export class DatabaseService {
         message: 'Failed to access tables'
       });
     }
-    
+
     // Check database size
     try {
       const sizeResult = await query(`
         SELECT pg_size_pretty(pg_database_size(current_database())) as db_size
       `);
       const dbSize = sizeResult.rows[0]?.db_size || '0 bytes';
-      
+
       checks.push({
         name: 'Database Size',
         status: 'pass',
@@ -661,11 +665,11 @@ export class DatabaseService {
         message: 'Failed to check database size'
       });
     }
-    
+
     // Determine overall status
     const hasFail = checks.some(c => c.status === 'fail');
     const hasWarning = checks.some(c => c.status === 'warning');
-    
+
     return {
       status: hasFail ? 'critical' : hasWarning ? 'warning' : 'healthy',
       checks
@@ -692,7 +696,7 @@ export class DatabaseService {
           AND table_schema = 'public'
         ORDER BY ordinal_position
       `, [tableName]);
-      
+
       const columns: ColumnInfo[] = result.rows.map(row => ({
         columnName: row.column_name,
         dataType: row.data_type,
@@ -701,7 +705,7 @@ export class DatabaseService {
         isUnique: false,
         defaultValue: row.column_default
       }));
-      
+
       // Get primary keys
       try {
         const pkResult = await query(`
@@ -713,7 +717,7 @@ export class DatabaseService {
             AND tc.constraint_type = 'PRIMARY KEY'
             AND tc.table_schema = 'public'
         `, [tableName]);
-        
+
         pkResult.rows.forEach(pk => {
           const column = columns.find(c => c.columnName === pk.column_name);
           if (column) {
@@ -723,7 +727,7 @@ export class DatabaseService {
       } catch (error) {
         console.log(`Could not get primary keys for ${tableName}:`, error);
       }
-      
+
       return {
         tableName,
         columns,
@@ -755,7 +759,7 @@ export class DatabaseService {
           current_database() as database,
           current_timestamp as timestamp
       `);
-      
+
       return {
         success: true,
         connected: true,
@@ -790,7 +794,7 @@ export class DatabaseService {
           current_setting('server_version') as server_version,
           current_timestamp as timestamp
       `);
-      
+
       return {
         postgresVersion: result.server_version,
         serverInfo: result.full_version,

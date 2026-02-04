@@ -1,5 +1,8 @@
 import dotenv from 'dotenv'
-dotenv.config({ path: '.env.local' })
+const envPath = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.local'
+dotenv.config({ path: envPath })
+// Also try generic .env if path doesn't exist or as fallback
+dotenv.config()
 
 import bcrypt from 'bcrypt'
 import { Client } from 'pg'

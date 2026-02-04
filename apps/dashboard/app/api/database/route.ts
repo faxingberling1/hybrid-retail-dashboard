@@ -133,116 +133,103 @@ export async function GET(request: NextRequest) {
 
     switch (action) {
       case 'tables':
-        // Get all tables with details
+        // Get all tables with details using bulk queries
         const tablesQuery = await query(`
           SELECT 
-            schemaname as schema_name,
-            tablename as table_name,
-            tableowner as table_owner
-          FROM pg_tables
-          WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
-          ORDER BY tablename
+            t.tablename as table_name,
+            pg_size_pretty(pg_total_relation_size(quote_ident(t.tablename))) as size,
+            COALESCE(s.n_live_tup, 0) as row_count
+          FROM pg_tables t
+          LEFT JOIN pg_stat_user_tables s ON s.relname = t.tablename
+          WHERE t.schemaname = 'public'
+          ORDER BY t.tablename
         `);
 
         console.log(`📊 Found ${tablesQuery.rows.length} tables`);
 
-        // Get enhanced table info
-        // Get enhanced table info sequentially to prevent connection pool exhaustion
-        const tablesWithDetails = [];
-        for (const table of tablesQuery.rows) {
-          try {
-            // Get row count
-            const countResult = await query(`SELECT COUNT(*) as count FROM "${table.table_name}"`);
-            const rowCount = parseInt(countResult.rows[0].count) || 0;
+        // Get all columns for all tables in one go
+        const allColumnsQuery = await query(`
+          SELECT 
+            table_name,
+            column_name,
+            data_type,
+            is_nullable,
+            column_default
+          FROM information_schema.columns
+          WHERE table_schema = 'public'
+          ORDER BY table_name, ordinal_position
+        `);
 
-            // Get table size
-            const sizeResult = await query(`
-              SELECT pg_size_pretty(pg_total_relation_size('${table.table_name}')) as size
-            `);
-            const size = sizeResult.rows[0]?.size || '0 bytes';
+        // Get all constraints (primary keys and unique) for all tables
+        const allConstraintsQuery = await query(`
+          SELECT
+            tc.table_name,
+            kcu.column_name,
+            tc.constraint_type
+          FROM information_schema.table_constraints tc
+          JOIN information_schema.key_column_usage kcu
+            ON tc.constraint_name = kcu.constraint_name
+          WHERE tc.table_schema = 'public'
+            AND tc.constraint_type IN ('PRIMARY KEY', 'UNIQUE')
+        `);
 
-            // Get columns
-            const columnsResult = await query(`
-              SELECT 
-                column_name,
-                data_type,
-                is_nullable,
-                column_default
-              FROM information_schema.columns
-              WHERE table_name = '${table.table_name}'
-              ORDER BY ordinal_position
-            `);
+        // Get all indexes for all tables
+        const allIndexesQuery = await query(`
+          SELECT
+            t.relname as table_name,
+            c.relname as index_name,
+            pg_get_indexdef(i.indexrelid) as index_definition,
+            i.indisunique as is_unique
+          FROM pg_index i
+          JOIN pg_class c ON c.oid = i.indexrelid
+          JOIN pg_class t ON t.oid = i.indrelid
+          JOIN pg_namespace n ON n.oid = t.relnamespace
+          WHERE n.nspname = 'public'
+            AND t.relkind = 'r'
+        `);
 
-            const columns = columnsResult.rows.map(row => ({
-              columnName: row.column_name,
-              dataType: row.data_type,
-              isNullable: row.is_nullable === 'YES',
-              isPrimaryKey: false,
-              isUnique: false,
-              defaultValue: row.column_default
-            }));
+        // Group data by table
+        const columnsByTable: Record<string, any[]> = {};
+        allColumnsQuery.rows.forEach((col: any) => {
+          if (!columnsByTable[col.table_name]) columnsByTable[col.table_name] = [];
+          columnsByTable[col.table_name].push({
+            columnName: col.column_name,
+            dataType: col.data_type,
+            isNullable: col.is_nullable === 'YES',
+            isPrimaryKey: false,
+            isUnique: false,
+            defaultValue: col.column_default
+          });
+        });
 
-            // Get constraints
-            try {
-              const constraintsResult = await query(`
-                SELECT
-                  kcu.column_name,
-                  tc.constraint_type
-                FROM information_schema.table_constraints tc
-                JOIN information_schema.key_column_usage kcu
-                  ON tc.constraint_name = kcu.constraint_name
-                WHERE tc.table_name = '${table.table_name}'
-                  AND tc.constraint_type IN ('PRIMARY KEY', 'UNIQUE')
-              `);
-
-              constraintsResult.rows.forEach(constraint => {
-                const column = columns.find(c => c.columnName === constraint.column_name);
-                if (column) {
-                  if (constraint.constraint_type === 'PRIMARY KEY') {
-                    column.isPrimaryKey = true;
-                  } else if (constraint.constraint_type === 'UNIQUE') {
-                    column.isUnique = true;
-                  }
-                }
-              });
-            } catch (error) {
-              console.log(`⚠️ Could not get constraints for ${table.table_name}:`, error);
+        allConstraintsQuery.rows.forEach((cons: any) => {
+          const cols = columnsByTable[cons.table_name];
+          if (cols) {
+            const col = cols.find((c: any) => c.columnName === cons.column_name);
+            if (col) {
+              if (cons.constraint_type === 'PRIMARY KEY') col.isPrimaryKey = true;
+              else if (cons.constraint_type === 'UNIQUE') col.isUnique = true;
             }
-
-            // Get indexes
-            const indexesResult = await query(`
-              SELECT
-                indexname as index_name,
-                indexdef as index_definition,
-                indisunique as is_unique
-              FROM pg_indexes
-              WHERE tablename = '${table.table_name}'
-            `);
-
-            const indexes = indexesResult.rows.map(row => ({
-              indexName: row.index_name,
-              indexDefinition: row.index_definition,
-              isUnique: row.is_unique
-            }));
-
-            tablesWithDetails.push({
-              tableName: table.table_name,
-              rowCount,
-              size,
-              columns,
-              indexes
-            });
-          } catch (error) {
-            console.error(`❌ Error getting details for ${table.table_name}:`, error);
-            tablesWithDetails.push({
-              tableName: table.table_name,
-              rowCount: 0,
-              size: '0 bytes',
-              columns: [],
-              indexes: []
-            });
           }
-        }
+        });
+
+        const indexesByTable: Record<string, any[]> = {};
+        allIndexesQuery.rows.forEach((idx: any) => {
+          if (!indexesByTable[idx.table_name]) indexesByTable[idx.table_name] = [];
+          indexesByTable[idx.table_name].push({
+            indexName: idx.index_name,
+            indexDefinition: idx.index_definition,
+            isUnique: idx.is_unique
+          });
+        });
+
+        const tablesWithDetails = tablesQuery.rows.map((table: any) => ({
+          tableName: table.table_name,
+          rowCount: parseInt(table.row_count) || 0,
+          size: table.size || '0 bytes',
+          columns: columnsByTable[table.table_name] || [],
+          indexes: indexesByTable[table.table_name] || []
+        }));
 
         return NextResponse.json({
           success: true,

@@ -1,0 +1,200 @@
+﻿node.exe : npm warn 
+config ignoring 
+workspace config at 
+C:\Users\Zah Computer
+s\Downloads\hybrid-re
+tail-pos\apps\dashboa
+rd/.npmrc
+At C:\Program Files\n
+odejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (npm war   
+ n config...ashbo    
+ard/.npmrc:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+app/api/database/route.ts(553,45): error TS7006: Parameter 'field' implicitly has an 'any' type.
+app/api/database/route.ts(657,41): error TS7006: Parameter 'field' implicitly has an 'any' type.
+app/api/database/route.ts(711,47): error TS7006: Parameter 'row' implicitly has an 'any' type.
+app/api/signup/route.ts(4,10): error TS2305: Module '"@/lib/db"' has no exported member 'db'.
+app/api/signup/route.ts(5,30): error TS7016: Could not find a declaration file for module 'uuid'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/uuid/dist/esm-browser/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`
+app/api/signup/route.ts(161,39): error TS7006: Parameter 'rollbackError' implicitly has an 'any' type.
+app/notifications/page.tsx(283,35): error TS2322: Type 'string' is not assignable to type 'UrlObject | RouteImpl<string>'.
+app/onboarding/[organizationId]/industry-setup/pharmacy/page.tsx(260,46): error TS2345: Argument of type '`/onboarding/${string}/import-medicines`' is not assignable to parameter of type 'RouteImpl<`/onboarding/${string}/import-medicines`>'.
+app/onboarding/[organizationId]/industry-setup/pharmacy/page.tsx(269,46): error TS2345: Argument of type '`/onboarding/${string}/setup-suppliers`' is not assignable to parameter of type 'RouteImpl<`/onboarding/${string}/setup-suppliers`>'.
+app/onboarding/[organizationId]/page.tsx(93,21): error TS2345: Argument of type '"/dashboard"' is not assignable to parameter of type 'RouteImpl<"/dashboard">'.
+app/onboarding/[organizationId]/page.tsx(183,50): error TS2345: Argument of type '`/onboarding/${string}/${string}`' is not assignable to parameter of type 'RouteImpl<`/onboarding/${string}/${string}`>'.
+app/onboarding/[organizationId]/page.tsx(210,40): error TS2345: Argument of type '"/dashboard"' is not assignable to parameter of type 'RouteImpl<"/dashboard">'.
+app/onboarding/complete/page.tsx(23,48): error TS2345: Argument of type '"/dashboard"' is not assignable to parameter of type 'RouteImpl<"/dashboard">'.
+app/super-admin/analytics/page.tsx(285,7): error TS2322: Type '{ children: Element[]; key: string; initial: { opacity: number; y: number; }; animate: { opacity: number; y: number; }; transition: { delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/super-admin/billing/page.tsx(418,13): error TS2322: Type '{ children: Element[]; key: string; initial: { opacity: number; y: number; }; animate: { opacity: number; y: number; }; transition: { delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/super-admin/organizations/page.tsx(194,7): error TS2322: Type '{ children: Element[]; key: string; initial: { opacity: number; y: number; }; animate: { opacity: number; y: number; }; transition: { delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/calculator/page.tsx(103,36): error TS2345: Argument of type 'null' is not assignable to parameter of type 'SetStateAction<boolean>'.
+app/user/calculator/page.tsx(174,37): error TS2322: Type '{ children: string; key: string; initial: { opacity: number; y: number; }; animate: { opacity: number; y: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/calculator/page.tsx(269,49): error TS2322: Type '{ children: Element[]; key: number; initial: { opacity: number; x: number; }; animate: { opacity: number; x: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/customers/page.tsx(62,25): error TS2322: Type '{ children: Element[]; key: number; initial: { opacity: number; x: number; }; animate: { opacity: number; x: number; }; transition: { delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/my-sales/page.tsx(42,25): error TS2322: Type '{ children: Element[]; key: string; initial: { opacity: number; y: number; }; animate: { opacity: number; y: number; }; transition: { delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/my-sales/page.tsx(60,37): error TS2322: Type '{ initial: { width: number; }; animate: { width: string; }; transition: { duration: number; delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/my-sales/page.tsx(116,33): error TS2322: Type '{ children: Element[]; key: string; initial: { opacity: number; x: number; }; animate: { opacity: number; x: number; }; transition: { delay: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/quick-sale/page.tsx(186,37): error TS2322: Type '{ children: Element[]; key: any; whileHover: { scale: number; translateY: number; }; whileTap: { scale: number; }; onClick: () => void; className: string; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'onClick' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/quick-sale/page.tsx(241,41): error TS2322: Type '{ children: Element[]; initial: { opacity: number; }; animate: { opacity: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+app/user/quick-sale/page.tsx(256,45): error TS2322: Type '{ children: Element[]; key: any; layout: true; initial: { opacity: number; x: number; }; animate: { opacity: number; x: number; }; exit: { opacity: number; scale: number; }; className: string; }' is not assignable to type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & HTMLAttributesWithoutMotionProps<unknown, unknown> & MotionProps & RefAttributes<unknown>'.
+components/dashboard/user/user-stats.tsx(8,11): error TS2503: Cannot find namespace 'JSX'.
+components/ui/advanced-settings/advanced-section.tsx(7,10): error TS2614: Module '"./logs-section"' has no exported member 'LogEntry'. Did you mean to use 'import LogEntry from "./logs-section"' instead?
+components/ui/advanced-settings/advanced-section.tsx(7,20): error TS2614: Module '"./logs-section"' has no exported member 'DebugTool'. Did you mean to use 'import DebugTool from "./logs-section"' instead?
+components/ui/advanced-settings/advanced-section.tsx(7,31): error TS2614: Module '"./logs-section"' has no exported member 'DangerZoneAction'. Did you mean to use 'import DangerZoneAction from "./logs-section"' instead?
+components/ui/advanced-settings/index.ts(8,15): error TS2614: Module '"./logs-section"' has no exported member 'LogEntry'. Did you mean to use 'import LogEntry from "./logs-section"' instead?
+components/ui/advanced-settings/index.ts(8,25): error TS2614: Module '"./logs-section"' has no exported member 'DebugTool'. Did you mean to use 'import DebugTool from "./logs-section"' instead?
+components/ui/advanced-settings/index.ts(8,36): error TS2614: Module '"./logs-section"' has no exported member 'DangerZoneAction'. Did you mean to use 'import DangerZoneAction from "./logs-section"' instead?
+components/ui/general-settings/regional-section.tsx(191,13): error TS2322: Type 'Element' is not assignable to type 'string'.
+components/ui/general-settings/regional-section.tsx(210,13): error TS2322: Type '{ label: string; name: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(216,11): error TS2322: Type 'Element' is not assignable to type 'string'.
+components/ui/general-settings/regional-section.tsx(243,15): error TS2322: Type '{ label: string; name: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(252,15): error TS2322: Type '{ label: string; name: string; value: "12h" | "24h"; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(262,13): error TS2322: Type '{ label: string; name: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(302,15): error TS2322: Type '{ label: string; description: string; enabled: true; onChange: () => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/general-settings/regional-section.tsx(310,15): error TS2322: Type '{ label: string; description: string; enabled: true; onChange: () => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/general-settings/regional-section.tsx(318,15): error TS2322: Type '{ label: string; description: string; enabled: true; onChange: () => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/general-settings/theme-section.tsx(276,11): error TS2322: Type '{ label: string; selectedMode: "system" | "light" | "dark"; onChange: (mode: string) => void; modes: { id: string; label: string; icon: LucideIcon; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ThemeModeSelectorProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ThemeModeSelectorProps'.
+components/ui/general-settings/theme-section.tsx(286,13): error TS2322: Type '{ label: string; selectedColor: string; onChange: (color: string) => void; colors: { id: string; value: string; name: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ColorSelectorProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ColorSelectorProps'.
+components/ui/general-settings/theme-section.tsx(330,13): error TS2322: Type '{ label: string; name: string; value: "small" | "large" | "medium"; onChange: (size: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/theme-section.tsx(339,13): error TS2322: Type '{ label: string; name: string; value: "compact" | "comfortable"; onChange: (density: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/theme-section.tsx(349,11): error TS2322: Type '{ label: string; description: string; enabled: boolean; onChange: (enabled: boolean) => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/index.ts(38,28): error TS2614: Module '"./integrations-settings/integration-card"' has no exported member 'AvailableIntegration'. Did you mean to use 'import AvailableIntegration from "./integrations-settings/integration-card"' instead?
+components/ui/index.ts(48,15): error TS2614: Module '"./advanced-settings/logs-section"' has no exported member 'LogEntry'. Did you mean to use 'import LogEntry from "./advanced-settings/logs-section"' instead?
+components/ui/index.ts(48,25): error TS2614: Module '"./advanced-settings/logs-section"' has no exported member 'DebugTool'. Did you mean to use 'import DebugTool from "./advanced-settings/logs-section"' instead?
+components/ui/index.ts(48,36): error TS2614: Module '"./advanced-settings/logs-section"' has no exported member 'DangerZoneAction'. Did you mean to use 'import DangerZoneAction from "./advanced-settings/logs-section"' instead?
+components/ui/integrations-settings/index.ts(8,28): error TS2614: Module '"./integration-card"' has no exported member 'AvailableIntegration'. Did you mean to use 'import AvailableIntegration from "./integration-card"' instead?
+lib/api/database/route.ts(50,36): error TS2783: 'success' is specified more than once, so this usage will be overwritten.
+lib/db.ts(1,34): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+lib/db.ts(47,19): error TS7006: Parameter 'err' implicitly has an 'any' type.
+lib/email.ts(4,34): error TS7016: Could not find a declaration file for module 'nodemailer'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/nodemailer/lib/nodemailer.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/nodemailer` if it exists or add a new declaration (.d.ts) file containing `declare module 'nodemailer';`
+lib/email.ts(5,38): error TS7016: Could not find a declaration file for module 'nodemailer'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/nodemailer/lib/nodemailer.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/nodemailer` if it exists or add a new declaration (.d.ts) file containing `declare module 'nodemailer';`
+lib/email.ts(13,22): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+lib/email.ts(13,35): error TS7016: Could not find a declaration file for module 'nodemailer'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/nodemailer/lib/nodemailer.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/nodemailer` if it exists or add a new declaration (.d.ts) file containing `declare module 'nodemailer';`
+lib/middleware/onboarding.ts(3,10): error TS2305: Module '"@/lib/db"' has no exported member 'db'.
+lib/models/activity.model.ts(49,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/models/activity.model.ts(59,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/models/transaction.model.ts(54,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/models/transaction.model.ts(64,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/repositories/analytics.repository.ts(127,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/repositories/analytics.repository.ts(174,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/repositories/analytics.repository.ts(249,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/server-db.ts(4,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+lib/server-db.ts(24,19): error TS7006: Parameter 'err' implicitly has an 'any' type.
+lib/services/database.service.ts(97,37): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/services/database.service.ts(164,60): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/services/database.service.ts(184,59): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/services/database.service.ts(671,7): error TS2322: Type '{ name: string; status: string; message: string; }[]' is not assignable to type '{ name: string; status: "pass" | "fail" | "warning"; message: string; }[]'.
+  Type '{ name: string; status: string; message: string; }' is not assignable to type '{ name: string; status: "pass" | "fail" | "warning"; message: string; }'.
+    Types of property 'status' are incompatible.
+      Type 'string' is not assignable to type '"pass" | "fail" | "warning"'.
+lib/services/database.service.ts(696,53): error TS7006: Parameter 'row' implicitly has an 'any' type.
+lib/services/database.service.ts(717,31): error TS7006: Parameter 'pk' implicitly has an 'any' type.
+lib/services/notification.service.ts(10,36): error TS2345: Argument of type '{ userId: string; read: false; expiresAt: Date; title: string; message: string; type?: NotificationType; priority?: NotificationPriority; ... 4 more ...; role?: UserRole; }' is not assignable to parameter of type 'Omit<Notification, "id" | "createdAt">'.
+  Types of property 'type' are incompatible.
+    Type 'NotificationType | undefined' is not assignable to type 'NotificationType'.
+      Type 'undefined' is not assignable to type 'NotificationType'.
+lib/services/notification.service.ts(27,32): error TS2345: Argument of type '{ userId: string; metadata: { role: "SUPER_ADMIN" | "ADMIN" | "USER"; dashboard?: string; entityId?: string; entityType?: string; }; read: false; expiresAt: Date; title: string; message: string; ... 5 more ...; role: "SUPER_ADMIN" | ... 1 more ... | "USER"; }' is not assignable to parameter of type 'Omit<Notification, "id" | "createdAt">'.
+  Types of property 'type' are incompatible.
+    Type 'NotificationType | undefined' is not assignable to type 'NotificationType'.
+      Type 'undefined' is not assignable to type 'NotificationType'.
+lib/services/notification.service.ts(53,43): error TS2339: Property 'findAll' does not exist on type 'typeof UserRepository'.
+lib/services/notification.service.ts(55,35): error TS7006: Parameter 'user' implicitly has an 'any' type.
+lib/services/settings.service.ts(21,52): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(29,65): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(37,58): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(42,54): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(74,99): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/store/settings-store.ts(509,28): error TS2698: Spread types may only be created from object types.
+lib/utils/validation.ts(115,18): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(116,16): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(122,16): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(122,33): error TS2339: Property 'errors' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(123,14): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+prisma.config.ts(4,30): error TS2307: Cannot find module 'prisma/config' or its corresponding type declarations.
+scripts/check-db.ts(17,35): error TS7006: Parameter 'row' implicitly has an 'any' type.
+scripts/check-db.ts(17,40): error TS7006: Parameter 'i' implicitly has an 'any' type.
+scripts/check-db.ts(41,26): error TS7006: Parameter 'col' implicitly has an 'any' type.
+scripts/check-db.ts(50,28): error TS7006: Parameter 'user' implicitly has an 'any' type.
+scripts/cleanup.ts(4,24): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/create-db.ts(1,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/debug-tickets.ts(3,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/final-verification.ts(61,59): error TS2345: Argument of type '{ read: false; title: string; message: string; type: string; priority: string; metadata: { alert: boolean; category: string; amount?: undefined; customerId?: undefined; meeting?: undefined; duration?: undefined; }; expiresAt?: undefined; userId: string; } | { ...; } | { ...; }' is not assignable to parameter of type 'Omit<Notification, "id" | "createdAt">'.
+  Type '{ read: false; title: string; message: string; type: string; priority: string; metadata: { alert: boolean; category: string; amount?: undefined; customerId?: undefined; meeting?: undefined; duration?: undefined; }; expiresAt?: undefined; userId: string; }' is not assignable to type 'Omit<Notification, "id" | "createdAt">'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type 'NotificationType'.
+scripts/fix-db.ts(4,24): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/fix-db.ts(30,30): error TS7006: Parameter 'col' implicitly has an 'any' type.
+scripts/fix-db.ts(30,35): error TS7006: Parameter 'index' implicitly has an 'any' type.
+scripts/fix-db.ts(35,49): error TS7006: Parameter 'row' implicitly has an 'any' type.
+scripts/migrate-direct.ts(6,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/migrate-notifications-complete.ts(2,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/migrate-notifications-complete.ts(247,35): error TS7006: Parameter 'row' implicitly has an 'any' type.
+scripts/migrate-tickets.ts(1,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/migrate.ts(4,24): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/seed-inventory.ts(2,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/seed.ts(7,20): error TS7016: Could not find a declaration file for module 'bcrypt'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/bcrypt/bcrypt.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/bcrypt` if it exists or add a new declaration (.d.ts) file containing `declare module 'bcrypt';`
+scripts/seed.ts(8,24): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/seed.ts(139,26): error TS7006: Parameter 'user' implicitly has an 'any' type.
+scripts/seed.ts(139,32): error TS7006: Parameter 'index' implicitly has an 'any' type.
+scripts/setup-db.ts(2,8): error TS2613: Module '"C:/Users/Zah Computers/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' has no default export. Did you mean to use 'import { pool } from "C:/Users/Zah Computers/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' instead?
+scripts/test-db-connection.ts(2,10): error TS2305: Module '"../lib/db"' has no exported member 'testSupabaseConnection'.
+scripts/test-notification-system.ts(3,8): error TS2613: Module '"C:/Users/Zah Computers/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' has no default export. Did you mean to use 'import { pool } from "C:/Users/Zah Computers/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' instead?
+scripts/test-notification-system.ts(48,9): error TS2322: Type 'string' is not assignable to type 'NotificationType'.
+scripts/test-notification-system.ts(52,11): error TS2322: Type 'string' is not assignable to type 'UserRole | undefined'.
+scripts/test-prisma-init.ts(3,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`
+scripts/test-serialization.ts(2,22): error TS7016: Could not find a declaration file for module 'pg'. 'C:/Users/Zah Computers/Downloads/hybrid-retail-pos/node_modules/pg/esm/index.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pg` if it exists or add a new declaration (.d.ts) file containing `declare module 'pg';`

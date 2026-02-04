@@ -2,82 +2,59 @@
 'use client'
 
 import { useState } from 'react'
-import { Building2, Users, MapPin, Clock } from 'lucide-react'
+import { Building2, Users, MapPin, Clock, Info } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const BUSINESS_TYPES = [
-  'Sole Proprietorship',
-  'Partnership',
-  'LLC',
-  'Corporation',
-  'Non-Profit',
-  'Other'
+  'Sole Proprietorship', 'Partnership', 'LLC', 'Corporation', 'Other'
 ]
 
 const EMPLOYEE_RANGES = [
-  '1-10',
-  '11-50',
-  '51-200',
-  '201-500',
-  '501-1000',
-  '1000+'
+  '1-10', '11-50', '51-200', '201-500', '501+'
 ]
 
 const COUNTRIES = [
-  'United States',
-  'United Kingdom',
-  'Canada',
-  'Australia',
-  'India',
-  'Germany',
-  'France',
-  'Japan',
-  'China',
-  'Other'
+  'United States', 'United Kingdom', 'Canada', 'Australia', 'Pakistan', 'Germany', 'France', 'Other'
 ]
 
-const TIMEZONES = [
-  'UTC',
-  'EST (UTC-5)',
-  'CST (UTC-6)',
-  'PST (UTC-8)',
-  'GMT (UTC+0)',
-  'CET (UTC+1)',
-  'IST (UTC+5:30)',
-  'AEST (UTC+10)'
-]
-
-export default function BusinessDetails({ formData, updateFormData }: any) {
+export default function BusinessDetails({ formData, updateFormData, theme }: any) {
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const isGalactic = theme === 'galactic'
+
+  const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 transition-all duration-300 outline-none font-medium ${isGalactic
+    ? 'bg-white/5 border-white/5 text-white placeholder:text-slate-600 focus:border-violet-500/50 focus:bg-white/10'
+    : 'bg-slate-50 border-slate-100 text-slate-900 placeholder:text-slate-400 focus:border-sky-500/50 focus:bg-white'
+    }`
+
+  const labelClasses = `block text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${isGalactic ? 'text-slate-400' : 'text-slate-500'
+    }`
 
   const validateField = (field: string, value: string) => {
     const newErrors = { ...errors }
-    
     if (!value.trim()) {
-      newErrors[field] = 'This field is required'
+      newErrors[field] = 'Required Parameter Missing'
     } else {
       delete newErrors[field]
     }
-    
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Business Details</h2>
-        <p className="text-gray-600">
-          Tell us about your business. This information helps us customize your dashboard.
+    <div className="space-y-10">
+      <div className="space-y-2">
+        <h2 className={`text-3xl font-black tracking-tighter ${isGalactic ? 'text-white' : 'text-slate-900'}`}>Business Details</h2>
+        <p className={`text-sm font-medium leading-relaxed ${isGalactic ? 'text-slate-400' : 'text-slate-500'}`}>
+          Tell us about your company. This helps us tailor your dashboard.
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="grid gap-8">
         {/* Business Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="space-y-2">
+          <label className={labelClasses}>
             <div className="flex items-center">
-              <Building2 className="w-4 h-4 mr-2 text-gray-500" />
-              Business Name *
+              <Building2 className="w-3.5 h-3.5 mr-2 opacity-50" />
+              Business Name
             </div>
           </label>
           <input
@@ -87,132 +64,117 @@ export default function BusinessDetails({ formData, updateFormData }: any) {
               updateFormData({ businessName: e.target.value })
               validateField('businessName', e.target.value)
             }}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-              errors.businessName ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="Enter your business name"
+            className={inputClasses}
+            placeholder="e.g. Nexus Dynamics Corp"
           />
           {errors.businessName && (
-            <p className="mt-1 text-sm text-red-600">{errors.businessName}</p>
+            <p className="text-[10px] font-black text-rose-500 uppercase tracking-tighter ml-2">{errors.businessName}</p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-8">
           {/* Business Type */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Business Type *
-            </label>
-            <select
-              value={formData.businessType}
-              onChange={(e) => {
-                updateFormData({ businessType: e.target.value })
-                validateField('businessType', e.target.value)
-              }}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                errors.businessType ? 'border-red-300' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select business type</option>
-              {BUSINESS_TYPES.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-            {errors.businessType && (
-              <p className="mt-1 text-sm text-red-600">{errors.businessType}</p>
-            )}
+          <div className="space-y-2">
+            <label className={labelClasses}>Business Type</label>
+            <div className="relative">
+              <select
+                value={formData.businessType}
+                onChange={(e) => {
+                  updateFormData({ businessType: e.target.value })
+                  validateField('businessType', e.target.value)
+                }}
+                className={`${inputClasses} appearance-none cursor-pointer`}
+              >
+                <option value="" disabled className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>Select type...</option>
+                {BUSINESS_TYPES.map(type => (
+                  <option key={type} value={type} className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>{type}</option>
+                ))}
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" /></svg>
+              </div>
+            </div>
           </div>
 
           {/* Employee Count */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <Users className="w-4 h-4 mr-2 text-gray-500" />
-                Employee Count
+          <div className="space-y-2">
+            <label className={labelClasses}>Number of Employees</label>
+            <div className="relative">
+              <select
+                value={formData.employees}
+                onChange={(e) => updateFormData({ employees: e.target.value })}
+                className={`${inputClasses} appearance-none cursor-pointer`}
+              >
+                {EMPLOYEE_RANGES.map(range => (
+                  <option key={range} value={range} className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>{range} Employees</option>
+                ))}
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                <Users className="w-4 h-4" />
               </div>
-            </label>
-            <select
-              value={formData.employees}
-              onChange={(e) => updateFormData({ employees: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            >
-              {EMPLOYEE_RANGES.map(range => (
-                <option key={range} value={range}>{range} employees</option>
-              ))}
-            </select>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-8">
           {/* Country */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <MapPin className="w-4 h-4 mr-2 text-gray-500" />
-                Country *
+          <div className="space-y-2">
+            <label className={labelClasses}>Country / Region</label>
+            <div className="relative">
+              <select
+                value={formData.country}
+                onChange={(e) => {
+                  updateFormData({ country: e.target.value })
+                  validateField('country', e.target.value)
+                }}
+                className={`${inputClasses} appearance-none cursor-pointer`}
+              >
+                <option value="" disabled className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>Select region...</option>
+                {COUNTRIES.map(country => (
+                  <option key={country} value={country} className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>{country}</option>
+                ))}
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                <MapPin className="w-4 h-4" />
               </div>
-            </label>
-            <select
-              value={formData.country}
-              onChange={(e) => {
-                updateFormData({ country: e.target.value })
-                validateField('country', e.target.value)
-              }}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                errors.country ? 'border-red-300' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select country</option>
-              {COUNTRIES.map(country => (
-                <option key={country} value={country}>{country}</option>
-              ))}
-            </select>
-            {errors.country && (
-              <p className="mt-1 text-sm text-red-600">{errors.country}</p>
-            )}
+            </div>
           </div>
 
-          {/* Timezone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-gray-500" />
-                Timezone
+          {/* Timezone (simplified) */}
+          <div className="space-y-2">
+            <label className={labelClasses}>Timezone</label>
+            <div className="relative">
+              <select
+                value={formData.timezone}
+                onChange={(e) => updateFormData({ timezone: e.target.value })}
+                className={`${inputClasses} appearance-none cursor-pointer`}
+              >
+                <option value="UTC" className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>Global (UTC)</option>
+                <option value="PST" className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>Pacific (PST)</option>
+                <option value="EST" className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>Eastern (EST)</option>
+                <option value="GMT" className={isGalactic ? 'bg-[#020412]' : 'bg-white'}>London (GMT)</option>
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                <Clock className="w-4 h-4" />
               </div>
-            </label>
-            <select
-              value={formData.timezone}
-              onChange={(e) => updateFormData({ timezone: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            >
-              {TIMEZONES.map(tz => (
-                <option key={tz} value={tz}>{tz}</option>
-              ))}
-            </select>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Industry Info (if selected in previous step) */}
       {formData.industry && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <div className="flex items-start">
-            <div className="p-1.5 bg-blue-100 rounded mr-3">
-              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-blue-800">
-                Your {formData.industry.charAt(0).toUpperCase() + formData.industry.slice(1)} Dashboard
-              </p>
-              <p className="text-sm text-blue-700 mt-1">
-                Based on your industry selection, we'll customize features like inventory management, 
-                customer relations, and reporting specifically for your business type.
-              </p>
-            </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={`p-6 border rounded-[2rem] flex items-center space-x-5 ${isGalactic ? 'bg-violet-500/10 border-violet-500/20' : 'bg-sky-50 border-sky-100'}`}
+        >
+          <div className={`p-2 rounded-xl ${isGalactic ? 'bg-violet-500/20 text-violet-400' : 'bg-sky-100 text-sky-600'}`}>
+            <Info className="w-5 h-5" />
           </div>
-        </div>
+          <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed text-slate-500">
+            Setting up {formData.industry} tools for your {formData.businessType || 'business'}.
+          </p>
+        </motion.div>
       )}
     </div>
   )

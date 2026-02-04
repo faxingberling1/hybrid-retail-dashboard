@@ -2,39 +2,40 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, Mail, X, Plus, UserCheck } from 'lucide-react'
+import { Users, Mail, X, Plus, UserCheck, Shield, Zap, BarChart3, Info } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const ROLES = [
-  { value: 'MANAGER', label: 'Manager', description: 'Can manage staff and operations' },
-  { value: 'USER', label: 'Staff', description: 'Basic access for daily operations' },
-  { value: 'VIEWER', label: 'Viewer', description: 'Read-only access to reports' },
-  { value: 'ACCOUNTANT', label: 'Accountant', description: 'Financial reporting and billing' },
+  { value: 'MANAGER', label: 'Command', description: 'Operations & Staff Sync', icon: Zap },
+  { value: 'USER', label: 'Operator', description: 'Core Task Execution', icon: UserCheck },
+  { value: 'VIEWER', label: 'Analyst', description: 'Intelligence & Reports', icon: BarChart3 },
+  { value: 'ACCOUNTANT', label: 'Vault', description: 'Fiscal & Asset Flow', icon: Shield },
 ]
 
-export default function UserInvitation({ formData, updateFormData }: any) {
+export default function UserInvitation({ formData, updateFormData, theme }: any) {
   const [emailInput, setEmailInput] = useState('')
   const [selectedRole, setSelectedRole] = useState('USER')
   const [emailError, setEmailError] = useState('')
+  const isGalactic = theme === 'galactic'
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+  const inputClasses = `flex-1 px-6 py-4 rounded-2xl border-2 transition-all duration-300 outline-none font-medium ${isGalactic
+    ? 'bg-white/5 border-white/5 text-white placeholder:text-slate-600 focus:border-violet-500/50 focus:bg-white/10'
+    : 'bg-white border-slate-100 text-slate-900 placeholder:text-slate-400 focus:border-sky-500/50 focus:bg-white'
+    }`
+
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   const addUser = () => {
     if (!emailInput.trim()) {
-      setEmailError('Email is required')
+      setEmailError('Node Identifier Required')
       return
     }
-
     if (!validateEmail(emailInput)) {
-      setEmailError('Please enter a valid email address')
+      setEmailError('Invalid Protocol Format')
       return
     }
-
-    // Check if email already exists
     if (formData.userEmails.includes(emailInput)) {
-      setEmailError('This email has already been added')
+      setEmailError('Node Already Synchronized')
       return
     }
 
@@ -42,7 +43,7 @@ export default function UserInvitation({ formData, updateFormData }: any) {
       userEmails: [...formData.userEmails, emailInput],
       userRoles: [...formData.userRoles, selectedRole]
     })
-    
+
     setEmailInput('')
     setEmailError('')
   }
@@ -50,47 +51,31 @@ export default function UserInvitation({ formData, updateFormData }: any) {
   const removeUser = (index: number) => {
     const newEmails = [...formData.userEmails]
     const newRoles = [...formData.userRoles]
-    
     newEmails.splice(index, 1)
     newRoles.splice(index, 1)
-    
-    updateFormData({
-      userEmails: newEmails,
-      userRoles: newRoles
-    })
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      addUser()
-    }
+    updateFormData({ userEmails: newEmails, userRoles: newRoles })
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Invite Your Team</h2>
-        <p className="text-gray-600">
-          Invite team members to join your dashboard. You can skip this step and add team members later.
+    <div className="space-y-10">
+      <div className="space-y-2">
+        <h2 className={`text-3xl font-black tracking-tighter ${isGalactic ? 'text-white' : 'text-slate-900'}`}>Invite Your Team</h2>
+        <p className={`text-sm font-medium leading-relaxed ${isGalactic ? 'text-slate-400' : 'text-slate-500'}`}>
+          Add team members to your organization and assign their roles.
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Add User Form */}
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h3 className="text-sm font-medium text-blue-800 mb-3">Add Team Member</h3>
-          
-          <div className="space-y-4">
-            {/* Email Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <div className="flex items-center">
-                  <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                  Email Address
-                </div>
-              </label>
-              <div className="flex gap-2">
+        <div className={`p-8 rounded-[2.5rem] border-2 shadow-sm ${isGalactic ? 'bg-white/5 border-white/5' : 'bg-slate-50/50 border-slate-100'}`}>
+          <div className="flex items-center space-x-3 mb-6">
+            <Plus className={`w-4 h-4 ${isGalactic ? 'text-violet-400' : 'text-sky-600'}`} />
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Invite New Member</span>
+          </div>
+
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <div className="flex gap-4">
                 <input
                   type="email"
                   value={emailInput}
@@ -98,112 +83,109 @@ export default function UserInvitation({ formData, updateFormData }: any) {
                     setEmailInput(e.target.value)
                     setEmailError('')
                   }}
-                  onKeyPress={handleKeyPress}
-                  className={`flex-1 px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    emailError ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  placeholder="team.member@yourbusiness.com"
+                  onKeyPress={(e) => e.key === 'Enter' && addUser()}
+                  className={`${inputClasses} ${emailError ? 'border-rose-500/50' : ''}`}
+                  placeholder="operator@nexus.io"
                 />
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={addUser}
-                  className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                  className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${isGalactic ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20' : 'bg-slate-900 text-white shadow-xl shadow-slate-900/10'
+                    }`}
                 >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add
-                </button>
+                  Provision
+                </motion.button>
               </div>
               {emailError && (
-                <p className="mt-1 text-sm text-red-600">{emailError}</p>
+                <p className="text-[10px] font-black text-rose-500 uppercase tracking-tighter ml-2">{emailError}</p>
               )}
             </div>
 
-            {/* Role Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Role
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {ROLES.map(role => (
-                  <button
-                    key={role.value}
-                    type="button"
-                    onClick={() => setSelectedRole(role.value)}
-                    className={`p-3 rounded-lg border text-left transition-colors ${
-                      selectedRole === role.value
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="font-medium text-gray-900">{role.label}</div>
-                    <div className="text-xs text-gray-600 mt-1">{role.description}</div>
-                  </button>
-                ))}
+            <div className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Access Tier</label>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {ROLES.map(role => {
+                  const Icon = role.icon
+                  const isSelected = selectedRole === role.value
+                  return (
+                    <button
+                      key={role.value}
+                      type="button"
+                      onClick={() => setSelectedRole(role.value)}
+                      className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 group ${isSelected
+                        ? (isGalactic ? 'bg-white text-black border-white shadow-xl' : 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-900/20')
+                        : (isGalactic ? 'bg-white/5 border-white/5 hover:border-white/10' : 'bg-white border-slate-100 hover:border-slate-200')
+                        }`}
+                    >
+                      <Icon className={`w-5 h-5 mb-3 transition-colors ${isSelected ? (isGalactic ? 'text-black' : 'text-white') : (isGalactic ? 'text-violet-400' : 'text-sky-500')}`} />
+                      <div className="font-black text-[11px] tracking-tight">{role.label}</div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>
         </div>
 
         {/* Invited Users List */}
-        {formData.userEmails.length > 0 ? (
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Team Members ({formData.userEmails.length})
-            </h3>
-            <div className="space-y-3">
-              {formData.userEmails.map((email: string, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gray-100 rounded">
-                      <UserCheck className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">{email}</div>
-                      <div className="text-sm text-gray-600">
-                        {ROLES.find(r => r.value === formData.userRoles[index])?.label || 'User'}
+        <AnimatePresence mode="popLayout">
+          {formData.userEmails.length > 0 ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Provisioned Nodes ({formData.userEmails.length})</span>
+              </div>
+              <div className="grid gap-3">
+                {formData.userEmails.map((email: string, index: number) => (
+                  <motion.div
+                    key={email}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className={`flex items-center justify-between p-4 rounded-[1.5rem] border transition-all ${isGalactic ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-white border-slate-100 hover:shadow-md'
+                      }`}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className={`p-2 rounded-xl ${isGalactic ? 'bg-white/5 text-violet-400' : 'bg-slate-50 text-sky-600'}`}>
+                        <UserCheck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className={`font-black text-xs tracking-tight ${isGalactic ? 'text-white' : 'text-slate-900'}`}>{email}</div>
+                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                          Tier: {ROLES.find(r => r.value === formData.userRoles[index])?.label}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeUser(index)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                    <button
+                      type="button"
+                      onClick={() => removeUser(index)}
+                      className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-            <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-600">No team members added yet</p>
-            <p className="text-sm text-gray-500 mt-1">
-              You can add team members now or invite them later from your dashboard.
-            </p>
-          </div>
-        )}
-
-        {/* Skip Option */}
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-start">
-            <div className="p-1.5 bg-gray-100 rounded mr-3">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-800">Optional Step</p>
-              <p className="text-sm text-gray-700 mt-1">
-                You can skip adding team members now and invite them later from your dashboard settings.
-                Team members will receive email invitations to join your business account.
+          ) : (
+            <div className={`text-center py-12 border-2 border-dashed rounded-[2.5rem] ${isGalactic ? 'border-white/10' : 'border-slate-200'}`}>
+              <Users className="w-12 h-12 text-slate-300 mx-auto mb-4 opacity-50" />
+              <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Isolated Environment</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1 leading-relaxed uppercase tracking-tighter">
+                No external nodes synchronized. You will be the sole operator.
               </p>
             </div>
+          )}
+        </AnimatePresence>
+
+        <div className={`p-6 border rounded-[2rem] flex items-center space-x-5 ${isGalactic ? 'bg-white/5 border-white/5 opacity-60' : 'bg-slate-50 border-slate-100'}`}>
+          <div className={`p-2 rounded-xl ${isGalactic ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+            <Info className="w-5 h-5" />
           </div>
+          <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed text-slate-500">
+            Node invitations are optional. Operators will receive a synchronization link via encrypted email protocols once initialization is complete.
+          </p>
         </div>
       </div>
     </div>

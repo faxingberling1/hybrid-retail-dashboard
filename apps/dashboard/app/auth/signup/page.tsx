@@ -1,22 +1,31 @@
 // app/auth/signup/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import IndustrySelection from './steps/industry-selection'
 import BusinessDetails from './steps/business-details'
 import AdminSetup from './steps/admin-setup'
+import TwoFactorSetup from './steps/two-factor-setup'
 import UserInvitation from './steps/user-invitation'
 import Confirmation from './steps/confirmation'
 import { toast } from 'sonner'
+import {
+  ArrowLeft, Check, Sparkles, Rocket,
+  ShieldCheck, Globe, Moon, Sun, ShoppingCart,
+  ArrowRight, Lock
+} from 'lucide-react'
+import Link from 'next/link'
 
 const STEPS = [
-  { id: 'industry', title: 'Industry', component: IndustrySelection },
-  { id: 'business', title: 'Business Details', component: BusinessDetails },
-  { id: 'admin', title: 'Admin Setup', component: AdminSetup },
-  { id: 'users', title: 'Invite Team', component: UserInvitation },
-  { id: 'confirm', title: 'Confirmation', component: Confirmation },
-]
+  { id: 'industry', title: 'Industry', component: IndustrySelection, desc: 'Tailor your experience' },
+  { id: 'business', title: 'Business Info', component: BusinessDetails, desc: 'Your brand details' },
+  { id: 'admin', title: 'Admin Setup', component: AdminSetup, desc: 'Create your account' },
+  { id: 'security', title: '2FA Setup', component: TwoFactorSetup, desc: 'Secure your access' },
+  { id: 'users', title: 'Team Setup', component: UserInvitation, desc: 'Invite your team' },
+  { id: 'confirm', title: 'Final Review', component: Confirmation, desc: 'Ready to start' },
+];
 
 export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState(0)
@@ -31,17 +40,26 @@ export default function SignupPage() {
     adminPassword: '',
     adminName: '',
     adminPhone: '',
+    twoFactorEnabled: false,
+    twoFactorVerified: false,
     userEmails: [] as string[],
     userRoles: [] as string[],
     termsAccepted: false,
     marketingEmails: false,
   })
   const [loading, setLoading] = useState(false)
+  const [theme, setTheme] = useState<'playful' | 'galactic'>('playful')
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const CurrentStepComponent = STEPS[currentStep].component
   const isLastStep = currentStep === STEPS.length - 1
   const isFirstStep = currentStep === 0
+  const isGalactic = theme === 'galactic'
 
   const updateFormData = (updates: any) => {
     setFormData(prev => ({ ...prev, ...updates }))
@@ -49,7 +67,7 @@ export default function SignupPage() {
 
   const handleNext = async () => {
     if (!validateStep(currentStep)) {
-      toast.error('Please fill in all required fields')
+      toast.error('Initialization stalled: Please fill required parameters.')
       return
     }
 
@@ -62,7 +80,6 @@ export default function SignupPage() {
 
   const handleBack = () => {
     if (isFirstStep) {
-      // If on first step, go back to login
       router.push('/login')
     } else {
       setCurrentStep(prev => prev - 1)
@@ -71,18 +88,13 @@ export default function SignupPage() {
 
   const validateStep = (stepIndex: number): boolean => {
     switch (stepIndex) {
-      case 0:
-        return !!formData.industry
-      case 1:
-        return !!(formData.businessName && formData.businessType && formData.country)
-      case 2:
-        return !!(formData.adminEmail && formData.adminPassword && formData.adminName)
-      case 3:
-        return true // User invitation is optional
-      case 4:
-        return formData.termsAccepted
-      default:
-        return true
+      case 0: return !!formData.industry
+      case 1: return !!(formData.businessName && formData.businessType && formData.country)
+      case 2: return !!(formData.adminEmail && formData.adminPassword && formData.adminName)
+      case 3: return formData.twoFactorVerified
+      case 4: return true
+      case 5: return formData.termsAccepted
+      default: return true
     }
   }
 
@@ -98,9 +110,8 @@ export default function SignupPage() {
       const data = await response.json()
 
       if (response.ok) {
-        toast.success('Account created successfully!')
-        
-        // Automatically sign in the user
+        toast.success('Core Synchronized: Account established.')
+
         const signInResult = await fetch('/api/auth/callback/credentials', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -116,165 +127,180 @@ export default function SignupPage() {
             router.push(`/onboarding/${data.organizationId}`)
           }, 1000)
         } else {
-          // If auto-signin fails, redirect to login
-          toast.success('Account created! Please sign in with your credentials.')
+          toast.success('System Initialized. Access portal at login.')
           router.push('/login')
         }
       } else {
-        toast.error(data.error || 'Failed to create account')
+        toast.error(data.error || 'Initialization Refused')
       }
     } catch (error: any) {
-      toast.error(error.message || 'Network error. Please try again.')
+      toast.error(error.message || 'Mesh Sync Failure')
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading && currentStep === STEPS.length - 1) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Creating Your Account</h2>
-          <p className="text-gray-600">Setting up your business dashboard...</p>
-        </div>
-      </div>
-    )
-  }
+  if (!isMounted) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header with Cancel option */}
-        <div className="flex justify-between items-center mb-8">
-          <button
-            onClick={() => router.push('/login')}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+    <div className={`min-h-screen transition-colors duration-1000 selection:bg-sky-500/20 overflow-x-hidden relative font-sans antialiased ${isGalactic ? 'bg-[#020412] text-white' : 'bg-white text-slate-900'}`}>
+
+      {/* Backgrounds */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <AnimatePresence mode="wait">
+          {isGalactic ? (
+            <motion.div key="galactic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
+              <motion.div animate={{ scale: [1, 1.2, 1], x: [0, 80, 0], y: [0, 40, 0] }} transition={{ duration: 25, repeat: Infinity }} className="absolute -top-[20%] -right-[10%] w-[80%] h-[80%] bg-violet-600/10 blur-[130px] rounded-full" />
+              <motion.div animate={{ scale: [1, 1.3, 1], x: [0, -60, 0], y: [0, 100, 0] }} transition={{ duration: 30, repeat: Infinity }} className="absolute top-[20%] -left-[10%] w-[70%] h-[70%] bg-blue-600/10 blur-[130px] rounded-full" />
+              {[...Array(15)].map((_, i) => (
+                <motion.div key={i} animate={{ opacity: [0, 1, 0], scale: [0, 1, 0] }} transition={{ duration: Math.random() * 3 + 2, repeat: Infinity, delay: Math.random() * 5 }} style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }} className="absolute w-1 h-1 bg-white rounded-full" />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div key="playful" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
+              <motion.div animate={{ scale: [1, 1.1, 1], x: [0, 50, 0], y: [0, 30, 0] }} transition={{ duration: 20, repeat: Infinity }} className="absolute -top-[10%] -right-[5%] w-[70%] h-[70%] bg-rose-200/10 blur-[120px] rounded-full" />
+              <motion.div animate={{ scale: [1, 1.2, 1], x: [0, -40, 0], y: [0, 60, 0] }} transition={{ duration: 25, repeat: Infinity }} className="absolute top-[20%] -left-[5%] w-[60%] h-[60%] bg-sky-200/10 blur-[120px] rounded-full" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+        {/* Header */}
+        <header className="flex justify-between items-center mb-16">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center space-x-4">
+            <div className={`p-4 border rounded-2xl shadow-sm ${isGalactic ? 'bg-black/40 border-white/10' : 'bg-white border-slate-100'}`}>
+              <ShoppingCart className={`h-6 w-6 ${isGalactic ? 'text-violet-400' : 'text-sky-500'}`} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black tracking-tighter">Create New Account</h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Account Configuration</p>
+            </div>
+          </motion.div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setTheme(isGalactic ? "playful" : "galactic")}
+            className={`p-2.5 rounded-2xl border transition-all flex items-center space-x-3 ${isGalactic ? 'bg-violet-500/10 border-violet-500/30' : 'bg-slate-100 border-slate-200'}`}
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Login
-          </button>
-          <div className="text-center flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Create Your Business Account
-            </h1>
-            <p className="text-gray-600">
-              Join thousands of businesses using HybridPOS to manage their operations
-            </p>
-          </div>
-          <div className="w-24"></div> {/* Spacer for alignment */}
-        </div>
+            <div className="relative w-10 h-6 bg-slate-200/50 dark:bg-white/10 rounded-full flex items-center p-1">
+              <motion.div animate={{ x: isGalactic ? 16 : 0 }} className={`w-4 h-4 rounded-full flex items-center justify-center ${isGalactic ? 'bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.5)]' : 'bg-white shadow-sm'}`}>
+                {isGalactic ? <Moon className="h-2.5 w-2.5 text-white" /> : <Sun className="h-2.5 w-2.5 text-amber-500" />}
+              </motion.div>
+            </div>
+            <span className={`text-[10px] font-black uppercase tracking-widest hidden sm:block ${isGalactic ? 'text-violet-400' : 'text-slate-500'}`}>
+              {isGalactic ? 'Dark' : 'Light'}
+            </span>
+          </motion.button>
+        </header>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                    index < currentStep
-                      ? 'bg-green-500 border-green-500 text-white'
-                      : index === currentStep
-                      ? 'bg-blue-600 border-blue-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-500'
-                  }`}
-                >
-                  {index < currentStep ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <span>{index + 1}</span>
-                  )}
+        <div className="grid lg:grid-cols-12 gap-16 items-start">
+          {/* Progress & Info Sidebar */}
+          <aside className="lg:col-span-4 space-y-12">
+            <div className="space-y-6">
+              <h1 className={`text-5xl font-black tracking-tighter leading-[0.9] ${isGalactic ? 'text-white' : 'text-slate-900'}`}>
+                Start your <br />
+                <span className={`text-transparent bg-clip-text bg-gradient-to-r ${isGalactic ? 'from-violet-400 to-fuchsia-500' : 'from-sky-500 to-blue-600'}`}>Journey.</span>
+              </h1>
+              <p className={`text-sm font-medium leading-relaxed max-w-sm ${isGalactic ? 'text-slate-400' : 'text-slate-500'}`}>
+                Join thousands of businesses already using our platform. Complete these simple steps to get started.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {STEPS.map((step, index) => (
+                <div key={step.id} className="flex items-center space-x-6">
+                  <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center shrink-0 transition-all duration-500 ${index < currentStep ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' :
+                    index === currentStep ? `${isGalactic ? 'bg-violet-600 border-violet-500 text-white shadow-lg shadow-violet-500/20' : 'bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/10'}` :
+                      `${isGalactic ? 'bg-white/5 border-white/5 text-slate-600' : 'bg-white border-slate-100 text-slate-400'}`
+                    }`}>
+                    {index < currentStep ? <Check className="h-5 w-5" /> : <span className="text-xs font-black">{index + 1}</span>}
+                  </div>
+                  <div className={`hidden md:block transition-opacity duration-500 ${index > currentStep ? 'opacity-30' : 'opacity-100'}`}>
+                    <div className={`text-xs font-black uppercase tracking-[0.2em] ${index === currentStep ? (isGalactic ? 'text-violet-400' : 'text-sky-600') : 'text-slate-400'}`}>{step.title}</div>
+                    <div className="text-[10px] font-bold text-slate-500 tracking-tight mt-0.5">{step.desc}</div>
+                  </div>
                 </div>
-                {index < STEPS.length - 1 && (
-                  <div
-                    className={`h-1 w-16 md:w-24 ${
-                      index < currentStep ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
-                  />
-                )}
+              ))}
+            </div>
+
+            <div className={`p-8 border rounded-[2.5rem] space-y-6 ${isGalactic ? 'bg-white/5 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+              <div className="flex items-center space-x-4">
+                <ShieldCheck className={isGalactic ? 'text-violet-400' : 'text-sky-600'} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Secure Setup</span>
               </div>
-            ))}
-          </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            {STEPS.map(step => (
-              <span key={step.id} className="text-center w-24">
-                {step.title}
-              </span>
-            ))}
-          </div>
-        </div>
+              <p className="text-[10px] font-bold text-slate-400 leading-relaxed uppercase tracking-tighter">
+                Your data is protected with enterprise-grade encryption and stored securely on our private network.
+              </p>
+            </div>
+          </aside>
 
-        {/* Step Content */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="p-8">
-            <CurrentStepComponent
-              formData={formData}
-              updateFormData={updateFormData}
-            />
-          </div>
-
-          {/* Navigation */}
-          <div className="border-t border-gray-200 p-6 bg-gray-50 flex justify-between">
-            <button
-              onClick={handleBack}
-              disabled={loading}
-              className="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          {/* Main Form Area */}
+          <main className="lg:col-span-8">
+            <motion.div
+              layout
+              className={`backdrop-blur-3xl border shadow-2xl rounded-[3.5rem] overflow-hidden ${isGalactic ? 'bg-black/40 border-white/10' : 'bg-white/40 border-white/80'}`}
             >
-              {isFirstStep ? 'Back to Login' : 'Back'}
-            </button>
-            
-            <button
-              onClick={handleNext}
-              disabled={loading}
-              className="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Processing...
-                </span>
-              ) : isLastStep ? (
-                'Create Account'
-              ) : (
-                'Continue'
-              )}
-            </button>
-          </div>
-        </div>
+              <div className="p-12">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentStep}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  >
+                    <CurrentStepComponent
+                      formData={formData}
+                      updateFormData={updateFormData}
+                      theme={theme}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-        {/* Security Note and Help Links */}
-        <div className="mt-8 text-center space-y-4">
-          <div className="text-sm text-gray-500">
-            <p>Your data is secured with 256-bit SSL encryption and stored in GDPR-compliant servers.</p>
-            <p className="mt-1">
-              Need help?{' '}
-              <button
-                onClick={() => window.open('mailto:support@hybridpos.com', '_blank')}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Contact Support
-              </button>
-            </p>
-          </div>
-          
-          <div className="pt-4 border-t border-gray-200">
-            <p className="text-gray-500 text-sm">
-              Already have an account?{' '}
-              <button
-                onClick={() => router.push('/login')}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Sign in here
-              </button>
-            </p>
-          </div>
+              {/* Navigation Bar */}
+              <div className={`p-8 border-t flex justify-between items-center ${isGalactic ? 'bg-white/5 border-white/5' : 'bg-slate-50/50 border-slate-100'}`}>
+                <button
+                  onClick={handleBack}
+                  disabled={loading}
+                  className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${isGalactic ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+                >
+                  {isFirstStep ? 'Cancel' : 'Previous Step'}
+                </button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleNext}
+                  disabled={loading}
+                  className={`px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center space-x-3 ${isGalactic ? 'bg-violet-600 text-white shadow-violet-500/20' : 'bg-slate-900 text-white shadow-slate-900/10'
+                    }`}
+                >
+                  {loading ? (
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full" />
+                  ) : (
+                    <>
+                      <span>{isLastStep ? 'Create Account' : 'Next Step'}</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </motion.button>
+              </div>
+            </motion.div>
+
+            <footer className="mt-12 flex flex-col md:flex-row justify-between items-center gap-6 px-6">
+              <div className="flex items-center space-x-6 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <Link href="#" className="hover:text-sky-500 transition-colors">Privacy Protocol</Link>
+                <Link href="#" className="hover:text-sky-500 transition-colors">Operator Terms</Link>
+              </div>
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                Core v4.3 • Dimension Synchronized
+              </div>
+            </footer>
+          </main>
         </div>
       </div>
     </div>

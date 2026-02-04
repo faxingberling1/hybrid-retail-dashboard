@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
   // Public paths - allow without authentication
   const publicPaths = [
     '/login',
+    '/contact',
     '/api/auth',
     '/_next',
     '/favicon.ico',
@@ -22,6 +23,7 @@ export async function middleware(request: NextRequest) {
     '/auth/verify',
     '/auth/accept-invite',
     '/unauthorized',
+    '/maintenance',
     '/api/onboarding',
     '/api/organizations',
     '/images', // Allow image assets
@@ -91,6 +93,11 @@ export async function middleware(request: NextRequest) {
     'x-user-organization-id': userOrganizationId,
     'x-is-admin': isAdmin.toString()
   })
+
+  // === MAINTENANCE MODE CHECK ===
+  // We'll rely on the GlobalMaintenanceBanner for the 'visual indicator on their screen' requirement
+  // to allow Admins and Users to see the banner while still being able to access relevant dashboards.
+  // The redirect was too restrictive based on the user's requirement for a 'visual indicator'.
 
   // === ONBOARDING CHECK - For authenticated users only ===
   // Only check for users with organization ID (new signups will have this)

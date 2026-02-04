@@ -1,0 +1,30 @@
+﻿node.exe : npm warn 
+config ignoring 
+workspace config at 
+C:\Users\Zah Computer
+s\Downloads\hybrid-re
+tail-pos\apps\dashboa
+rd/.npmrc
+At C:\Program Files\n
+odejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (npm war   
+ n config...ashbo    
+ard/.npmrc:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+app/super-admin/database/page.tsx(41,26): error TS2307: Cannot find module '@/components/ui/database/dashboard-tab' or its corresponding type declarations.
+app/super-admin/database/page.tsx(42,23): error TS2307: Cannot find module '@/components/ui/database/tables-tab' or its corresponding type declarations.
+app/super-admin/database/page.tsx(43,22): error TS2307: Cannot find module '@/components/ui/database/query-tab' or its corresponding type declarations.
+app/super-admin/database/page.tsx(44,23): error TS2307: Cannot find module '@/components/ui/database/health-tab' or its corresponding type declarations.
+app/super-admin/database/page.tsx(45,26): error TS2307: Cannot find module '@/components/ui/database/analytics-tab' or its corresponding type declarations.

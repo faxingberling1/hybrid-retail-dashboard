@@ -2,30 +2,34 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Lock, Phone, Eye, EyeOff, Check, X } from 'lucide-react'
+import { User, Mail, Lock, Phone, Eye, EyeOff, Check, X, ShieldCheck, Sparkles } from 'lucide-react'
 import { validatePasswordStrength } from '@/lib/auth-utils'
+import { motion, AnimatePresence } from 'framer-motion'
 
-export default function AdminSetup({ formData, updateFormData }: any) {
+export default function AdminSetup({ formData, updateFormData, theme }: any) {
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState({ isValid: false, errors: [] as string[] })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const isGalactic = theme === 'galactic'
+
+  const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 transition-all duration-300 outline-none font-medium ${isGalactic
+    ? 'bg-white/5 border-white/5 text-white placeholder:text-slate-600 focus:border-violet-500/50 focus:bg-white/10'
+    : 'bg-slate-50 border-slate-100 text-slate-900 placeholder:text-slate-400 focus:border-sky-500/50 focus:bg-white'
+    }`
+
+  const labelClasses = `block text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${isGalactic ? 'text-slate-400' : 'text-slate-500'
+    }`
 
   const validateField = (field: string, value: string) => {
     const newErrors = { ...errors }
-    
     if (!value.trim()) {
-      newErrors[field] = 'This field is required'
+      newErrors[field] = 'Required'
+    } else if (field === 'adminEmail' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      newErrors[field] = 'Invalid Protocol'
     } else {
-      // Email validation
-      if (field === 'adminEmail' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        newErrors[field] = 'Please enter a valid email address'
-      } else {
-        delete newErrors[field]
-      }
+      delete newErrors[field]
     }
-    
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handlePasswordChange = (password: string) => {
@@ -36,298 +40,132 @@ export default function AdminSetup({ formData, updateFormData }: any) {
   }
 
   const getPasswordStrengthColor = () => {
-    if (!formData.adminPassword) return 'bg-gray-200'
-    if (formData.adminPassword.length < 4) return 'bg-red-500'
-    if (formData.adminPassword.length < 8) return 'bg-yellow-500'
-    if (passwordStrength.isValid) return 'bg-green-500'
-    return 'bg-orange-500'
-  }
-
-  const getPasswordStrengthText = () => {
-    if (!formData.adminPassword) return 'Enter a password'
-    if (formData.adminPassword.length < 4) return 'Very Weak'
-    if (formData.adminPassword.length < 8) return 'Weak'
-    if (passwordStrength.isValid) return 'Strong'
-    return 'Medium'
+    if (!formData.adminPassword) return isGalactic ? 'bg-white/10' : 'bg-slate-200'
+    if (formData.adminPassword.length < 8) return 'bg-rose-500'
+    if (passwordStrength.isValid) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]'
+    return 'bg-amber-500'
   }
 
   const passwordRequirements = [
-    {
-      text: 'At least 8 characters',
-      met: formData.adminPassword?.length >= 8
-    },
-    {
-      text: 'Contains uppercase letter',
-      met: /[A-Z]/.test(formData.adminPassword || '')
-    },
-    {
-      text: 'Contains lowercase letter',
-      met: /[a-z]/.test(formData.adminPassword || '')
-    },
-    {
-      text: 'Contains number (0-9)',
-      met: /[0-9]/.test(formData.adminPassword || '')
-    },
-    {
-      text: 'Contains special character',
-      met: /[^A-Za-z0-9]/.test(formData.adminPassword || '')
-    }
+    { text: '8+ Characters', met: formData.adminPassword?.length >= 8 },
+    { text: 'Uppercase', met: /[A-Z]/.test(formData.adminPassword || '') },
+    { text: 'Number', met: /[0-9]/.test(formData.adminPassword || '') },
+    { text: 'Symbol', met: /[^A-Za-z0-9]/.test(formData.adminPassword || '') }
   ]
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Admin Account</h2>
-        <p className="text-gray-600">
-          This will be your main account to manage {formData.businessName || 'your business'} dashboard.
-          You'll use these credentials to sign in.
+    <div className="space-y-10">
+      <div className="space-y-2">
+        <h2 className={`text-3xl font-black tracking-tighter ${isGalactic ? 'text-white' : 'text-slate-900'}`}>Admin Account</h2>
+        <p className={`text-sm font-medium leading-relaxed ${isGalactic ? 'text-slate-400' : 'text-slate-500'}`}>
+          Create your administrator account to manage your organization.
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="grid gap-8">
         {/* Full Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <div className="flex items-center">
-              <User className="w-4 h-4 mr-2 text-gray-500" />
-              Full Name *
-            </div>
-          </label>
-          <input
-            type="text"
-            value={formData.adminName}
-            onChange={(e) => {
-              updateFormData({ adminName: e.target.value })
-              validateField('adminName', e.target.value)
-            }}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-              errors.adminName ? 'border-red-300 bg-red-50' : 'border-gray-300'
-            }`}
-            placeholder="Enter your full name"
-          />
-          {errors.adminName && (
-            <p className="mt-2 text-sm text-red-600 flex items-center">
-              <X className="w-4 h-4 mr-1" />
-              {errors.adminName}
-            </p>
-          )}
+        <div className="space-y-2">
+          <label className={labelClasses}>Full Name</label>
+          <div className="relative">
+            <input
+              type="text"
+              value={formData.adminName}
+              onChange={(e) => {
+                updateFormData({ adminName: e.target.value })
+                validateField('adminName', e.target.value)
+              }}
+              className={`${inputClasses} ${errors.adminName ? 'border-rose-500/50 bg-rose-500/5' : ''}`}
+              placeholder="e.g. Commander Shepard"
+            />
+            <User className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
+          </div>
         </div>
 
         {/* Email */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <div className="flex items-center">
-              <Mail className="w-4 h-4 mr-2 text-gray-500" />
-              Email Address *
-            </div>
-          </label>
-          <input
-            type="email"
-            value={formData.adminEmail}
-            onChange={(e) => {
-              updateFormData({ adminEmail: e.target.value })
-              validateField('adminEmail', e.target.value)
-            }}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-              errors.adminEmail ? 'border-red-300 bg-red-50' : 'border-gray-300'
-            }`}
-            placeholder="you@yourbusiness.com"
-          />
-          {errors.adminEmail && (
-            <p className="mt-2 text-sm text-red-600 flex items-center">
-              <X className="w-4 h-4 mr-1" />
-              {errors.adminEmail}
-            </p>
-          )}
-          <p className="mt-2 text-sm text-gray-500">
-            This will be your username for logging in
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <Lock className="w-4 h-4 mr-2 text-gray-500" />
-                Password *
-              </div>
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={formData.adminPassword}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10 ${
-                  errors.adminPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Create a strong password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
-            
-            {/* Password strength indicator */}
-            {formData.adminPassword && (
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Password strength:</span>
-                  <span className={`text-sm font-semibold ${
-                    passwordStrength.isValid ? 'text-green-600' : 
-                    formData.adminPassword.length >= 8 ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
-                    {getPasswordStrengthText()}
-                  </span>
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-1">
-                  <div 
-                    className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
-                    style={{ 
-                      width: `${Math.min(
-                        (formData.adminPassword.length / 12) * 100, 
-                        passwordStrength.isValid ? 100 : 85
-                      )}%` 
-                    }}
-                  />
-                </div>
-                
-                {/* Password requirements checklist */}
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm font-medium text-gray-700">Password must contain:</p>
-                  <ul className="space-y-1.5">
-                    {passwordRequirements.map((req, index) => (
-                      <li 
-                        key={index} 
-                        className={`text-sm flex items-center ${req.met ? 'text-green-600' : 'text-gray-500'}`}
-                      >
-                        {req.met ? (
-                          <Check className="w-4 h-4 mr-2 flex-shrink-0" />
-                        ) : (
-                          <div className="w-4 h-4 mr-2 flex-shrink-0 rounded-full border border-gray-300" />
-                        )}
-                        {req.text}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-            
-            {errors.adminPassword && (
-              <p className="mt-2 text-sm text-red-600 flex items-center">
-                <X className="w-4 h-4 mr-1" />
-                {errors.adminPassword}
-              </p>
-            )}
-          </div>
-
-          {/* Phone (Optional) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center">
-                <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                Phone Number (Optional)
-              </div>
-            </label>
+        <div className="space-y-2">
+          <label className={labelClasses}>Primary Auth Node (Email)</label>
+          <div className="relative">
             <input
-              type="tel"
-              value={formData.adminPhone}
-              onChange={(e) => updateFormData({ adminPhone: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="+1 (555) 123-4567"
+              type="email"
+              value={formData.adminEmail}
+              onChange={(e) => {
+                updateFormData({ adminEmail: e.target.value })
+                validateField('adminEmail', e.target.value)
+              }}
+              className={`${inputClasses} ${errors.adminEmail ? 'border-rose-500/50 bg-rose-500/5' : ''}`}
+              placeholder="admin@nexus-dynamics.io"
             />
-            <p className="mt-2 text-sm text-gray-500">
-              For account recovery and important notifications
-            </p>
+            <Mail className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
           </div>
         </div>
 
-        {/* Security Tips */}
-        <div className="bg-blue-50 rounded-xl border border-blue-200 p-5">
-          <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
-            <Lock className="w-5 h-5 mr-2" />
-            Security Tips
-          </h4>
-          <ul className="space-y-2 text-sm text-blue-700">
-            <li className="flex items-start">
-              <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-              Use a unique password that you don't use elsewhere
-            </li>
-            <li className="flex items-start">
-              <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-              Consider using a password manager to generate and store passwords
-            </li>
-            <li className="flex items-start">
-              <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-              Enable two-factor authentication after setup for extra security
-            </li>
-            <li className="flex items-start">
-              <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-              Never share your password with anyone, including team members
-            </li>
-          </ul>
-        </div>
-
-        {/* Industry Info */}
-        {formData.industry && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-5">
-            <div className="flex items-start">
-              <div className="p-2 bg-white rounded-lg mr-3">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="font-semibold text-blue-800 mb-1">
-                  {formData.industry.charAt(0).toUpperCase() + formData.industry.slice(1)} Admin Dashboard
-                </h4>
-                <p className="text-blue-700 text-sm">
-                  As an administrator for your {formData.industry} business, you'll have access to:
-                  inventory management, staff scheduling, customer analytics, and financial reports.
-                </p>
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          {/* Password */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className={labelClasses}>Encryption Key (Password)</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={formData.adminPassword}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  className={`${inputClasses} pr-14 ${errors.adminPassword ? 'border-rose-500/50 bg-rose-500/5' : ''}`}
+                  placeholder="Secure protocol..."
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-opacity"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Validation Summary */}
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h4 className="font-medium text-gray-700 mb-3">Account Setup Status</h4>
-          <div className="space-y-3">
-            {[
-              { 
-                label: 'Full name', 
-                valid: !!formData.adminName.trim(),
-                value: formData.adminName || 'Not provided'
-              },
-              { 
-                label: 'Email address', 
-                valid: !!formData.adminEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.adminEmail),
-                value: formData.adminEmail || 'Not provided'
-              },
-              { 
-                label: 'Password strength', 
-                valid: passwordStrength.isValid,
-                value: passwordStrength.isValid ? 'Strong' : 'Needs improvement'
-              }
-            ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-3 ${item.valid ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-sm text-gray-700">{item.label}</span>
-                </div>
-                <span className={`text-sm font-medium ${item.valid ? 'text-green-600' : 'text-gray-500'}`}>
-                  {item.value}
+            {/* Strength Bar */}
+            <div className="space-y-3 px-2">
+              <div className="flex justify-between items-center">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Key Strength</span>
+                <span className={`text-[9px] font-black uppercase tracking-widest ${passwordStrength.isValid ? 'text-emerald-500' : 'text-slate-400'}`}>
+                  {formData.adminPassword ? (passwordStrength.isValid ? 'Vault Grade' : 'Vulnerable') : 'Awaiting Input'}
                 </span>
               </div>
-            ))}
+              <div className={`h-1.5 rounded-full overflow-hidden ${isGalactic ? 'bg-white/5' : 'bg-slate-100'}`}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min((formData.adminPassword.length / 12) * 100, 100)}%` }}
+                  className={`h-full transition-colors duration-500 ${getPasswordStrengthColor()}`}
+                />
+              </div>
+            </div>
           </div>
+
+          {/* Requirements Checklist */}
+          <div className={`p-6 rounded-[2rem] border-2 ${isGalactic ? 'bg-white/5 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+            <label className={labelClasses}>Security Protocols</label>
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              {passwordRequirements.map((req, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className={`w-4 h-4 rounded-full flex items-center justify-center border transition-all duration-500 ${req.met ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-white/10'}`}>
+                    {req.met && <Check className="w-2.5 h-2.5" />}
+                  </div>
+                  <span className={`text-[9px] font-black uppercase tracking-tighter ${req.met ? (isGalactic ? 'text-white' : 'text-slate-900') : 'text-slate-400'}`}>{req.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`p-8 border rounded-[2.5rem] flex items-center space-x-6 ${isGalactic ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}>
+        <div className={`p-3 rounded-2xl ${isGalactic ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600'}`}>
+          <ShieldCheck className="w-6 h-6" />
+        </div>
+        <div>
+          <h4 className={`text-xs font-black uppercase tracking-widest ${isGalactic ? 'text-white' : 'text-slate-900'}`}>Admin Protocol Confirmed</h4>
+          <p className="text-[10px] font-bold text-slate-500 mt-1 leading-relaxed uppercase tracking-tighter">
+            Establishing biometric simulation and master key encryption. Your identity will be the root node of the {formData.businessName || 'Business'} ecosystem.
+          </p>
         </div>
       </div>
     </div>

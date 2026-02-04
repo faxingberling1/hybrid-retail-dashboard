@@ -1,7 +1,7 @@
 // lib/auth.ts
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { verifyPassword } from './auth-utils'
+import { verifyPassword } from './server-auth-utils'
 import { queryOne } from './db'
 
 export const authOptions: NextAuthOptions = {
@@ -23,8 +23,7 @@ export const authOptions: NextAuthOptions = {
             `SELECT 
               u.*, 
               o.id as organization_id,
-              o.business_name as organization_name,
-              o.industry as organization_industry,
+              o.name as organization_name,
               o.status as organization_status
             FROM users u
             LEFT JOIN organizations o ON u.organization_id = o.id
@@ -37,16 +36,25 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
+          // === MAINTENANCE MODE LOGIN BLOCK ===
+          const maintenanceSetting = await queryOne("SELECT value FROM system_settings WHERE key = 'maintenance_mode'")
+          const isMaintenanceActive = maintenanceSetting?.value === true || maintenanceSetting?.value === 'true'
+
+          if (isMaintenanceActive && user.role !== 'SUPER_ADMIN') {
+            console.warn(`🚧 Login blocked for ${user.email}: Maintenance mode active`)
+            throw new Error("MAINTENANCE_ACTIVE")
+          }
+
           // Use the auth-utils verifyPassword function
           const isValid = await verifyPassword(credentials.password, user.password_hash)
-          
+
           if (!isValid) {
             console.log('❌ Invalid password for:', credentials.email)
             return null
           }
 
           console.log('✅ Login successful for:', credentials.email)
-          
+
           return {
             id: user.id,
             email: user.email,
@@ -54,8 +62,7 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
             image: user.avatar_url,
             organizationId: user.organization_id,
-            organizationName: user.organization_name,
-            organizationIndustry: user.organization_industry
+            organizationName: user.organization_name
           }
         } catch (error) {
           console.error('❌ Auth error:', error)
@@ -72,7 +79,6 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email
         token.organizationId = user.organizationId
         token.organizationName = user.organizationName
-        token.organizationIndustry = user.organizationIndustry
       }
       return token
     },
@@ -83,11 +89,9 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email as string
         session.user.organizationId = token.organizationId as string
         session.user.organizationName = token.organizationName as string
-        session.user.organizationIndustry = token.organizationIndustry as string
-        
+
         session.organizationId = token.organizationId as string
         session.organizationName = token.organizationName as string
-        session.organizationIndustry = token.organizationIndustry as string
       }
       return session
     }
