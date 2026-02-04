@@ -12,7 +12,7 @@
       "dest": "apps/dashboard/$1"
     }
   ],
-  "buildCommand": "cd ../.. && npx turbo run build --filter=dashboard",
-  "installCommand": "cd ../.. && npm install",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
   "outputDirectory": "apps/dashboard/.next"
 }
