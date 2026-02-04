@@ -20,7 +20,9 @@
     "docker:dev": "docker-compose -f docker-compose.dev.yml up",
     "docker:build": "docker-compose -f docker-compose.dev.yml build",
     "docker:down": "docker-compose -f docker-compose.dev.yml down",
-    "install:all": "npm install && turbo run install"
+    "install:all": "npm install && turbo run install",
+    "dashboard:dev": "npm run dev --workspace=dashboard",
+    "dashboard:build": "npm run build --workspace=dashboard"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

@@ -19,7 +19,7 @@ const handler = NextAuth({
         console.log("=".repeat(60))
         console.log("🔐 NextAuth: Authorization attempt started")
         console.log("📧 Received email:", credentials?.email)
-        
+
         if (!credentials?.email || !credentials?.password) {
           console.log("❌ Missing credentials - email or password empty")
           throw new Error("Email and password are required")
@@ -28,7 +28,7 @@ const handler = NextAuth({
         try {
           // Test database connection first
           console.log("🔗 Testing database connection...")
-          
+
           // Fetch user from PostgreSQL database
           console.log("🔍 Querying database for user:", credentials.email)
           const user = await queryOne(
@@ -38,6 +38,7 @@ const handler = NextAuth({
               first_name, 
               last_name, 
               role, 
+              organization_id,
               password_hash,
               is_active,
               is_verified,
@@ -54,6 +55,7 @@ const handler = NextAuth({
           }
 
           console.log(`✅ User found: ${user.email} (${user.role})`)
+          console.log(`   Org ID: ${user.organization_id}`)
           console.log(`   Active: ${user.is_active}, Verified: ${user.is_verified}`)
           console.log(`   Created: ${new Date(user.created_at).toLocaleDateString()}`)
 
@@ -64,29 +66,30 @@ const handler = NextAuth({
 
           // Verify password with BCrypt
           console.log("🔐 Verifying password...")
-          
+
           const isValid = await verifyPassword(credentials.password, user.password_hash)
-          
+
           if (!isValid) {
             console.log("❌ Password verification failed")
             throw new Error("Invalid credentials - password incorrect")
           }
 
           console.log("✅ PostgreSQL authentication SUCCESSFUL!")
-          
+
           // Return user object for JWT token
           const userObj = {
             id: user.id.toString(),
             email: user.email,
             name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email.split('@')[0],
             role: user.role,
-            image: null
+            organizationId: user.organization_id || '',
+            image: undefined
           }
-          
+
           console.log("✅ Returning user object:", userObj)
           console.log("=".repeat(60))
           return userObj
-          
+
         } catch (error: any) {
           console.error("❌ Authentication error:", error.message)
           if (error.code) console.error("   Error code:", error.code)
@@ -100,65 +103,68 @@ const handler = NextAuth({
       console.log("🔄 JWT callback triggered")
       console.log("   User:", user?.email)
       console.log("   Trigger:", trigger)
-      
+
       if (user) {
         token.id = user.id
         token.email = user.email
         token.name = user.name
         token.role = user.role
-        console.log("   Updated token with user data")
+        token.organizationId = (user as any).organizationId
+        console.log("   Updated token with user data including organizationId")
       }
-      
+
       // Handle session update
       if (trigger === "update" && session) {
         token.name = session.user.name
         token.email = session.user.email
         token.role = session.user.role
+        token.organizationId = session.user.organizationId
         console.log("   Updated token from session")
       }
-      
+
       return token
     },
     async session({ session, token }) {
       console.log("🔄 Session callback triggered")
       console.log("   Token email:", token.email)
-      
+
       if (session?.user && token) {
         session.user.id = token.id as string
         session.user.email = token.email as string
         session.user.name = token.name as string
         session.user.role = token.role as string
-        
+        session.user.organizationId = token.organizationId as string
+
         console.log("   Session updated with user data")
       }
-      
+
       return session
     },
     async redirect({ url, baseUrl }) {
       console.log("🔄 Redirect callback")
       console.log("   URL:", url)
       console.log("   Base URL:", baseUrl)
-      
+
       // Default redirect for empty or base URL
       if (!url || url === baseUrl) {
-        const redirectUrl = `${baseUrl}/super-admin`
-        console.log("   Redirecting to default:", redirectUrl)
-        return redirectUrl
+        // We don't have user role here easily without session, 
+        // but NextAuth usually handles this by redirecting to callbackUrl
+        return baseUrl
       }
-      
+
       // Allow relative URLs
       if (url.startsWith("/")) {
         const redirectUrl = `${baseUrl}${url}`
         console.log("   Redirecting relative URL:", redirectUrl)
         return redirectUrl
       }
-      
+
       // Allow same origin URLs
       if (url.startsWith(baseUrl)) {
         console.log("   Redirecting absolute URL:", url)
         return url
       }
-      
+
       // Fallback to base URL
       console.log("   Redirecting to fallback:", baseUrl)
       return baseUrl

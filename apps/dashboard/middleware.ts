@@ -212,6 +212,7 @@ export async function middleware(request: NextRequest) {
   // ADMIN can access admin and user routes
   if (userRole.toUpperCase() === 'ADMIN') {
     const allowedPaths = [
+      '/',
       '/admin',
       '/user',
       '/api/admin',
@@ -220,7 +221,6 @@ export async function middleware(request: NextRequest) {
       '/notifications',
       '/settings',
       '/profile',
-      '/billing',
       '/billing',
       '/api/tickets',
       '/api/notifications',
@@ -249,13 +249,13 @@ export async function middleware(request: NextRequest) {
   // MANAGER can access manager and user routes
   if (userRole.toUpperCase() === 'MANAGER') {
     const allowedPaths = [
+      '/',
       '/manager',
       '/user',
       '/api/manager',
       '/api/user',
       '/dashboard',
       '/notifications',
-      '/profile',
       '/profile',
       '/api/tickets',
       '/api/notifications',
@@ -284,11 +284,11 @@ export async function middleware(request: NextRequest) {
   // USER can only access user routes
   if (userRole.toUpperCase() === 'USER') {
     const allowedPaths = [
+      '/',
       '/user',
       '/api/user',
       '/dashboard',
       '/notifications',
-      '/profile',
       '/profile',
       '/api/tickets',
       '/api/notifications',
