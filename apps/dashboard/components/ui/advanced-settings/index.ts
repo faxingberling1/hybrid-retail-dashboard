@@ -5,4 +5,6 @@ export { default as SystemInformationSection } from './system-information-sectio
 export { default as LogsSection } from './logs-section';
 export { default as DebugToolsSection } from './debug-tools-section';
 export { default as DangerZoneSection } from './danger-zone-section';
-export type { LogEntry, DebugTool, DangerZoneAction } from './logs-section';
+export type { LogEntry } from './logs-section';
+export type { DebugTool } from './debug-tools-section';
+export type { DangerZoneAction } from './danger-zone-section';

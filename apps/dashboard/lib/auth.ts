@@ -24,7 +24,8 @@ export const authOptions: NextAuthOptions = {
               u.*, 
               o.id as organization_id,
               o.name as organization_name,
-              o.status as organization_status
+              o.status as organization_status,
+              o.industry as organization_industry
             FROM users u
             LEFT JOIN organizations o ON u.organization_id = o.id
             WHERE u.email = $1 AND u.is_active = true`,
@@ -62,7 +63,8 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
             image: user.avatar_url,
             organizationId: user.organization_id,
-            organizationName: user.organization_name
+            organizationName: user.organization_name,
+            industry: user.organization_industry
           }
         } catch (error) {
           console.error('❌ Auth error:', error)
@@ -79,6 +81,7 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email
         token.organizationId = user.organizationId
         token.organizationName = user.organizationName
+        token.industry = user.industry
       }
       return token
     },
@@ -92,6 +95,7 @@ export const authOptions: NextAuthOptions = {
 
         session.organizationId = token.organizationId as string
         session.organizationName = token.organizationName as string
+        session.user.industry = token.industry as string
       }
       return session
     }

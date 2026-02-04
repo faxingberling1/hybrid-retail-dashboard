@@ -1,0 +1,62 @@
+﻿app/user/calculator/page.tsx(103,36): error TS2345: Argument of type 'null' is not assignable to parameter of type 'SetStateAction<boolean>'.
+components/dashboard/user/user-stats.tsx(8,11): error TS2503: Cannot find namespace 'JSX'.
+components/ui/advanced-settings/advanced-section.tsx(7,20): error TS2614: Module '"./logs-section"' has no exported member 'DebugTool'. Did you mean to use 'import DebugTool from "./logs-section"' instead?
+components/ui/advanced-settings/advanced-section.tsx(7,31): error TS2614: Module '"./logs-section"' has no exported member 'DangerZoneAction'. Did you mean to use 'import DangerZoneAction from "./logs-section"' instead?
+components/ui/general-settings/regional-section.tsx(191,13): error TS2322: Type 'Element' is not assignable to type 'string'.
+components/ui/general-settings/regional-section.tsx(210,13): error TS2322: Type '{ label: string; name: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(216,11): error TS2322: Type 'Element' is not assignable to type 'string'.
+components/ui/general-settings/regional-section.tsx(243,15): error TS2322: Type '{ label: string; name: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(252,15): error TS2322: Type '{ label: string; name: string; value: "12h" | "24h"; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(262,13): error TS2322: Type '{ label: string; name: string; value: string; onChange: (value: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/regional-section.tsx(302,15): error TS2322: Type '{ label: string; description: string; enabled: true; onChange: () => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/general-settings/regional-section.tsx(310,15): error TS2322: Type '{ label: string; description: string; enabled: true; onChange: () => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/general-settings/regional-section.tsx(318,15): error TS2322: Type '{ label: string; description: string; enabled: true; onChange: () => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+components/ui/general-settings/theme-section.tsx(276,11): error TS2322: Type '{ label: string; selectedMode: "system" | "light" | "dark"; onChange: (mode: string) => void; modes: { id: string; label: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<...>>; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ThemeModeSelectorProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ThemeModeSelectorProps'.
+components/ui/general-settings/theme-section.tsx(286,13): error TS2322: Type '{ label: string; selectedColor: string; onChange: (color: string) => void; colors: { id: string; value: string; name: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ColorSelectorProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ColorSelectorProps'.
+components/ui/general-settings/theme-section.tsx(330,13): error TS2322: Type '{ label: string; name: string; value: "small" | "large" | "medium"; onChange: (size: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/theme-section.tsx(339,13): error TS2322: Type '{ label: string; name: string; value: "compact" | "comfortable"; onChange: (density: string) => void; options: { value: string; label: string; }[]; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & SelectFieldProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & SelectFieldProps'.
+components/ui/general-settings/theme-section.tsx(349,11): error TS2322: Type '{ label: string; description: string; enabled: boolean; onChange: (enabled: boolean) => void; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & ToggleSwitchProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & ToggleSwitchProps'.
+lib/email.ts(13,22): error TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', 'nodenext', or 'preserve', and the 'target' option is set to 'es2017' or higher.
+lib/services/notification.service.ts(10,36): error TS2345: Argument of type '{ userId: string; read: false; expiresAt: Date; title: string; message: string; type?: NotificationType; priority?: NotificationPriority; ... 4 more ...; role?: UserRole; }' is not assignable to parameter of type 'Omit<Notification, "id" | "createdAt">'.
+  Types of property 'type' are incompatible.
+    Type 'NotificationType | undefined' is not assignable to type 'NotificationType'.
+      Type 'undefined' is not assignable to type 'NotificationType'.
+lib/services/notification.service.ts(27,32): error TS2345: Argument of type '{ userId: string; metadata: { role: "SUPER_ADMIN" | "ADMIN" | "USER"; dashboard?: string; entityId?: string; entityType?: string; }; read: false; expiresAt: Date; title: string; message: string; ... 5 more ...; role: "SUPER_ADMIN" | ... 1 more ... | "USER"; }' is not assignable to parameter of type 'Omit<Notification, "id" | "createdAt">'.
+  Types of property 'type' are incompatible.
+    Type 'NotificationType | undefined' is not assignable to type 'NotificationType'.
+      Type 'undefined' is not assignable to type 'NotificationType'.
+lib/services/notification.service.ts(53,43): error TS2339: Property 'findAll' does not exist on type 'typeof UserRepository'.
+lib/services/notification.service.ts(55,35): error TS7006: Parameter 'user' implicitly has an 'any' type.
+lib/services/settings.service.ts(21,52): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(29,65): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(37,58): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(42,54): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/services/settings.service.ts(74,99): error TS2304: Cannot find name 'SettingsApiResponse'.
+lib/store/settings-store.ts(509,28): error TS2698: Spread types may only be created from object types.
+lib/utils/validation.ts(115,18): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(116,16): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(122,16): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(122,33): error TS2339: Property 'errors' does not exist on type 'PropertyDescriptor'.
+lib/utils/validation.ts(123,14): error TS2339: Property 'setError' does not exist on type 'PropertyDescriptor'.
+scripts/final-verification.ts(61,59): error TS2345: Argument of type '{ read: false; title: string; message: string; type: string; priority: string; metadata: { alert: boolean; category: string; amount?: undefined; customerId?: undefined; meeting?: undefined; duration?: undefined; }; expiresAt?: undefined; userId: string; } | { ...; } | { ...; }' is not assignable to parameter of type 'Omit<Notification, "id" | "createdAt">'.
+  Type '{ read: false; title: string; message: string; type: string; priority: string; metadata: { alert: boolean; category: string; amount?: undefined; customerId?: undefined; meeting?: undefined; duration?: undefined; }; expiresAt?: undefined; userId: string; }' is not assignable to type 'Omit<Notification, "id" | "createdAt">'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type 'NotificationType'.
+scripts/migrate-settings.ts(2,20): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+scripts/setup-db.ts(2,8): error TS2613: Module '"C:/Users/Alex Murphy/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' has no default export. Did you mean to use 'import { pool } from "C:/Users/Alex Murphy/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' instead?
+scripts/test-db-connection.ts(2,10): error TS2305: Module '"../lib/db"' has no exported member 'testSupabaseConnection'.
+scripts/test-notification-system.ts(3,8): error TS2613: Module '"C:/Users/Alex Murphy/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' has no default export. Did you mean to use 'import { pool } from "C:/Users/Alex Murphy/Downloads/hybrid-retail-pos/apps/dashboard/lib/db"' instead?
+scripts/test-notification-system.ts(48,9): error TS2322: Type 'string' is not assignable to type 'NotificationType'.
+scripts/test-notification-system.ts(52,11): error TS2322: Type 'string' is not assignable to type 'UserRole | undefined'.

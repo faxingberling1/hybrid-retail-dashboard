@@ -9,27 +9,27 @@ export function validatePasswordStrength(password: string): {
   errors: string[]
 } {
   const errors: string[] = []
-  
+
   if (password.length < 8) {
     errors.push('Password must be at least 8 characters')
   }
-  
+
   if (!password.match(/[A-Z]/)) {
     errors.push('Password must contain at least one uppercase letter')
   }
-  
+
   if (!password.match(/[a-z]/)) {
     errors.push('Password must contain at least one lowercase letter')
   }
-  
+
   if (!password.match(/[0-9]/)) {
     errors.push('Password must contain at least one number')
   }
-  
+
   if (!password.match(/[^A-Za-z0-9]/)) {
     errors.push('Password must contain at least one special character')
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors
@@ -42,7 +42,7 @@ export function validatePasswordStrength(password: string): {
 export function generateSecurePassword(length: number = 12): string {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()'
   let password = ''
-  
+
   if (typeof window !== 'undefined' && window.crypto) {
     const randomValues = new Uint8Array(length)
     window.crypto.getRandomValues(randomValues)
@@ -54,7 +54,7 @@ export function generateSecurePassword(length: number = 12): string {
       password += charset[Math.floor(Math.random() * charset.length)]
     }
   }
-  
+
   return password
 }
 
@@ -81,16 +81,16 @@ export function isSuperAdmin(role?: string): boolean {
  */
 export function hasRole(userRole?: string, requiredRole?: string | string[]): boolean {
   if (!userRole || !requiredRole) return false
-  
+
   const userRoleUpper = userRole.toUpperCase()
-  
+
   if (Array.isArray(requiredRole)) {
-    return requiredRole.some(role => 
+    return requiredRole.some(role =>
       userRoleUpper === role.toUpperCase() ||
       (role.toUpperCase() === 'ADMIN' && isAdmin(userRole))
     )
   }
-  
+
   return userRoleUpper === requiredRole.toUpperCase()
 }
 
@@ -114,11 +114,11 @@ export function createUserSessionData(user: any) {
       image: user.image,
       organizationId: user.organizationId,
       organizationName: user.organizationName,
-      organizationIndustry: user.organizationIndustry
+      industry: user.industry
     },
     organizationId: user.organizationId,
     organizationName: user.organizationName,
-    organizationIndustry: user.organizationIndustry
+    industry: user.industry
   }
 }
 
@@ -128,20 +128,20 @@ export function createUserSessionData(user: any) {
 export async function getUserOrganization(): Promise<{
   organizationId?: string
   organizationName?: string
-  organizationIndustry?: string
+  industry?: string
 }> {
   try {
     const { getSession } = await import('next-auth/react')
     const session = await getSession()
-    
+
     if (!session?.user) {
       return {}
     }
-    
+
     return {
       organizationId: session.user.organizationId,
       organizationName: session.user.organizationName,
-      organizationIndustry: session.user.organizationIndustry,
+      industry: session.user.industry,
     }
   } catch (error) {
     console.error('Error getting user organization:', error)

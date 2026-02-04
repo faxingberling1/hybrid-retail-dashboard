@@ -2,7 +2,7 @@ import { Bug, RefreshCw, Database, Zap, Shield, Wifi } from 'lucide-react';
 import SectionHeader from '../settings/section-header';
 import { useState } from 'react';
 
-interface DebugTool {
+export interface DebugTool {
   id: string;
   title: string;
   description: string;

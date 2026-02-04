@@ -6,20 +6,20 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const action = url.searchParams.get('action');
-    
+
     switch (action) {
       case 'tables':
         const tables = await DatabaseService.getTables();
         return NextResponse.json({ success: true, tables });
-        
+
       case 'stats':
         const stats = await DatabaseService.getDatabaseStats();
         return NextResponse.json({ success: true, stats });
-        
+
       case 'health':
         const health = await DatabaseService.getHealthStatus();
         return NextResponse.json({ success: true, health });
-        
+
       default:
         return NextResponse.json(
           { success: false, error: 'Invalid action' },
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { action, ...data } = await request.json();
-    
+
     switch (action) {
       case 'execute_query':
         if (!data.query) {
@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
           );
         }
         const queryResult = await DatabaseService.executeQuery(data.query);
-        return NextResponse.json({ success: true, ...queryResult });
-        
+        return NextResponse.json(queryResult);
+
       case 'table_data':
         if (!data.tableName) {
           return NextResponse.json(
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
           data.pageSize || 10
         );
         return NextResponse.json({ success: true, ...tableData });
-        
+
       case 'insert_data':
         if (!data.tableName || !data.data) {
           return NextResponse.json(
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         }
         const insertResult = await DatabaseService.insertData(data.tableName, data.data);
         return NextResponse.json(insertResult);
-        
+
       case 'update_data':
         if (!data.tableName || !data.id || !data.data) {
           return NextResponse.json(
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
           data.idColumn
         );
         return NextResponse.json(updateResult);
-        
+
       case 'delete_data':
         if (!data.tableName || !data.id) {
           return NextResponse.json(
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
           data.idColumn
         );
         return NextResponse.json(deleteResult);
-        
+
       default:
         return NextResponse.json(
           { success: false, error: 'Invalid action' },

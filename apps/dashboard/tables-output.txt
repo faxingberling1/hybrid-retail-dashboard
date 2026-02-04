@@ -1,0 +1,1 @@
+TABLES:["tickets","products","transaction_items","onboarding_progress","user_invitations","system_settings","notifications","notification_preferences","users","role_permissions","organizations","activity_logs","analytics_data","api_keys","invoices","audit_trails","subscriptions","system_logs","categories","user_sessions","ticket_replies","transactions"]

@@ -47,7 +47,9 @@ export function AdminHeader() {
                 <p className="text-sm font-bold text-gray-900 leading-none mb-1">
                   {session?.user?.name || "Store Admin"}
                 </p>
-                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Store: TechGadget</p>
+                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                  Store: {session?.organizationName || "TechGadget"}
+                </p>
               </div>
               <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-md ring-2 ring-white group-hover:ring-gray-100 transition-all">
                 <Building2 className="h-4 w-4 text-white" />
@@ -66,7 +68,10 @@ export function AdminHeader() {
                     {session?.user?.email || "admin@techgadget.com"}
                   </p>
                   <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-1">
-                    Store Administrator
+                    {session?.user?.industry
+                      ? `${session.user.industry.charAt(0).toUpperCase() + session.user.industry.slice(1)} Administrator`
+                      : 'Store Administrator'
+                    }
                   </p>
                 </div>
 
@@ -83,6 +88,14 @@ export function AdminHeader() {
                   >
                     Store Settings
                   </a>
+                  {session?.organizationId && (
+                    <a
+                      href={`/onboarding/${session.organizationId}`}
+                      className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+                    >
+                      Complete Setup
+                    </a>
+                  )}
                 </div>
 
                 <div className="py-1 border-t border-gray-100">

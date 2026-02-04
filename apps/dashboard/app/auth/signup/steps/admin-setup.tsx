@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { User, Mail, Lock, Phone, Eye, EyeOff, Check, X, ShieldCheck, Sparkles } from 'lucide-react'
-import { validatePasswordStrength } from '@/lib/auth-utils'
+import { validatePasswordStrength } from '@/lib/client-auth-utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function AdminSetup({ formData, updateFormData, theme }: any) {

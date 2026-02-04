@@ -389,7 +389,7 @@ async function main() {
   const method = 1; // Default to complete migration
   
   if (method === 1) {
-    await runMigration();
+    await runMigrationInParts();
   } else if (method === 2) {
     await runMigrationInParts();
   } else {

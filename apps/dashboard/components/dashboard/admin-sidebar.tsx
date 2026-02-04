@@ -19,21 +19,61 @@ import {
   CreditCard,
   Calendar,
   Truck,
-  LifeBuoy
+  LifeBuoy,
+  Pill,
+  Stethoscope,
+  Utensils,
+  GraduationCap,
+  Home,
+  Car,
+  Factory,
+  Scissors
 } from "lucide-react"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { useNotification } from "@/lib/hooks/use-notification"
 
 export function AdminSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { data: session } = useSession()
   const { notifications } = useNotification()
 
-  const navigationItems = [
+  const industry = session?.user?.industry?.toLowerCase() || 'retail'
+
+  const baseItems = [
     { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/admin" },
     { name: "Inventory Management", icon: <Package className="h-5 w-5" />, href: "/admin/inventory" },
     { name: "Sales", icon: <ShoppingBag className="h-5 w-5" />, href: "/admin/sales" },
+  ]
+
+  const industryItems: Record<string, any[]> = {
+    pharmacy: [
+      { name: "Prescriptions", icon: <Pill className="h-5 w-5" />, href: "/admin/prescriptions" },
+      { name: "Patient Records", icon: <Users className="h-5 w-5" />, href: "/admin/patients" },
+    ],
+    healthcare: [
+      { name: "Appointments", icon: <Calendar className="h-5 w-5" />, href: "/admin/appointments" },
+      { name: "Patient Files", icon: <Stethoscope className="h-5 w-5" />, href: "/admin/patients" },
+    ],
+    fashion: [
+      { name: "Collections", icon: <Scissors className="h-5 w-5" />, href: "/admin/collections" },
+      { name: "Trend Analysis", icon: <BarChart3 className="h-5 w-5" />, href: "/admin/trends" },
+    ],
+    restaurant: [
+      { name: "Menu Management", icon: <Utensils className="h-5 w-5" />, href: "/admin/menu" },
+      { name: "Table Orders", icon: <ShoppingBag className="h-5 w-5" />, href: "/admin/orders" },
+    ],
+    manufacturing: [
+      { name: "Production Line", icon: <Factory className="h-5 w-5" />, href: "/admin/production" },
+    ],
+    education: [
+      { name: "Students", icon: <GraduationCap className="h-5 w-5" />, href: "/admin/students" },
+      { name: "Course Content", icon: <FileText className="h-5 w-5" />, href: "/admin/courses" },
+    ]
+  }
+
+  const commonEndItems = [
     { name: "Customers", icon: <Users className="h-5 w-5" />, href: "/admin/customers" },
     { name: "Staff", icon: <Users className="h-5 w-5" />, href: "/admin/staff" },
     { name: "Reports", icon: <BarChart3 className="h-5 w-5" />, href: "/admin/reports" },
@@ -42,6 +82,12 @@ export function AdminSidebar() {
     { name: "Schedule", icon: <Calendar className="h-5 w-5" />, href: "/admin/schedule" },
     { name: "Support", icon: <LifeBuoy className="h-5 w-5" />, href: "/admin/support" },
     { name: "Store Settings", icon: <Settings className="h-5 w-5" />, href: "/admin/settings" },
+  ]
+
+  const navigationItems = [
+    ...baseItems,
+    ...(industryItems[industry] || []),
+    ...commonEndItems
   ]
 
   const handleLogout = async () => {

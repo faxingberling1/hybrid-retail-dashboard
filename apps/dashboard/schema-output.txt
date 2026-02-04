@@ -1,0 +1,2 @@
+ONBOARDING_COLUMNS:[{"column_name":"organization_id","data_type":"uuid"},{"column_name":"completed","data_type":"boolean"},{"column_name":"completed_at","data_type":"timestamp with time zone"},{"column_name":"step_id","data_type":"character varying"}]
+ONBOARDING_CONSTRAINTS:[]

@@ -13,6 +13,8 @@ function getPoolConfig(): PoolConfig {
     // We'll let pg handle it mostly, but we can inspect it for logging if needed.
 
     // Default SSL to false unless specified in URL or env
+    const isLocalhost = process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1');
+    const sslDisabled = process.env.DB_SSL === 'false';
     const isProd = process.env.NODE_ENV === 'production';
 
     // Simple config - trust the connection string + robust defaults
@@ -20,8 +22,9 @@ function getPoolConfig(): PoolConfig {
       connectionString: process.env.DATABASE_URL,
       // For many cloud providers (like Neon, DigitalOcean, etc), SSL is required.
       // If the URL has ?sslmode=... pg will handle it.
-      // If not, we might need to enforce it in prod.
-      ssl: isProd ? { rejectUnauthorized: false } : undefined,
+      // We only enforce rejectUnauthorized: false if it's production and NOT localhost,
+      // and not explicitly disabled.
+      ssl: (isProd && !isLocalhost && !sslDisabled) ? { rejectUnauthorized: false } : undefined,
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
@@ -137,6 +140,22 @@ export async function healthCheck() {
         waitingCount: pool.waitingCount
       }
     };
+  }
+}
+
+export const db = {
+  query,
+  queryOne,
+  queryAll,
+  transaction,
+  pool,
+  testConnection: async () => {
+    try {
+      await query('SELECT 1')
+      return true
+    } catch (e) {
+      return false
+    }
   }
 }
 

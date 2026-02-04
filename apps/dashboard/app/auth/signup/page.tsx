@@ -10,6 +10,7 @@ import AdminSetup from './steps/admin-setup'
 import TwoFactorSetup from './steps/two-factor-setup'
 import UserInvitation from './steps/user-invitation'
 import Confirmation from './steps/confirmation'
+import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
 import {
   ArrowLeft, Check, Sparkles, Rocket,
@@ -112,17 +113,13 @@ export default function SignupPage() {
       if (response.ok) {
         toast.success('Core Synchronized: Account established.')
 
-        const signInResult = await fetch('/api/auth/callback/credentials', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.adminEmail,
-            password: formData.adminPassword,
-            redirect: false,
-          }),
+        const signInResult = await signIn('credentials', {
+          email: formData.adminEmail,
+          password: formData.adminPassword,
+          redirect: false,
         })
 
-        if (signInResult.ok) {
+        if (signInResult && !signInResult.error) {
           setTimeout(() => {
             router.push(`/onboarding/${data.organizationId}`)
           }, 1000)

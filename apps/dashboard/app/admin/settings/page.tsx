@@ -1,17 +1,114 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     Settings, Store, Bell, Shield,
     Globe, CreditCard, Puzzle, HelpCircle,
     Save, ChevronRight, CheckCircle2, Moon,
-    Smartphone, Share2, Languages
+    Smartphone, Share2, Languages, Loader2
 } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
+import { toast } from "sonner"
+
+import { GeneralSettings } from "@/components/dashboard/settings/general-settings"
+import { NotificationSettings } from "@/components/dashboard/settings/notification-settings"
+import { PaymentSettings } from "@/components/dashboard/settings/payment-settings"
+import { SecuritySettings } from "@/components/dashboard/settings/security-settings"
+import { IntegrationSettings } from "@/components/dashboard/settings/integration-settings"
+import { DeleteAccountModal } from "@/components/dashboard/settings/delete-account-modal"
+import { signOut } from "next-auth/react"
 
 export default function AdminSettingsPage() {
     const [activeTab, setActiveTab] = useState("GENERAL")
     const [isSaving, setIsSaving] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [data, setData] = useState({
+        organization: {
+            name: "",
+            billing_email: "",
+            address: "",
+            currency: "PKR",
+            timezone: "Asia/Karachi",
+            settings: {}
+        },
+        notifications: {
+            email_notifications: true,
+            push_notifications: true,
+            desktop_notifications: true,
+            digest_frequency: "realtime"
+        }
+    })
+
+    useEffect(() => {
+        fetchSettings()
+    }, [])
+
+    const fetchSettings = async () => {
+        try {
+            const response = await fetch("/api/admin/settings")
+            const resData = await response.json()
+            if (resData.error) throw new Error(resData.error)
+            setData({
+                organization: resData.organization || data.organization,
+                notifications: resData.notifications || data.notifications
+            })
+        } catch (error: any) {
+            toast.error(`Fetch Failed: ${error.message}`)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleSave = async () => {
+        setIsSaving(true)
+        try {
+            const response = await fetch("/api/admin/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            if (!response.ok) throw new Error("Broadcast Refused")
+            toast.success("Settings Synchronized")
+        } catch (error: any) {
+            toast.error(error.message)
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    const handleOrgChange = (field: string, value: any) => {
+        setData(prev => ({
+            ...prev,
+            organization: { ...prev.organization, [field]: value }
+        }))
+    }
+
+    const handleNotificationChange = (field: string, value: any) => {
+        setData(prev => ({
+            ...prev,
+            notifications: { ...prev.notifications, [field]: value }
+        }))
+    }
+
+    const handleDeleteAccount = async () => {
+        setIsDeleting(true)
+        try {
+            const response = await fetch("/api/admin/account/delete", {
+                method: "DELETE"
+            })
+            if (!response.ok) throw new Error("Deletion failed")
+
+            toast.success("Account Destroyed. Redirecting...")
+            setTimeout(() => {
+                signOut({ callbackUrl: "/login" })
+            }, 2000)
+        } catch (error: any) {
+            toast.error(error.message)
+            setIsDeleting(false)
+        }
+    }
 
     const tabs = [
         { id: "GENERAL", label: "General", icon: <Store className="h-4 w-4" /> },
@@ -21,13 +118,26 @@ export default function AdminSettingsPage() {
         { id: "INTEGRATIONS", label: "Integrations", icon: <Puzzle className="h-4 w-4" /> }
     ]
 
-    const handleSave = () => {
-        setIsSaving(true)
-        setTimeout(() => setIsSaving(false), 2000)
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
+                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Accessing Cipher...</p>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className="p-8">
+            <DeleteAccountModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteAccount}
+                isLoading={isDeleting}
+            />
+
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
@@ -39,8 +149,8 @@ export default function AdminSettingsPage() {
                     disabled={isSaving}
                     className="flex items-center gap-2 px-8 py-3.5 bg-gray-900 text-white rounded-2xl text-sm font-black shadow-xl shadow-gray-900/20 hover:scale-[1.02] transition-all active:scale-[0.98] disabled:opacity-70"
                 >
-                    {isSaving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="h-5 w-5" />}
-                    {isSaving ? "Publishing Changes..." : "Save Configuration"}
+                    {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                    {isSaving ? "Syncing..." : "Save Changes"}
                 </button>
             </div>
 
@@ -54,11 +164,11 @@ export default function AdminSettingsPage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`
-                    w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 font-bold text-sm
-                    ${activeTab === tab.id
+                                        w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 font-bold text-sm
+                                        ${activeTab === tab.id
                                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
                                             : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}
-                  `}
+                                    `}
                                 >
                                     {tab.icon}
                                     {tab.label}
@@ -71,92 +181,59 @@ export default function AdminSettingsPage() {
                             <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">System Status</div>
                             <div className="flex items-center gap-3">
                                 <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-                                <span className="text-xs font-bold text-gray-700">All Modules Healthy</span>
+                                <span className="text-xs font-bold text-gray-700">Operational</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 space-y-8">
-                    {/* General Section */}
+                <div className="flex-1">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeTab}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {activeTab === "GENERAL" && (
+                                <GeneralSettings data={data.organization} onChange={handleOrgChange} />
+                            )}
+                            {activeTab === "NOTIFICATIONS" && (
+                                <NotificationSettings data={data.notifications} onChange={handleNotificationChange} />
+                            )}
+                            {activeTab === "PAYMENTS" && (
+                                <PaymentSettings data={data.organization.settings} onChange={(f, v) => handleOrgChange('settings', { ...data.organization.settings, [f]: v })} />
+                            )}
+                            {activeTab === "SECURITY" && (
+                                <SecuritySettings data={data.organization.settings} onChange={(f, v) => handleOrgChange('settings', { ...data.organization.settings, [f]: v })} />
+                            )}
+                            {activeTab === "INTEGRATIONS" && (
+                                <IntegrationSettings data={data.organization.settings} />
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Danger Zone */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-[3.5rem] p-12 border border-gray-100 shadow-2xl relative overflow-hidden"
-                        {...({} as any)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-12 p-12 bg-rose-50/30 rounded-[3.5rem] border border-rose-100 flex flex-col md:flex-row items-center justify-between gap-8"
                     >
-                        <div className="max-w-3xl">
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-8 flex items-center gap-4">
-                                <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
-                                    <Globe className="h-6 w-6" />
-                                </div>
-                                Business Profile
-                            </h2>
-
-                            <div className="grid md:grid-cols-2 gap-8 mb-12">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Official Store Name</label>
-                                    <input type="text" defaultValue="TechGadget Lahore" className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none transition-all font-bold text-gray-900" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Business Email</label>
-                                    <input type="email" defaultValue="admin@techgadget.pk" className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none transition-all font-bold text-gray-900" />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 mb-12">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Store Address</label>
-                                <textarea rows={3} defaultValue="Shop 42, Floor 2, IT Tower, Gulberg III, Lahore, Pakistan" className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl outline-none transition-all font-bold text-gray-900 resize-none" />
-                            </div>
-
-                            <div className="grid md:grid-cols-2 gap-8">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Currency</label>
-                                    <select className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl font-bold text-gray-900 outline-none appearance-none cursor-pointer">
-                                        <option>PKR (₨)</option>
-                                        <option>USD ($)</option>
-                                        <option>EUR (€)</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Language</label>
-                                    <div className="relative">
-                                        <Languages className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                                        <select className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl font-bold text-gray-900 outline-none appearance-none cursor-pointer">
-                                            <option>English (International)</option>
-                                            <option>Urdu (Pakistan)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 className="text-xl font-black text-rose-900 mb-2">Danger Zone</h3>
+                            <p className="text-sm text-rose-700/60 font-medium max-w-md">
+                                Permanently delete this organization and all associated data. This action cannot be undone.
+                            </p>
                         </div>
-                    </motion.div>
-
-                    {/* Preferences Section */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="bg-gray-50 rounded-[3.5rem] p-12 border border-gray-100 shadow-sm"
-                        {...({} as any)}
-                    >
-                        <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-10">Interface Preferences</h2>
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {[
-                                { label: "Dark Mode Ecosystem", icon: <Moon />, desc: "Adjust theme based on sun" },
-                                { label: "Mobile Optimization", icon: <Smartphone />, desc: "Responsive first layout" },
-                                { label: "Social Connect", icon: <Share2 />, desc: "Public store visibility" }
-                            ].map((pref) => (
-                                <div key={pref.label} className="bg-white p-8 rounded-[2.5rem] border border-gray-200/50 hover:border-blue-200 transition-all cursor-pointer group shadow-sm hover:shadow-xl">
-                                    <div className="p-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 w-fit rounded-2xl mb-6 transition-colors">
-                                        {pref.icon}
-                                    </div>
-                                    <div className="text-sm font-black text-gray-900 mb-2">{pref.label}</div>
-                                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{pref.desc}</div>
-                                </div>
-                            ))}
-                        </div>
+                        <button
+                            onClick={() => setIsDeleteModalOpen(true)}
+                            className="px-10 py-5 bg-white border-2 border-rose-200 text-rose-600 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all shadow-sm active:scale-95"
+                        >
+                            Delete Account
+                        </button>
                     </motion.div>
                 </div>
             </div>

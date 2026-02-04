@@ -8,6 +8,7 @@ import BusinessDetails from '../steps/business-details'
 import AdminSetup from '../steps/admin-setup'
 import UserInvitation from '../steps/user-invitation'
 import Confirmation from '../steps/confirmation'
+import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
 
 const STEPS = [
@@ -86,7 +87,7 @@ export default function SignupPage() {
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -96,18 +97,15 @@ export default function SignupPage() {
 
       if (response.ok) {
         toast.success('Account created successfully!')
-        
+
         // Automatically sign in the user
-        const signInResult = await fetch('/api/auth/callback/credentials', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.adminEmail,
-            password: formData.adminPassword,
-          }),
+        const signInResult = await signIn('credentials', {
+          email: formData.adminEmail,
+          password: formData.adminPassword,
+          redirect: false,
         })
 
-        if (signInResult.ok) {
+        if (signInResult && !signInResult.error) {
           setTimeout(() => {
             router.push(`/onboarding/${data.organizationId}`)
           }, 1000)
@@ -156,13 +154,12 @@ export default function SignupPage() {
             {STEPS.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                    index < currentStep
-                      ? 'bg-green-500 border-green-500 text-white'
-                      : index === currentStep
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${index < currentStep
+                    ? 'bg-green-500 border-green-500 text-white'
+                    : index === currentStep
                       ? 'bg-blue-600 border-blue-600 text-white'
                       : 'bg-white border-gray-300 text-gray-500'
-                  }`}
+                    }`}
                 >
                   {index < currentStep ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,9 +171,8 @@ export default function SignupPage() {
                 </div>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`h-1 w-16 md:w-24 ${
-                      index < currentStep ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
+                    className={`h-1 w-16 md:w-24 ${index < currentStep ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
                   />
                 )}
               </div>
@@ -209,7 +205,7 @@ export default function SignupPage() {
             >
               Back
             </button>
-            
+
             <button
               onClick={handleNext}
               disabled={loading}

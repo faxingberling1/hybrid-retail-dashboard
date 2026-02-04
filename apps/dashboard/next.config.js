@@ -34,10 +34,11 @@ const nextConfig = {
         path: require.resolve('path-browserify'),
         querystring: require.resolve('querystring-es3'),
         vm: require.resolve('vm-browserify'),
+        'pg-native': false,
       };
     }
 
-    // Fix for pg-native warnings
+    // Fix for pg-native warnings on server
     if (isServer) {
       config.externals.push({
         'pg-native': 'commonjs pg-native',
@@ -58,16 +59,12 @@ const nextConfig = {
     return config;
   },
 
-  // Experimental features (optional)
+  // Experimental features
   experimental: {
-    // Enable if you need server actions
-    serverActions: {
-      allowedOrigins: ['localhost:3000', '*.vercel.app'],
-    },
-    // Improve build performance
-    optimizeCss: false,
-    // Next.js 14 features
-    typedRoutes: true,
+    // If Next 16 uses a different way to allow origins, it might be here.
+    // serverActions is likely stable now.
+    // optimizeCss: false,
+    // typedRoutes: false,
   },
 
   // Images configuration

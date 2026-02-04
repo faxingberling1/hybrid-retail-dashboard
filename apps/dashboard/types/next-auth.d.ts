@@ -15,11 +15,11 @@ declare module "next-auth" {
       image?: string
       organizationId: string
       organizationName?: string
-      organizationIndustry?: string
+      industry?: string
     } & DefaultSession["user"]
     organizationId: string
     organizationName?: string
-    organizationIndustry?: string
+    industry?: string
   }
 
   interface User {
@@ -30,7 +30,7 @@ declare module "next-auth" {
     image?: string
     organizationId: string
     organizationName?: string
-    organizationIndustry?: string
+    industry?: string
   }
 }
 
@@ -42,6 +42,6 @@ declare module "next-auth/jwt" {
     role: string
     organizationId: string
     organizationName?: string
-    organizationIndustry?: string
+    industry?: string
   }
 }

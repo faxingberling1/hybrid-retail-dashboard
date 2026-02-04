@@ -33,6 +33,9 @@ export default function LoginPage() {
   const [timeLeft, setTimeLeft] = useState<string>("")
   const [progress, setProgress] = useState(0)
   const [activeFeature, setActiveFeature] = useState<number | null>(null)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loginMethod, setLoginMethod] = useState<"quick" | "manual">("manual")
 
   useEffect(() => {
     setIsMounted(true)
@@ -161,6 +164,35 @@ export default function LoginPage() {
         border: "border-rose-500/30"
       },
       features: ["Quick Setup", "Business Info", "Admin Profile", "Team Access"]
+    }
+  }
+
+  const handleManualLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !password) {
+      setError("Credentials Required: Please initialize authentication parameters.")
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false
+      })
+
+      if (result?.error) {
+        setError(`Access Denied: ${result.error}`)
+      } else if (result?.ok) {
+        window.location.href = "/dashboard"
+      }
+    } catch (err: any) {
+      setError(`Core Interrupt: ${err.message}`)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -517,56 +549,143 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  {(["SUPER_ADMIN", "ADMIN", "USER", "NEW_ACCOUNT"] as const).map((role) => {
-                    const cred = demoCredentials[role]
-                    const themeStyles = isGalactic ? cred.galactic : cred.playful
+                {/* Login Method Toggle */}
+                <div className={`p-1 rounded-2xl flex ${isGalactic ? 'bg-white/5' : 'bg-slate-100'}`}>
+                  <button
+                    onClick={() => setLoginMethod("manual")}
+                    className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${loginMethod === "manual"
+                      ? (isGalactic ? 'bg-violet-600 text-white shadow-lg' : 'bg-white text-slate-900 shadow-sm')
+                      : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                  >
+                    Manual Entry
+                  </button>
+                  <button
+                    onClick={() => setLoginMethod("quick")}
+                    className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${loginMethod === "quick"
+                      ? (isGalactic ? 'bg-violet-600 text-white shadow-lg' : 'bg-white text-slate-900 shadow-sm')
+                      : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                  >
+                    Quick Access
+                  </button>
+                </div>
 
-                    return (
-                      <MotionButton
-                        key={role}
-                        whileHover={{ scale: 1.02, x: 5 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleLogin(role)}
-                        className={`w-full group relative p-6 rounded-[2.5rem] border-2 transition-all duration-500 text-left ${selectedRole === role
-                          ? `${isGalactic ? 'bg-white text-black border-white' : 'bg-slate-900 border-slate-900 text-white'} shadow-2xl`
-                          : `${isGalactic ? 'bg-white/5 border-white/5 hover:border-white/20' : 'bg-white border-slate-50 hover:border-slate-200'} shadow-sm`
-                          } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-6">
-                            <div className={`p-4 rounded-2xl transition-all duration-300 ${selectedRole === role
-                              ? (isGalactic ? 'bg-black/10' : 'bg-white/10')
-                              : themeStyles.bg
-                              }`}>
-                              <div className={selectedRole === role ? (isGalactic ? 'text-black' : 'text-white') : themeStyles.accent}>
-                                {cred.icon}
-                              </div>
-                            </div>
-                            <div>
-                              <h4 className={`font-black text-xl tracking-tighter ${selectedRole === role ? (isGalactic ? 'text-black' : 'text-white') : (isGalactic ? 'text-white' : 'text-slate-900')}`}>
-                                {cred.name}
-                              </h4>
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {cred.features.slice(0, 2).map((feature, idx) => (
-                                  <span key={idx} className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full ${selectedRole === role ? (isGalactic ? 'bg-black/5 text-black/70' : 'bg-white/20 text-white') : (isGalactic ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500')}`}>
-                                    {feature}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <div className={`transition-all duration-500 ${selectedRole === role ? 'translate-x-0' : 'translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`}>
-                            {selectedRole === role && isLoading ? (
-                              <MotionDiv animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className={`w-6 h-6 border-2 border-t-white rounded-full ${isGalactic ? 'border-black/20' : 'border-white/20'}`} />
-                            ) : (
-                              <ArrowRight className={`h-6 w-6 ${selectedRole === role ? (isGalactic ? 'text-black' : 'text-white') : 'text-slate-300'}`} />
-                            )}
+                <div className="space-y-6">
+                  {loginMethod === "manual" ? (
+                    <motion.form
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      onSubmit={handleManualLogin}
+                      className="space-y-6"
+                    >
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className={`text-[10px] font-black uppercase tracking-[0.2em] ml-1 ${isGalactic ? 'text-slate-500' : 'text-slate-400'}`}>Node ID / Email</label>
+                          <div className="relative group">
+                            <User className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${isGalactic ? 'text-slate-600 group-focus-within:text-violet-400' : 'text-slate-300 group-focus-within:text-sky-500'}`} />
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder="operator@hybridpos.pk"
+                              className={`w-full pl-12 pr-4 py-4 rounded-2xl border-2 outline-none transition-all text-sm font-medium ${isGalactic
+                                ? 'bg-white/5 border-white/5 focus:border-violet-500/50 text-white placeholder:text-slate-700'
+                                : 'bg-white border-slate-50 focus:border-sky-500/50 text-slate-900 placeholder:text-slate-300'
+                                }`}
+                            />
                           </div>
                         </div>
+                        <div className="space-y-2">
+                          <label className={`text-[10px] font-black uppercase tracking-[0.2em] ml-1 ${isGalactic ? 'text-slate-500' : 'text-slate-400'}`}>Protocol Key / Password</label>
+                          <div className="relative group">
+                            <Shield className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${isGalactic ? 'text-slate-600 group-focus-within:text-violet-400' : 'text-slate-300 group-focus-within:text-sky-500'}`} />
+                            <input
+                              type="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="••••••••"
+                              className={`w-full pl-12 pr-4 py-4 rounded-2xl border-2 outline-none transition-all text-sm font-medium ${isGalactic
+                                ? 'bg-white/5 border-white/5 focus:border-violet-500/50 text-white placeholder:text-slate-700'
+                                : 'bg-white border-slate-50 focus:border-sky-500/50 text-slate-900 placeholder:text-slate-300'
+                                }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <MotionButton
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        whileTap={{ scale: 0.99 }}
+                        disabled={isLoading}
+                        className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] flex items-center justify-center group shadow-xl transition-all ${isGalactic
+                          ? 'bg-violet-600 text-white shadow-violet-500/20 hover:bg-violet-500'
+                          : 'bg-slate-900 text-white shadow-slate-900/10 hover:bg-slate-800'
+                          } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        {isLoading ? (
+                          <MotionDiv animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full" />
+                        ) : (
+                          <>
+                            <span>Authorize Access</span>
+                            <ArrowRight className="h-4 w-4 ml-3 transform group-hover:translate-x-1 transition-transform" />
+                          </>
+                        )}
                       </MotionButton>
-                    )
-                  })}
+                    </motion.form>
+                  ) : (
+                    <div className="space-y-4">
+                      {(["SUPER_ADMIN", "ADMIN", "USER", "NEW_ACCOUNT"] as const).map((role) => {
+                        const cred = demoCredentials[role]
+                        const themeStyles = isGalactic ? cred.galactic : cred.playful
+
+                        return (
+                          <MotionButton
+                            key={role}
+                            whileHover={{ scale: 1.02, x: 5 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleLogin(role)}
+                            className={`w-full group relative p-6 rounded-[2.5rem] border-2 transition-all duration-500 text-left ${selectedRole === role
+                              ? `${isGalactic ? 'bg-white text-black border-white' : 'bg-slate-900 border-slate-900 text-white'} shadow-2xl`
+                              : `${isGalactic ? 'bg-white/5 border-white/5 hover:border-white/20' : 'bg-white border-slate-50 hover:border-slate-200'} shadow-sm`
+                              } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-6">
+                                <div className={`p-4 rounded-2xl transition-all duration-300 ${selectedRole === role
+                                  ? (isGalactic ? 'bg-black/10' : 'bg-white/10')
+                                  : themeStyles.bg
+                                  }`}>
+                                  <div className={selectedRole === role ? (isGalactic ? 'text-black' : 'text-white') : themeStyles.accent}>
+                                    {cred.icon}
+                                  </div>
+                                </div>
+                                <div>
+                                  <h4 className={`font-black text-xl tracking-tighter ${selectedRole === role ? (isGalactic ? 'text-black' : 'text-white') : (isGalactic ? 'text-white' : 'text-slate-900')}`}>
+                                    {cred.name}
+                                  </h4>
+                                  <div className="flex flex-wrap gap-2 mt-2">
+                                    {cred.features.slice(0, 2).map((feature, idx) => (
+                                      <span key={idx} className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full ${selectedRole === role ? (isGalactic ? 'bg-black/5 text-black/70' : 'bg-white/20 text-white') : (isGalactic ? 'bg-white/5 text-slate-400' : 'bg-slate-100 text-slate-500')}`}>
+                                        {feature}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className={`transition-all duration-500 ${selectedRole === role ? 'translate-x-0' : 'translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`}>
+                                {selectedRole === role && isLoading ? (
+                                  <MotionDiv animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className={`w-6 h-6 border-2 border-t-white rounded-full ${isGalactic ? 'border-black/20' : 'border-white/20'}`} />
+                                ) : (
+                                  <ArrowRight className={`h-6 w-6 ${selectedRole === role ? (isGalactic ? 'text-black' : 'text-white') : 'text-slate-300'}`} />
+                                )}
+                              </div>
+                            </div>
+                          </MotionButton>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {error && (

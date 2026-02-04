@@ -19,13 +19,15 @@ export async function middleware(request: NextRequest) {
     '/api/public',
     '/auth',
     '/auth/signup', // Signup page
-    '/api/auth/signup', // Signup API
+    '/api/signup', // Signup API
+    '/api/auth/signup', // Alternative signup API path
     '/auth/verify',
     '/auth/accept-invite',
     '/unauthorized',
     '/maintenance',
     '/api/onboarding',
     '/api/organizations',
+    '/api/system/settings',
     '/images', // Allow image assets
     '/fonts', // Allow font assets
     '/icon.svg', // Allow favicon

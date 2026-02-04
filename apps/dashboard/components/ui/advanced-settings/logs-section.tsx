@@ -2,7 +2,7 @@ import { FileText, Search, Filter, Download } from 'lucide-react';
 import SectionHeader from '../settings/section-header';
 import { useState } from 'react';
 
-interface LogEntry {
+export interface LogEntry {
   id: string;
   timestamp: string;
   level: 'info' | 'warning' | 'error';
@@ -32,13 +32,13 @@ export default function LogsSection({
   const itemsPerPage = 10;
 
   const filteredLogs = logs.filter(log => {
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       log.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.user?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesLevel = filterLevel === 'all' || log.level === filterLevel;
-    
+
     return matchesSearch && matchesLevel;
   });
 
@@ -191,16 +191,15 @@ export default function LogsSection({
                   } else {
                     pageNum = currentPage - 2 + i;
                   }
-                  
+
                   return (
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`px-3 py-1 text-sm rounded-lg ${
-                        currentPage === pageNum
+                      className={`px-3 py-1 text-sm rounded-lg ${currentPage === pageNum
                           ? 'bg-purple-600 text-white'
                           : 'border border-gray-300 hover:bg-gray-50'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>

@@ -4,7 +4,9 @@ import SystemInformationSection from './system-information-section';
 import LogsSection from './logs-section';
 import DebugToolsSection from './debug-tools-section';
 import DangerZoneSection from './danger-zone-section';
-import { LogEntry, DebugTool, DangerZoneAction } from './logs-section';
+import { LogEntry } from './logs-section';
+import { DebugTool } from './debug-tools-section';
+import { DangerZoneAction } from './danger-zone-section';
 
 interface AdvancedSectionProps {
   // Data Management

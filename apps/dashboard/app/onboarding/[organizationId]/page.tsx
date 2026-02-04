@@ -20,6 +20,8 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AdminHeader } from '@/components/dashboard/admin-header';
+import { DashboardFooter } from '@/components/dashboard/dashboard-footer';
 
 const ONBOARDING_STEPS = [
   { id: 'industry-setup', name: 'Industry Setup', icon: Settings, description: 'Protocol recalibration for your sector.' },
@@ -103,6 +105,24 @@ export default function OnboardingPage() {
     }
   };
 
+  const handleSkipOnboarding = async () => {
+    toast.loading('Bypassing initialization sequence...');
+    try {
+      await fetch(`/api/onboarding/${organizationId}/complete`, {
+        method: 'POST'
+      });
+
+      toast.dismiss();
+      toast.success('Sequence Aborted: Accessing Dashboard.');
+      setTimeout(() => {
+        router.push(`/dashboard`);
+      }, 1000);
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Bypass Failure.');
+    }
+  };
+
   const progress = (completedSteps.length / ONBOARDING_STEPS.length) * 100;
   const isComplete = completedSteps.length === ONBOARDING_STEPS.length;
 
@@ -114,6 +134,7 @@ export default function OnboardingPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-1000 selection:bg-sky-500/20 overflow-x-hidden relative font-sans antialiased ${isGalactic ? 'bg-[#020412] text-white' : 'bg-[#f8fafc] text-slate-900'}`}>
+      <AdminHeader />
 
       {/* Dynamic Backgrounds */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -193,19 +214,19 @@ export default function OnboardingPage() {
                     transition={{ delay: idx * 0.1 }}
                     key={step.id}
                     className={`group relative overflow-hidden rounded-[2.5rem] p-8 border-2 transition-all duration-500 ${isCompleted
-                        ? (isGalactic ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50/50 border-emerald-100')
-                        : isCurrent
-                          ? (isGalactic ? 'bg-white text-black border-white shadow-2xl' : 'bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/10')
-                          : (isGalactic ? 'bg-black/40 border-white/5 hover:border-white/10' : 'bg-white border-slate-100 hover:border-slate-200')
+                      ? (isGalactic ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50/50 border-emerald-100')
+                      : isCurrent
+                        ? (isGalactic ? 'bg-white text-black border-white shadow-2xl' : 'bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/10')
+                        : (isGalactic ? 'bg-black/40 border-white/5 hover:border-white/10' : 'bg-white border-slate-100 hover:border-slate-200')
                       }`}
                   >
                     <div className="relative z-10 space-y-6">
                       <div className="flex justify-between items-start">
                         <div className={`p-4 rounded-2xl transition-all duration-300 ${isCompleted
-                            ? (isGalactic ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600')
-                            : isCurrent
-                              ? 'bg-black/10'
-                              : (isGalactic ? 'bg-white/5 text-violet-400' : 'bg-sky-50 text-sky-600')
+                          ? (isGalactic ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600')
+                          : isCurrent
+                            ? 'bg-black/10'
+                            : (isGalactic ? 'bg-white/5 text-violet-400' : 'bg-sky-50 text-sky-600')
                           }`}>
                           <Icon className="h-6 w-6" />
                         </div>
@@ -228,8 +249,8 @@ export default function OnboardingPage() {
                           whileHover={{ x: 5 }}
                           onClick={() => router.push(`/onboarding/${organizationId}/${step.id}`)}
                           className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-3 transition-all ${isCurrent
-                              ? (isGalactic ? 'bg-black text-white hover:bg-black/80' : 'bg-white text-slate-900 hover:bg-white/90')
-                              : (isGalactic ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-50 hover:bg-slate-100')
+                            ? (isGalactic ? 'bg-black text-white hover:bg-black/80' : 'bg-white text-slate-900 hover:bg-white/90')
+                            : (isGalactic ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-50 hover:bg-slate-100')
                             }`}
                         >
                           <span>{isCurrent ? 'Continue Setup' : 'Start Module'}</span>
@@ -295,13 +316,20 @@ export default function OnboardingPage() {
                   onClick={handleCompleteOnboarding}
                   disabled={!isComplete}
                   className={`w-full py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center space-x-4 ${isComplete
-                      ? (isGalactic ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-emerald-600 text-white shadow-emerald-600/20')
-                      : (isGalactic ? 'bg-white/5 text-slate-600 border border-white/5 cursor-not-allowed' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed')
+                    ? (isGalactic ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-emerald-600 text-white shadow-emerald-600/20')
+                    : (isGalactic ? 'bg-white/5 text-slate-600 border border-white/5 cursor-not-allowed' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed')
                     }`}
                 >
                   <span>Finalize Command</span>
                   <LayoutDashboard className="h-4 w-4" />
                 </motion.button>
+
+                <button
+                  onClick={handleSkipOnboarding}
+                  className={`w-full mt-4 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${isGalactic ? 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10' : 'text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200'}`}
+                >
+                  Skip for Now
+                </button>
               </div>
             </motion.div>
 
@@ -311,13 +339,19 @@ export default function OnboardingPage() {
                 <span className="text-[10px] font-black uppercase tracking-widest">Global Node : Karachi (KHI-01)</span>
               </div>
               <div className="flex flex-col gap-4">
-                <button className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-sky-500 text-left transition-colors">Skip Initialization Sequence</button>
+                <button
+                  onClick={handleSkipOnboarding}
+                  className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-sky-500 text-left transition-colors"
+                >
+                  Skip Initialization Sequence
+                </button>
                 <button className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-sky-500 text-left transition-colors">Emergency Protocol Support</button>
               </div>
             </footer>
           </aside>
         </main>
       </div>
+      <DashboardFooter />
     </div>
   );
 }

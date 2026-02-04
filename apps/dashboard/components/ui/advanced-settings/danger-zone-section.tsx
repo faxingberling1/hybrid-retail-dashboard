@@ -1,7 +1,7 @@
 import { AlertTriangle, Trash2, RefreshCw, Archive, Lock } from 'lucide-react';
 import SectionHeader from '../settings/section-header';
 
-interface DangerZoneAction {
+export interface DangerZoneAction {
   id: string;
   title: string;
   description: string;

@@ -35,7 +35,8 @@ export { default as IntegrationStatusBadge } from './integrations-settings/integ
 export { default as AvailableIntegrationsGrid } from './integrations-settings/available-integrations-grid';
 export { default as IntegrationDetailsPanel } from './integrations-settings/integration-details-panel';
 export { default as IntegrationActions } from './integrations-settings/integration-actions';
-export type { Integration, AvailableIntegration } from './integrations-settings/integration-card';
+export type { Integration } from './integrations-settings/integration-card';
+export type { AvailableIntegration } from './integrations-settings/available-integrations-grid';
 
 // Advanced Settings Components
 export { default as AdvancedSection } from './advanced-settings/advanced-section';
@@ -45,7 +46,9 @@ export { default as SystemInformationSection } from './advanced-settings/system-
 export { default as LogsSection } from './advanced-settings/logs-section';
 export { default as DebugToolsSection } from './advanced-settings/debug-tools-section';
 export { default as DangerZoneSection } from './advanced-settings/danger-zone-section';
-export type { LogEntry, DebugTool, DangerZoneAction } from './advanced-settings/logs-section';
+export type { LogEntry } from './advanced-settings/logs-section';
+export type { DebugTool } from './advanced-settings/debug-tools-section';
+export type { DangerZoneAction } from './advanced-settings/danger-zone-section';
 
 // Settings UI Components
 export { default as SectionHeader } from './settings/section-header';
