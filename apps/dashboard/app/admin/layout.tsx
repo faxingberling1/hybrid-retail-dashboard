@@ -3,8 +3,8 @@
 import { ReactNode, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { AdminSidebar } from "@/components/admin-sidebar"
-import { AdminHeader } from "@/components/admin-header"
+import { AdminSidebar } from '@/components/dashboard/admin-sidebar';
+import { AdminHeader } from '@/components/dashboard/admin-header';
 
 export default function AdminLayout({
   children,

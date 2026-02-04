@@ -12,9 +12,9 @@ import {
   AlertCircle, Info, Eye, Shield
 } from "lucide-react"
 import { motion } from "framer-motion"
-import IndustryDashboardPersonalizer from "@/components/industry-dashboard-personalizer"
-import { OnboardingBanner } from "@/components/onboarding-banner"
-import { DashboardFooter } from "@/components/dashboard-footer"
+import IndustryDashboardPersonalizer from '@/components/dashboard/industry-dashboard-personalizer';
+import { OnboardingBanner } from '@/components/dashboard/onboarding-banner';
+import { DashboardFooter } from '@/components/dashboard/dashboard-footer';
 
 // Recharts for charts
 import {
