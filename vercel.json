@@ -1,15 +1,12 @@
 {
   "version": 2,
-  "framework": null,
-  "builds": [
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:dashboard",
+  "outputDirectory": "apps/dashboard/.next",
+  "routes": [
     {
-      "src": "apps/dashboard/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
+      "src": "/(.*)",
+      "dest": "apps/dashboard/$1"
     }
-  ],
-  "installCommand": "cd apps/dashboard && npm install",
-  "buildCommand": "cd apps/dashboard && npx prisma generate && next build"
+  ]
 }
