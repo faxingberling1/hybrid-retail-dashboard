@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
 // Reload triggered at 2026-02-03 00:21
 const nextConfig = {
   reactStrictMode: true,
