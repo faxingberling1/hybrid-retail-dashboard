@@ -8,6 +8,8 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
+const MotionTr = motion.create('tr');
+
 export default function UserInventoryPage() {
     const queryClient = useQueryClient()
     const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
@@ -287,7 +289,7 @@ export default function UserInventoryPage() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {filteredInventory.map((item: any, idx: number) => (
-                                        <motion.tr
+                                        <MotionTr
                                             {...({
                                                 key: item.id,
                                                 initial: { opacity: 0 },
@@ -364,7 +366,7 @@ export default function UserInventoryPage() {
                                                     </button>
                                                 </div>
                                             </td>
-                                        </motion.tr>
+                                        </MotionTr>
                                     ))}
                                 </tbody>
                             </table>
