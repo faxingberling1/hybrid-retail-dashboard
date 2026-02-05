@@ -48,6 +48,7 @@ const nextConfig = {
     // Optional: Add alias for problematic modules
     config.resolve.alias = {
       ...config.resolve.alias,
+      '@': path.resolve(__dirname),
       // Add any problematic module aliases here if needed
     };
 
