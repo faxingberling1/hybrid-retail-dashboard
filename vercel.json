@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": "cd apps/dashboard && npm install && npm run build",
+  "installCommand": "cd apps/dashboard && npm install",
+  "outputDirectory": "apps/dashboard/.next",
   "builds": [
     {
       "src": "apps/dashboard/package.json",
