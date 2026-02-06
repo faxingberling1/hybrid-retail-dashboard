@@ -87,13 +87,7 @@ export default function LandingPage() {
       <header className={`fixed top-0 inset-x-0 z-[100] transition-all duration-500 ${scrolled ? 'py-4' : 'py-8'}`}>
         <nav className="container mx-auto px-6">
           <div className={`p-4 md:px-8 rounded-[2rem] transition-all duration-500 flex items-center justify-between ${scrolled ? 'bg-white/80 backdrop-blur-2xl border border-slate-100 shadow-[0_8px_32px_rgba(0,0,0,0.03)]' : 'bg-transparent'}`}>
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-sky-500/20 blur-xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-2.5 bg-sky-500 text-white rounded-2xl shadow-lg shadow-sky-500/20">
-                  <ShoppingCart className="h-6 w-6" />
-                </div>
-              </div>
+            <Link href="/" className="flex items-center space-x-3 group transition-transform hover:scale-105">
               <div>
                 <span className="text-xl font-black tracking-tighter text-slate-900 block leading-none">HybridPOS</span>
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Enterprise Unified</span>
@@ -368,7 +362,7 @@ export default function LandingPage() {
                   className="w-40 h-40 bg-white shadow-2xl rounded-[3rem] border border-slate-50 flex items-center justify-center relative z-20 group"
                 >
                   <div className="absolute inset-0 bg-sky-500/10 rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <ShoppingCart className="h-16 w-16 text-sky-500 transition-transform group-hover:scale-110" />
+                  <span className="text-4xl font-black tracking-tighter text-sky-500 transition-transform group-hover:scale-110">HP</span>
                 </MotionDiv>
 
                 {/* Floating Orbitals */}

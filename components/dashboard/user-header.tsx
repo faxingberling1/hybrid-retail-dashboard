@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Bell, ChevronDown, Menu, User, Globe } from "lucide-react"
+import { Search, Bell, ChevronDown, Menu, User } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { NotificationBell } from "@/components/dashboard/notification-bell"
@@ -34,15 +34,7 @@ export function UserHeader() {
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="h-8 w-px bg-gray-200/50 hidden sm:block"></div>
 
-          <Link
-            href="/"
-            className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
-            title="View Landing Page"
-          >
-            <Globe className="h-5 w-5" />
-          </Link>
 
           <div className="bg-blue-50/50 border border-blue-100 px-3 py-1.5 rounded-xl hidden sm:block">
             <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">Terminal #01</span>

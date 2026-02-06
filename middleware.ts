@@ -46,9 +46,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', origin))
   }
 
-  // Rewrite /home to /index.html internally
-  if (pathname === '/home') {
-    console.log('🔄 Rewriting /home to /home (internal)')
+  // Rewrite / and /home to /index.html internally
+  if (pathname === '/' || pathname === '/home') {
+    console.log(`🔄 Rewriting ${pathname} to /index.html`)
     return NextResponse.rewrite(new URL('/index.html', origin))
   }
 
