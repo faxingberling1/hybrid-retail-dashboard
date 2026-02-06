@@ -1,12 +1,12 @@
-// /middleware.ts
+// /proxy.ts (migrated from middleware.ts for Next.js 16)
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, origin } = request.nextUrl
 
-  console.log('\n=== MIDDLEWARE START ===')
+  console.log('\n=== PROXY START ===')
   console.log('📁 Path:', pathname)
 
   // Public paths - allow without authentication
@@ -102,7 +102,7 @@ export async function middleware(request: NextRequest) {
   // The redirect was too restrictive based on the user's requirement for a 'visual indicator'.
 
   // === ONBOARDING CHECK - Disabled for Edge Runtime ===
-  // Database queries are not supported in Edge Runtime (middleware)
+  // Database queries are not supported in Edge Runtime (proxy)
   // Onboarding checks should be handled in page components or API routes instead
 
   // Allow access to onboarding pages regardless of role
