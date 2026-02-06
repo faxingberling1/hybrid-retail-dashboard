@@ -100,6 +100,17 @@ const nextConfig = {
       },
     ];
   },
+
+  // Redirects configuration
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/login',
+        permanent: false, // Temporary redirect (307)
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
