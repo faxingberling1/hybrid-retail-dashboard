@@ -25,15 +25,18 @@ export async function hashPassword(password: string): Promise<string> {
 export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
   try {
     if (!password || !hashedPassword) {
-      console.error('❌ verifyPassword: Missing password or hash')
+      console.error(`❌ verifyPassword: Missing password (${!!password}) or hash (${!!hashedPassword})`)
       return false
     }
-    
+
+    console.log(`DEBUG: verifyPassword called with password prefix: ${password.substring(0, 2)}...`)
+    console.log(`DEBUG: verifyPassword called with hash prefix: ${hashedPassword.substring(0, 10)}...`)
+
     if (!hashedPassword.match(/^\$2[aby]\$\d+\$/)) {
       console.error('❌ verifyPassword: Invalid bcrypt hash format')
       return false
     }
-    
+
     const isValid = await bcrypt.compare(password, hashedPassword)
     console.log(`🔐 Password verification: ${isValid ? '✅ Valid' : '❌ Invalid'}`)
     return isValid
@@ -55,7 +58,7 @@ export async function checkOnboardingStatus(userId: string): Promise<{
   try {
     // Dynamic import for server-db
     const { db } = await import('./server-db')
-    
+
     const result = await db.query(
       `SELECT 
         o.id as organization_id,
@@ -72,7 +75,7 @@ export async function checkOnboardingStatus(userId: string): Promise<{
       GROUP BY o.id`,
       [userId]
     )
-    
+
     if (result.rows.length === 0) {
       return {
         completed: false,
@@ -80,11 +83,11 @@ export async function checkOnboardingStatus(userId: string): Promise<{
         totalSteps: 5
       }
     }
-    
+
     const row = result.rows[0]
     const completedSteps = parseInt(row.completed_steps) || 0
     const totalSteps = parseInt(row.total_steps) || 5
-    
+
     return {
       completed: completedSteps >= totalSteps,
       steps: completedSteps,

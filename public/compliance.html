@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HybridPOS | Compliance & Legal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bg-mesh {
+            background-color: #ffffff;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(197, 100%, 95%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 100%, 95%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(262, 100%, 95%, 1) 0, transparent 50%);
+        }
+    </style>
+</head>
+
+<body class="bg-mesh min-h-screen font-sans selection:bg-blue-500/10 selection:text-blue-600">
+    <!-- Navigation -->
+    <nav class="fixed top-0 inset-x-0 z-[100] p-6">
+        <div
+            class="max-w-7xl mx-auto glass rounded-[2.5rem] px-8 py-5 flex items-center justify-between shadow-[0_8px_40px_rgba(0,0,0,0.04)]">
+            <a href="/home" class="flex items-center space-x-3 group">
+                <div class="p-2.5 bg-blue-600 text-white rounded-2xl shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                <span class="text-xl font-extrabold tracking-tighter text-slate-900 block leading-none">HybridPOS</span>
+            </a>
+            <div class="flex items-center space-x-4">
+                <a href="/login"
+                    class="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-48 pb-32 max-w-7xl mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto mb-20 space-y-6">
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900">Trust & <br><span
+                    class="text-gradient">Integrity.</span></h1>
+            <p class="text-xl text-slate-500 font-medium leading-relaxed">
+                Operating at the highest levels of global retail compliance. Your data security and legal posture are
+                the bedrock of our ecosystem.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-12 mb-32">
+            <section class="glass p-12 rounded-[3.5rem] border-sky-100 space-y-8">
+                <h2 class="text-3xl font-black tracking-tight text-slate-900">Compliance Standards</h2>
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-black text-slate-900">SOC2 Type II</h3>
+                            <p class="text-sm font-medium text-slate-500 leading-relaxed">Full lifecycle security
+                                controls verified by independent third-party auditors for continuous protection.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-black text-slate-900">GDPR & CCPA</h3>
+                            <p class="text-sm font-medium text-slate-500 leading-relaxed">Exceeding data privacy
+                                requirements for all global regions, ensuring user rights and data sovereignty.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass p-12 rounded-[3.5rem] border-sky-100 space-y-8">
+                <h2 class="text-3xl font-black tracking-tight text-slate-900">Legal Documents</h2>
+                <ul class="space-y-4">
+                    <li>
+                        <a href="#"
+                            class="flex items-center justify-between p-6 bg-white rounded-3xl border-2 border-slate-50 hover:border-blue-500 transition-all group">
+                            <span class="font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Privacy
+                                Policy</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="flex items-center justify-between p-6 bg-white rounded-3xl border-2 border-slate-50 hover:border-blue-500 transition-all group">
+                            <span class="font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Terms of
+                                Service</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <div class="glass p-16 rounded-[4rem] text-center space-y-6">
+            <h2 class="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">Security
+                Transparency</h2>
+            <p class="text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
+                We maintain a public real-time audit log of all system changes. For enterprise security inquiries or to
+                request our latest SOC2 report, please contact our security team.
+            </p>
+            <div class="pt-6">
+                <a href="/support.html"
+                    class="inline-flex px-10 py-5 bg-slate-900 text-white rounded-3xl font-black text-xs uppercase tracking-[0.4em] hover:bg-slate-800 transition-all">Contact
+                    Security</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-20 border-t border-slate-100 bg-white">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">&copy; 2026 HybridPOS Enterprise
+                Compliance</p>
+        </div>
+    </footer>
+</body>
+
+</html>

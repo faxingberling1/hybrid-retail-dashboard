@@ -162,7 +162,7 @@ export default function LandingPage() {
               className="inline-flex items-center px-4 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-sky-600 shadow-sm"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Next Generation Retail Mesh Sarah</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Next Generation Retail Mesh</span>
             </MotionDiv>
 
             <h1 className="text-7xl md:text-[9rem] font-black tracking-tighter leading-[0.85] text-slate-900">
@@ -171,8 +171,8 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
-              The high-fidelity ecosystem for professional commerce Sarah.
-              Real-time synchronization Sarah, neural inventory Sarah, and zero-latency performance Sarah.
+              The high-fidelity ecosystem for professional commerce.
+              Real-time synchronization, neural inventory, and zero-latency performance.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
@@ -192,7 +192,7 @@ export default function LandingPage() {
                   whileTap={{ scale: 0.98 }}
                   className="px-10 py-6 bg-white text-slate-900 border-2 border-slate-100 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] flex items-center shadow-xl shadow-slate-200/50 hover:border-sky-200 transition-all"
                 >
-                  View Live Demo Sarah
+                  View Live Demo
                 </MotionButton>
               </Link>
             </div>
@@ -212,8 +212,8 @@ export default function LandingPage() {
               <div className="p-4 bg-sky-50 text-sky-500 rounded-2xl w-fit mb-6">
                 <Activity className="h-6 w-6" />
               </div>
-              <h3 className="text-2xl font-black tracking-tight mb-2 text-slate-900">Live Pulse Sarah</h3>
-              <p className="text-slate-500 font-medium leading-relaxed">Real-time telemetry of your entire retail network Sarah.</p>
+              <h3 className="text-2xl font-black tracking-tight mb-2 text-slate-900">Live Pulse</h3>
+              <p className="text-slate-500 font-medium leading-relaxed">Real-time telemetry of your entire retail network.</p>
               <div className="mt-8 flex items-center space-x-3">
                 <div className="h-1.5 w-12 bg-sky-500 rounded-full" />
                 <div className="h-1.5 w-4 bg-slate-100 rounded-full" />
@@ -233,12 +233,12 @@ export default function LandingPage() {
                   <Database className="h-12 w-12" />
                 </div>
               </div>
-              <h3 className="text-4xl font-black tracking-tighter mb-4 text-slate-900">99.99% Uptime Sarah</h3>
-              <p className="text-slate-500 font-medium text-lg leading-relaxed">Architected for mission-critical retail environments Sarah.</p>
+              <h3 className="text-4xl font-black tracking-tighter mb-4 text-slate-900">99.99% Uptime</h3>
+              <p className="text-slate-500 font-medium text-lg leading-relaxed">Architected for mission-critical retail environments.</p>
               <div className="mt-10 pt-10 border-t border-slate-100 flex items-center justify-between">
                 <div className="text-left">
                   <div className="text-3xl font-black text-slate-900 tracking-tighter">1.2ms</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Response Delay Sarah</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Response Delay</div>
                 </div>
                 <div className="text-right text-emerald-500">
                   <TrendingUp className="h-8 w-8" />
@@ -258,8 +258,8 @@ export default function LandingPage() {
               <div className="p-4 bg-indigo-50 text-indigo-500 rounded-2xl w-fit mb-6">
                 <Layers className="h-6 w-6" />
               </div>
-              <h3 className="text-2xl font-black tracking-tight mb-2 text-slate-900">Infinite Scaling Sarah</h3>
-              <p className="text-slate-500 font-medium leading-relaxed">Expand your empire from one store to thousands effortlessly Sarah.</p>
+              <h3 className="text-2xl font-black tracking-tight mb-2 text-slate-900">Infinite Scaling</h3>
+              <p className="text-slate-500 font-medium leading-relaxed">Expand your empire from one store to thousands effortlessly.</p>
               <div className="mt-8 flex items-center space-x-2">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="h-8 w-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
@@ -285,14 +285,14 @@ export default function LandingPage() {
               className="inline-flex items-center px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-400 shadow-sm"
             >
               <Cpu className="h-4 w-4 mr-2" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Engineered Core Sarah</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Engineered Core</span>
             </MotionDiv>
             <h2 className="text-6xl font-black tracking-tighter text-slate-900">
-              Built for <span className="text-sky-500">Retail Masters Sarah</span>.
+              Built for <span className="text-sky-500">Retail Masters</span>.
             </h2>
             <p className="text-xl text-slate-500 font-medium leading-relaxed">
-              Every detail optimized Sarah for high-throughput Sarah commercial environments Sarah.
-              Powering the future of brick-and-mortar Sarah.
+              Every detail optimized for high-throughput commercial environments.
+              Powering the future of brick-and-mortar.
             </p>
           </div>
 
@@ -311,10 +311,10 @@ export default function LandingPage() {
                   {feature.icon}
                 </div>
                 <h3 className="text-2xl font-black tracking-tight mb-4 text-slate-900 group-hover:text-sky-500 transition-colors">
-                  {feature.title} Sarah
+                  {feature.title}
                 </h3>
                 <p className="text-slate-500 font-medium leading-relaxed">
-                  {feature.desc} Sarah
+                  {feature.desc}
                 </p>
               </MotionDiv>
             ))}
@@ -338,16 +338,16 @@ export default function LandingPage() {
               <h2 className="text-6xl font-black tracking-tighter text-slate-900 leading-[0.9]">
                 Regional <br />
                 Multi-Node <br />
-                <span className="text-sky-500">Sync Grid Sarah</span>
+                <span className="text-sky-500">Sync Grid</span>
               </h2>
               <p className="text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
-                Our distributed mesh network Sarah ensures your data Sarah is synchronized Sarah across all branches Sarah with zero latency Sarah.
-                Even if the cloud goes dark Sarah, your stores keep running Sarah.
+                Our distributed mesh network ensures your data is synchronized across all branches with zero latency.
+                Even if the cloud goes dark, your stores keep running.
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 {["P2P Protocol", "Encrypted Tunnel", "Instant Relay", "Node Resilience"].map((tag, i) => (
                   <span key={i} className="px-5 py-2 bg-slate-50 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-400 border border-slate-100">
-                    {tag} Sarah
+                    {tag}
                   </span>
                 ))}
               </div>
@@ -402,10 +402,10 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-4 gap-16 text-center">
             {[
-              { value: "480K+", label: "Active Nodes Sarah", icon: <Layers className="h-6 w-6" /> },
-              { value: "1.2B+", label: "Transactions Sarah", icon: < Zap className="h-6 w-6" /> },
-              { value: "100%", label: "Data Integrity Sarah", icon: <Shield className="h-6 w-6" /> },
-              { value: "<1ms", label: "Neural Delay Sarah", icon: <Cpu className="h-6 w-6" /> }
+              { value: "480K+", label: "Active Nodes", icon: <Layers className="h-6 w-6" /> },
+              { value: "1.2B+", label: "Transactions", icon: < Zap className="h-6 w-6" /> },
+              { value: "100%", label: "Data Integrity", icon: <Shield className="h-6 w-6" /> },
+              { value: "<1ms", label: "Neural Delay", icon: <Cpu className="h-6 w-6" /> }
             ].map((stat, i) => (
               <MotionDiv
                 key={i}
@@ -440,11 +440,11 @@ export default function LandingPage() {
         >
           <h2 className="text-7xl md:text-9xl font-black tracking-tighter text-slate-900 leading-[0.85]">
             Command Your <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-600">Enterprise. Sarah</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-600">Enterprise.</span>
           </h2>
           <p className="text-xl md:text-2xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
-            Ready to upgrade your operational Sarah matrix Sarah?
-            Join the elite retail Sarah networks Sarah.
+            Ready to upgrade your operational matrix?
+            Join the elite retail networks.
           </p>
           <Link href="/login">
             <MotionButton
@@ -452,14 +452,14 @@ export default function LandingPage() {
               whileTap={{ scale: 0.98 }}
               className="px-16 py-8 bg-slate-900 text-white rounded-[2.5rem] font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-slate-900/30 group inline-flex items-center"
             >
-              Deploy Now Sarah
+              Deploy Now
               <ArrowRight className="ml-4 h-6 w-6 group-hover:translate-x-3 transition-transform" />
             </MotionButton>
           </Link>
         </MotionDiv>
       </section>
 
-      {/* Footer Sarah */}
+      {/* Footer */}
       <footer className="py-20 bg-white border-t border-slate-100">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 items-start mb-20">
@@ -468,11 +468,11 @@ export default function LandingPage() {
                 <div className="p-2 bg-sky-500 text-white rounded-xl shadow-lg shadow-sky-500/10">
                   <ShoppingCart className="h-5 w-5" />
                 </div>
-                <span className="text-lg font-black tracking-tighter text-slate-900">HybridPOS Sarah</span>
+                <span className="text-lg font-black tracking-tighter text-slate-900">HybridPOS</span>
               </Link>
               <p className="text-sm text-slate-400 font-medium leading-relaxed">
-                The ultimate retail ecosystem Sarah.
-                Synchronized Sarah, secure Sarah, and scalable Sarah.
+                The ultimate retail ecosystem.
+                Synchronized, secure, and scalable.
               </p>
               <div className="flex items-center space-x-4">
                 {[Twitter, Github, Linkedin].map((Icon, i) => (
@@ -484,27 +484,27 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 mb-8">Ecosystem Sarah</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 mb-8">Ecosystem</h4>
               <ul className="space-y-4">
-                {["POS Core Sarah", "Inventory Mesh Sarah", "Analytics Sarah", "Mobile App Sarah"].map((item, i) => (
+                {["POS Core", "Inventory Mesh", "Analytics", "Mobile App"].map((item, i) => (
                   <li key={i}><Link href="#" className="text-sm text-slate-400 font-medium hover:text-sky-500 transition-colors">{item}</Link></li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 mb-8">Network Sarah</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 mb-8">Network</h4>
               <ul className="space-y-4">
-                {["Regional Nodes Sarah", "Uptime Map Sarah", "Dev API Sarah", "Partners Sarah"].map((item, i) => (
+                {["Regional Nodes", "Uptime Map", "Dev API", "Partners"].map((item, i) => (
                   <li key={i}><Link href="#" className="text-sm text-slate-400 font-medium hover:text-sky-500 transition-colors">{item}</Link></li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 mb-8">Legal Sarah</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 mb-8">Legal</h4>
               <ul className="space-y-4">
-                {["Privacy Sarah", "Terms Sarah", "SLA Sarah", "Security Sarah"].map((item, i) => (
+                {["Privacy", "Terms", "SLA", "Security"].map((item, i) => (
                   <li key={i}><Link href="#" className="text-sm text-slate-400 font-medium hover:text-sky-500 transition-colors">{item}</Link></li>
                 ))}
               </ul>
@@ -513,11 +513,11 @@ export default function LandingPage() {
 
           <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-              &copy; {new Date().getFullYear()} Hybrid Retail Systems Ltd. Sarah
+              &copy; {new Date().getFullYear()} Hybrid Retail Systems Ltd.
             </p>
             <div className="flex items-center space-x-2">
               <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">All Nodes Active Sarah</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">All Nodes Active</span>
             </div>
           </div>
         </div>
@@ -545,7 +545,7 @@ export default function LandingPage() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-4xl font-black tracking-tighter text-slate-900 hover:text-sky-500"
               >
-                {link.name} Sarah
+                {link.name}
               </Link>
             ))}
             <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
@@ -553,7 +553,7 @@ export default function LandingPage() {
                 whileTap={{ scale: 0.95 }}
                 className="px-10 py-5 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl"
               >
-                Launch Dashboard Sarah
+                Launch Dashboard
               </MotionButton>
             </Link>
           </MotionDiv>

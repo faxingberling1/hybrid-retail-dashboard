@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Bell, ChevronDown, Menu, Building2 } from "lucide-react"
+import { Search, Bell, ChevronDown, Menu, Building2, Globe } from "lucide-react"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { NotificationBell } from "@/components/dashboard/notification-bell"
 
 export function AdminHeader() {
@@ -34,6 +35,14 @@ export function AdminHeader() {
 
         <div className="flex items-center gap-6">
           <div className="h-8 w-px bg-gray-200/50 hidden sm:block"></div>
+
+          <Link
+            href="/"
+            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+            title="View Landing Page"
+          >
+            <Globe className="h-5 w-5" />
+          </Link>
 
           <NotificationBell />
 
@@ -76,6 +85,12 @@ export function AdminHeader() {
                 </div>
 
                 <div className="py-1">
+                  <Link
+                    href="/"
+                    className="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+                  >
+                    View Landing Page
+                  </Link>
                   <a
                     href="/admin/profile"
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"

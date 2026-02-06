@@ -1,4 +1,5 @@
-import { Clock, RefreshCw, LogOut } from "lucide-react"
+import { Clock, RefreshCw, LogOut, Globe } from "lucide-react"
+import Link from "next/link"
 
 interface UserDashboardHeaderProps {
     user: {
@@ -47,6 +48,13 @@ export function UserDashboardHeader({ user, isLoading, onSync, onLogout }: UserD
                         </>
                     )}
                 </button>
+                <Link
+                    href="/"
+                    className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center"
+                >
+                    <Globe className="h-4 w-4 mr-2" />
+                    View Website
+                </Link>
                 <button
                     onClick={onLogout}
                     className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-medium hover:from-red-700 hover:to-red-800 transition-all flex items-center"

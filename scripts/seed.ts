@@ -10,15 +10,20 @@ import { Client } from 'pg'
 async function seed() {
   console.log('🌱 Starting database seeding...')
 
+  const isLocal = process.env.DATABASE_URL?.includes('localhost') ||
+    process.env.DATABASE_URL?.includes('127.0.0.1') ||
+    process.env.POSTGRES_HOST?.includes('localhost') ||
+    process.env.POSTGRES_HOST?.includes('127.0.0.1');
+
   const config = process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL + (process.env.DATABASE_URL.includes('?') ? '&' : '?') + 'sslmode=require' }
+    ? { connectionString: process.env.DATABASE_URL + (isLocal ? '' : (process.env.DATABASE_URL.includes('?') ? '&' : '?') + 'sslmode=require') }
     : {
       host: process.env.POSTGRES_HOST,
       port: parseInt(process.env.POSTGRES_PORT || '5432'),
       database: process.env.POSTGRES_DATABASE,
       user: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
-      ssl: { rejectUnauthorized: false }
+      ssl: isLocal ? false : { rejectUnauthorized: false }
     };
 
   const client = new Client(config)
@@ -29,9 +34,9 @@ async function seed() {
 
     // Hash passwords
     const saltRounds = 10
-    const demoPassword = 'Admin@123'
+    const demoPassword = 'demo123'
     const passwordHash = await bcrypt.hash(demoPassword, saltRounds)
-    console.log('🔐 Hashed Admin@123 password')
+    console.log('🔐 Hashed demo123 password')
 
     // Demo users data - Updated to match your schema
     const demoUsers = [

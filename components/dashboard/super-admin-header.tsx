@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Bell, ChevronDown, Menu, Shield } from "lucide-react"
+import { Search, Bell, ChevronDown, Menu, Shield, Globe } from "lucide-react"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { NotificationBell } from "@/components/dashboard/notification-bell"
 import { NotificationDropdown } from "@/components/ui/notification-dropdown"
 import { useNotification } from "@/lib/hooks/use-notification"
@@ -38,6 +39,14 @@ export function SuperAdminHeader() {
 
         <div className="flex items-center gap-6">
           <div className="h-8 w-px bg-gray-200/50 hidden sm:block"></div>
+
+          <Link
+            href="/"
+            className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
+            title="View Landing Page"
+          >
+            <Globe className="h-5 w-5" />
+          </Link>
 
           {/* Notification Bell with Dropdown */}
           <NotificationBell />
@@ -79,6 +88,12 @@ export function SuperAdminHeader() {
                 </div>
 
                 <div className="py-1">
+                  <Link
+                    href="/"
+                    className="block px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 font-medium"
+                  >
+                    View Landing Page
+                  </Link>
                   <a
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

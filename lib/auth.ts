@@ -47,6 +47,9 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Use the auth-utils verifyPassword function
+          console.log(`DEBUG: Attempting to verify password for ${credentials.email}`)
+          console.log(`DEBUG: Password length: ${credentials.password.length}`)
+          console.log(`DEBUG: Hash length: ${user.password_hash?.length}`)
           const isValid = await verifyPassword(credentials.password, user.password_hash)
 
           if (!isValid) {
