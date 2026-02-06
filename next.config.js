@@ -56,6 +56,11 @@ const nextConfig = {
     return config;
   },
 
+  // Experimental features - empty turbopack config to allow webpack usage
+  experimental: {
+    turbopack: {},
+  },
+
   // Images configuration
   images: {
     remotePatterns: [
