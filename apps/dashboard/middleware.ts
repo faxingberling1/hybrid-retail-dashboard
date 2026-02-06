@@ -102,7 +102,10 @@ export async function middleware(request: NextRequest) {
   // The redirect was too restrictive based on the user's requirement for a 'visual indicator'.
 
   // === ONBOARDING CHECK - For authenticated users only ===
-  // Only check for users with organization ID (new signups will have this)
+  // NOTE: Onboarding check moved to app-level components for Edge Runtime compatibility
+  // Edge Functions can't use database connections (pg-native not supported)
+  // The onboarding check is now handled in layout.tsx or page components
+  /*
   if (userOrganizationId) {
     const shouldCheckOnboarding =
       !pathname.includes('/onboarding') &&
@@ -196,6 +199,7 @@ export async function middleware(request: NextRequest) {
       }
     }
   }
+  */
 
   // Allow access to onboarding pages regardless of role
   if (pathname.includes('/onboarding')) {
