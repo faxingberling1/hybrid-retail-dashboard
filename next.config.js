@@ -9,11 +9,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Disable ESLint during build (optional)
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   webpack: (config, { isServer, dev }) => {
     // Fix for nodemailer fs module error
     if (!isServer) {
@@ -59,16 +54,6 @@ const nextConfig = {
     }
 
     return config;
-  },
-
-  // Experimental features
-  experimental: {
-    // Disable Turbopack to use existing webpack config
-    turbo: false,
-    // If Next 16 uses a different way to allow origins, it might be here.
-    // serverActions is likely stable now.
-    // optimizeCss: false,
-    // typedRoutes: false,
   },
 
   // Images configuration
