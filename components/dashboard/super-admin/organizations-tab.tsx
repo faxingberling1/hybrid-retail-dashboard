@@ -16,7 +16,7 @@ export default function OrganizationsTab({ topOrganizations }: OrganizationsTabP
                 animate={{ opacity: 1, y: 0 }}
             >
                 {/* Top Organizations */}
-                <div className="glass-card p-1 rounded-[2rem] overflow-hidden">
+                <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-900/[0.08]">
                     <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-[1.8rem]">
                         <div className="flex items-center justify-between mb-6">
                             <div>
@@ -40,7 +40,7 @@ export default function OrganizationsTab({ topOrganizations }: OrganizationsTabP
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.05 }}
                                 >
-                                    <div className="flex items-center justify-between p-5 glass-card rounded-2xl group cursor-pointer">
+                                    <div className="flex items-center justify-between p-5 glass-card rounded-2xl group cursor-pointer border border-slate-900/5 hover:border-slate-900/10 transition-colors">
                                         <div className="flex items-center">
                                             <div className="h-14 w-14 grad-indigo p-0.5 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                                                 <div className="h-full w-full bg-white dark:bg-slate-900 rounded-[0.9rem] flex items-center justify-center">

@@ -18,7 +18,7 @@ export default function SystemStatusBanner() {
         <MotionDiv
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-1 rounded-[2rem] overflow-hidden shadow-premium border-none"
+            className="glass-card p-1 rounded-[2rem] overflow-hidden shadow-premium border border-slate-900/[0.08]"
         >
             <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-5 md:p-6 rounded-[1.8rem] flex flex-wrap items-center gap-4">
                 <div className="flex items-center space-x-3 px-4 py-2 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl border border-emerald-500/20">

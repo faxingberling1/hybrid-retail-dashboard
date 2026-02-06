@@ -108,10 +108,10 @@ export default function SuperAdminPage() {
   ]
 
   const statsData = [
-    { title: "Total Organizations", value: "42", change: "+12%", icon: <Building2 className="h-5 w-5" />, color: "bg-blue-100 text-blue-600", trend: "up", description: "Active across platform" },
-    { title: "Active Users", value: "1,248", change: "+8%", icon: <Users className="h-5 w-5" />, color: "bg-green-100 text-green-600", trend: "up", description: "Logged in last 24h" },
-    { title: "Monthly Revenue", value: "₨ 8.4M", change: "+23%", icon: <DollarSign className="h-5 w-5" />, color: "bg-purple-100 text-purple-600", trend: "up", description: "Platform revenue" },
-    { title: "System Health", value: "99.95%", change: "+0.05%", icon: <Activity className="h-5 w-5" />, color: "bg-emerald-100 text-emerald-600", trend: "up", description: "Uptime last 30 days" },
+    { title: "Total Organizations", value: "42", change: "+12%", icon: <Building2 className="h-5 w-5" />, color: "bg-blue-600 shadow-blue-500/20", trend: "up", description: "Active across platform" },
+    { title: "Active Users", value: "1,248", change: "+8%", icon: <Users className="h-5 w-5" />, color: "bg-indigo-600 shadow-indigo-500/20", trend: "up", description: "Logged in last 24h" },
+    { title: "Monthly Revenue", value: "₨ 8.4M", change: "+23%", icon: <DollarSign className="h-5 w-5" />, color: "bg-violet-600 shadow-violet-500/20", trend: "up", description: "Platform revenue" },
+    { title: "System Health", value: "99.95%", change: "+0.05%", icon: <Activity className="h-5 w-5" />, color: "bg-emerald-600 shadow-emerald-500/20", trend: "up", description: "System health" },
   ]
 
   const tabs = [
@@ -184,7 +184,7 @@ export default function SuperAdminPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-900/5 pb-8 mb-4">
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-12 grad-indigo rounded-full" />
@@ -239,8 +239,8 @@ export default function SuperAdminPage() {
 
         {/* Dynamic Navigation & Content Layer */}
         <div className="space-y-8">
-          <div className="flex items-center justify-center lg:justify-start">
-            <nav className="flex items-center glass p-1.5 rounded-2xl overflow-x-auto no-scrollbar scroll-smooth" aria-label="Tabs">
+          <div className="flex items-center w-full">
+            <nav className="flex items-center w-full glass p-2 rounded-2xl border border-slate-900/[0.08]" aria-label="Tabs">
               {tabs.map((tab) => {
                 const Icon = tab.icon
                 const isActive = activeTab === tab.id
@@ -248,7 +248,7 @@ export default function SuperAdminPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`group relative py-3 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${isActive
+                    className={`group relative flex-1 py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center ${isActive
                       ? 'text-white'
                       : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                       }`}
@@ -273,8 +273,8 @@ export default function SuperAdminPage() {
           </div>
 
           {/* Module Content Switcher */}
-          <div className="glass p-1 rounded-[2rem] overflow-hidden shadow-premium">
-            <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-[1.8rem]">
+          <div className="glass p-1 rounded-[2rem] overflow-hidden shadow-premium border border-slate-900/[0.08]">
+            <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-[1.8rem] border border-slate-900/5">
               <motion.div
                 key={activeTab}
                 initial={{ opacity: 0, x: 20 }}

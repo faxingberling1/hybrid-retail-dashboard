@@ -15,7 +15,7 @@ export default function ControlHubTab() {
             >
                 {/* Information Sidebar */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800 h-fit">
+                    <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-900/[0.08] h-fit">
                         <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-6 rounded-[1.8rem]">
                             <div className="flex items-center space-x-2 mb-4">
                                 <Info className="h-4 w-4 text-indigo-500" />

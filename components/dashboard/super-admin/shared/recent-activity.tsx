@@ -23,7 +23,7 @@ export default function RecentActivity({ recentActivities }: RecentActivityProps
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
             >
-                <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800">
+                <div className="glass-card p-1 rounded-[2rem] overflow-hidden shadow-premium border border-slate-900/10">
                     <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-[1.8rem]">
                         <div className="flex items-center justify-between mb-8">
                             <div>

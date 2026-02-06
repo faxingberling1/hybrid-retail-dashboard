@@ -16,7 +16,7 @@ export default function SecurityTab({ securityAlerts }: SecurityTabProps) {
                 animate={{ opacity: 1, y: 0 }}
             >
                 {/* Security Alerts */}
-                <div className="glass-card p-1 rounded-[2rem] overflow-hidden">
+                <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-900/[0.08]">
                     <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-[1.8rem]">
                         <div className="flex items-center justify-between mb-8">
                             <div>
@@ -78,7 +78,7 @@ export default function SecurityTab({ securityAlerts }: SecurityTabProps) {
 
                         {/* Security Intelligence Layer */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-                            <div className="p-6 glass-card rounded-[1.5rem] bg-indigo-500/5 border-indigo-500/10">
+                            <div className="p-6 glass-card rounded-[1.5rem] bg-indigo-500/5 border border-slate-900/[0.08]">
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="p-2 grad-indigo rounded-xl">
                                         <Lock className="h-5 w-5 text-white" />
@@ -91,7 +91,7 @@ export default function SecurityTab({ securityAlerts }: SecurityTabProps) {
                                 </div>
                             </div>
 
-                            <div className="p-6 glass-card rounded-[1.5rem] bg-emerald-500/5 border-emerald-500/10">
+                            <div className="p-6 glass-card rounded-[1.5rem] bg-emerald-500/5 border border-slate-900/[0.08]">
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="p-2 grad-emerald rounded-xl">
                                         <UserCheck className="h-5 w-5 text-white" />
@@ -104,7 +104,7 @@ export default function SecurityTab({ securityAlerts }: SecurityTabProps) {
                                 </div>
                             </div>
 
-                            <div className="p-6 glass-card rounded-[1.5rem] bg-rose-500/5 border-rose-500/10">
+                            <div className="p-6 glass-card rounded-[1.5rem] bg-rose-500/5 border border-slate-900/[0.08]">
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="p-2 grad-warm rounded-xl">
                                         <ShieldAlert className="h-5 w-5 text-white" />

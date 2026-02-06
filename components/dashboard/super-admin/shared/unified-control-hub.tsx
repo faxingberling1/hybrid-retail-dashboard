@@ -191,9 +191,9 @@ export default function UnifiedControlHub() {
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-card p-1 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl"
+            className="glass-card p-1 rounded-[2.5rem] overflow-hidden border border-slate-900/[0.12] shadow-2xl"
         >
-            <div className="bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-[2.4rem]">
+            <div className="bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl p-8 rounded-[2.4rem] border border-slate-900/5">
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <div className="flex items-center space-x-2 mb-2">

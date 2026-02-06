@@ -20,7 +20,7 @@ export default function SystemTab() {
                 animate={{ opacity: 1, y: 0 }}
             >
                 {/* System Health */}
-                <div className="glass-card p-1 rounded-[2rem] overflow-hidden">
+                <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-900/[0.08]">
                     <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-[1.8rem]">
                         <div className="flex items-center justify-between mb-6">
                             <div>
@@ -115,7 +115,7 @@ export default function SystemTab() {
 
                 {/* System Diagnostics & Critical Log Stream */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 glass-card p-1 rounded-[2rem] overflow-hidden">
+                    <div className="lg:col-span-2 glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-900/[0.08]">
                         <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-[1.8rem]">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Critical Events</h3>
@@ -146,7 +146,7 @@ export default function SystemTab() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-1 rounded-[2rem] overflow-hidden">
+                    <div className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-900/[0.08]">
                         <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-[1.8rem] h-full flex flex-col justify-between">
                             <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-4">Resource Stability</h3>
                             <div className="flex-1 flex flex-col justify-center items-center text-center p-6 glass rounded-2xl mb-4 border border-emerald-500/10 bg-emerald-500/5">

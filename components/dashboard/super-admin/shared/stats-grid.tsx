@@ -24,7 +24,7 @@ export default function StatsGrid({ statsData }: StatsGridProps) {
             {statsData.map((stat, index) => (
                 <div
                     key={stat.title}
-                    className="glass-card p-6 rounded-2xl relative overflow-hidden group"
+                    className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-900/5 hover:border-slate-900/10 transition-colors"
                 >
                     {/* Background Decorative Pattern */}
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-current opacity-[0.03] rounded-full blur-2xl group-hover:opacity-[0.08] transition-opacity" />
