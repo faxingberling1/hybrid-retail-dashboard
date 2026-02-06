@@ -46,6 +46,20 @@ const nextConfig = {
       },
     ],
   },
+
+  // Explicitly rewrite / and /home to index.html
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: '/index.html',
+      },
+      {
+        source: '/home',
+        destination: '/index.html',
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig;

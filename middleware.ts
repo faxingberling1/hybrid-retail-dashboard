@@ -40,17 +40,6 @@ export async function middleware(request: NextRequest) {
     '/manifest.json', // Allow PWA manifest
   ]
 
-  // Redirect /index.html to /home for a cleaner URL
-  if (pathname === '/index.html') {
-    console.log('🔄 Redirecting /index.html to /home')
-    return NextResponse.redirect(new URL('/home', origin))
-  }
-
-  // Rewrite / and /home to /index.html internally
-  if (pathname === '/' || pathname === '/home') {
-    console.log(`🔄 Rewriting ${pathname} to /index.html`)
-    return NextResponse.rewrite(new URL('/index.html', origin))
-  }
 
   const isPublicPath = publicPaths.some(path =>
     pathname === path || pathname.startsWith(`${path}/`)
