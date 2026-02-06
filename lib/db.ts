@@ -12,7 +12,8 @@ function getPoolConfig(): PoolConfig {
     // Parse URL manually or let pg handle it.
     // We'll let pg handle it mostly, but we can inspect it for logging if needed.
 
-    // Default SSL to false unless specified in URL or env
+    // Default SSL to true if it's a Neon URL or not localhost
+    const isNeon = process.env.DATABASE_URL.includes('neon.tech');
     const isLocalhost = process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1');
     const sslDisabled = process.env.DB_SSL === 'false';
     const isProd = process.env.NODE_ENV === 'production';
@@ -22,9 +23,8 @@ function getPoolConfig(): PoolConfig {
       connectionString: process.env.DATABASE_URL,
       // For many cloud providers (like Neon, DigitalOcean, etc), SSL is required.
       // If the URL has ?sslmode=... pg will handle it.
-      // We only enforce rejectUnauthorized: false if it's production and NOT localhost,
-      // and not explicitly disabled.
-      ssl: (isProd && !isLocalhost && !sslDisabled) ? { rejectUnauthorized: false } : undefined,
+      // We enforce rejectUnauthorized: false for Neon or Production if not explicitly disabled
+      ssl: ((isProd || isNeon) && !isLocalhost && !sslDisabled) ? { rejectUnauthorized: false } : undefined,
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,

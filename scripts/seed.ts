@@ -4,20 +4,21 @@ dotenv.config({ path: envPath })
 // Also try generic .env if path doesn't exist or as fallback
 dotenv.config()
 
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { Client } from 'pg'
 
 async function seed() {
   console.log('🌱 Starting database seeding...')
 
   const config = process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL }
+    ? { connectionString: process.env.DATABASE_URL + (process.env.DATABASE_URL.includes('?') ? '&' : '?') + 'sslmode=require' }
     : {
       host: process.env.POSTGRES_HOST,
       port: parseInt(process.env.POSTGRES_PORT || '5432'),
       database: process.env.POSTGRES_DATABASE,
       user: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
+      ssl: { rejectUnauthorized: false }
     };
 
   const client = new Client(config)
@@ -28,9 +29,9 @@ async function seed() {
 
     // Hash passwords
     const saltRounds = 10
-    const demoPassword = 'demo123'
+    const demoPassword = 'Admin@123'
     const passwordHash = await bcrypt.hash(demoPassword, saltRounds)
-    console.log('🔐 Hashed demo password')
+    console.log('🔐 Hashed Admin@123 password')
 
     // Demo users data - Updated to match your schema
     const demoUsers = [
