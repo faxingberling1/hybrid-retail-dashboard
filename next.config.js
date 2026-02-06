@@ -63,6 +63,8 @@ const nextConfig = {
 
   // Experimental features
   experimental: {
+    // Disable Turbopack to use existing webpack config
+    turbo: false,
     // If Next 16 uses a different way to allow origins, it might be here.
     // serverActions is likely stable now.
     // optimizeCss: false,
