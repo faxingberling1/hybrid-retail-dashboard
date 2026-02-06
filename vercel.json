@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "installCommand": "npm install",
-  "buildCommand": "turbo run build --filter=dashboard",
+  "buildCommand": "cd apps/dashboard && npm install && npm run build",
   "outputDirectory": "apps/dashboard/.next",
-  "routes": [
+  "installCommand": "cd apps/dashboard && npm install",
+  "framework": "nextjs",
+  "redirects": [
     {
-      "src": "/(.*)",
-      "dest": "apps/dashboard/$1"
+      "source": "/(.*)",
+      "destination": "/apps/dashboard/$1"
     }
   ]
 }
