@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001 --no-turbopack",
-    "build": "npx prisma generate && next build --no-turbopack",
+    "dev": "cross-env NEXT_PRIVATE_FORCE_WEBPACK=1 next dev -p 3001",
+    "build": "cross-env NEXT_PRIVATE_FORCE_WEBPACK=1 npx prisma generate && next build",
     "postinstall": "npx prisma generate",
     "start": "next start -p 3001",
     "lint": "next lint",
@@ -79,6 +79,7 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
     "typescript": "^5.9.3"
