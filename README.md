@@ -1,6 +1,6 @@
 # Hybrid Retail POS Dashboard
 
-A modern, responsive, and role-based Point of Sale (POS) and Dashboard application built with **Next.js 15**. This application is designed to manage hybrid retail operations, offering distinct interfaces for Super Admins, Store Admins, and Staff Users.
+A modern, responsive, and role-based Point of Sale (POS) and Dashboard application built with **Next.js 14**. This application is designed to manage hybrid retail operations, offering distinct interfaces for Super Admins, Store Admins, and Staff Users.
 
 ## 🚀 Features
 
@@ -9,35 +9,37 @@ A modern, responsive, and role-based Point of Sale (POS) and Dashboard applicati
 - **Store Admin**: Store-specific analytics, staff management, inventory control, and settings.
 - **User (Staff)**: Point of Sale (POS) terminal interface, quick sales, customer management, and personal sales tracking.
 
-### Core Modules
-- **Real-time Notifications**: Live updates with Pusher integration for instant alerts across the platform.
-- **Support Ticket System**: Full-featured helpdesk for managing user inquiries and platform support.
-- **Advanced Analytics**: Organization-specific metrics, sales data visualization, and performance tracking.
-- **Billing & Subscriptions**: Managed invoice generation and subscription lifecycle tracking.
-- **Onboarding Flow**: Guided setup process for new organizations to get started quickly.
-- **Audit & Activity Logs**: Comprehensive security tracking of all system and user actions.
-
 ### Premium UI/UX
 - **Modern Design**: Glassmorphism headers, gradient themes (Purple for Super Admin, Blue for Admin, Green for User).
 - **Responsive**: Fully responsive layouts optimized for varying screen sizes.
-- **Interactive**: Smooth transitions using Framer Motion, interactive sidebars, and dynamic charts using Recharts.
+- **Interactive**: Smooth transitions using Framer Motion, interactive sidebars, and dynamic charts.
+
+### Robust Notification System
+- **Real-Time Updates**: Notification bell with live unread counts.
+- **Role-Specific Targeting**: Notifications can be targeted to specific roles (e.g., all Admins) or individual users.
+- **Filtering**: Filter by type (Info, Success, Warning) or read status.
+- **Persistence**: Database-backed notification storage with expiry management.
+
+### Technical Highlights
+- **Authentication**: Secure, session-based authentication using **NextAuth.js**.
+- **Database**: Type-safe database access with **Prisma ORM** and **PostgreSQL**.
+- **Performance**: Server Components and optimized assets for fast load times.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Directory)
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Directory)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/) (Prisma ORM)
-- **Real-time**: [Pusher](https://pusher.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [Prisma](https://www.prisma.io/)
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/)
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Animation**: [Framer Motion](https://www.framer.com/motion/)
 
 ## 🏁 Getting Started
 
 ### Prerequisites
-- Node.js (v20 or higher)
+- Node.js (v18 or higher)
 - PostgreSQL database
 
 ### Installation
@@ -45,19 +47,18 @@ A modern, responsive, and role-based Point of Sale (POS) and Dashboard applicati
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd hybrid-retail-dashboard
+   cd dashboard
    ```
 
 2. **Install dependencies**
    ```bash
-   cd apps/dashboard
    npm install
    ```
 
 3. **Environment Setup**
-   Create a `.env.local` file in the `apps/dashboard` directory:
+   Create a `.env.local` file in the root directory (or update existing) with the following variables:
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/dashboard_db"
+   DATABASE_URL="postgresql://user:password@localhost:5432/hybrid_retail_db"
    NEXTAUTH_SECRET="your-secret-key"
    NEXTAUTH_URL="http://localhost:3001"
    ```
@@ -85,37 +86,32 @@ Open [http://localhost:3001](http://localhost:3001) with your browser.
 
 ## 📜 Available Scripts
 
-Run these commands from the root directory:
-
-- `npm run dev`: Starts development server on port 3001
-- `npm run build`: Builds for production
-- `npm run start`: Starts production server
-- `npm run lint`: Runs ESLint
-- `npm run migrate:all`: Runs all Prisma migrations
-- `npm run seed`: Seeds database with initial data
-- `npm run db:fix`: Runs database fix scripts
-- `npm run db:reset`: Resets the database
-- `npm run db:health`: Performs database health check
-- `npm run test:notification-system`: Tests the real-time notification system
-- `npm run test:auth`: Tests Authentication API
+- `npm run dev`: Starts the development server on port 3001.
+- `npm run build`: Builds the application for production.
+- `npm run start`: Starts the production server.
+- `npm run lint`: Runs ESLint checks.
+- `npm run db:create`: Creates the PostgreSQL database.
+- `npm run migrate:all`: Runs all Prisma migrations.
+- `npm run seed`: Seeds the database with initial users and data.
+- `npm run db:check`: Verifies database connection.
 
 ## 📁 Project Structure
 
-- `/apps/dashboard`: Main dashboard application
-  - `/app`: App Router pages and API routes
-    - `/api`: Backend API endpoints
-    - `/admin`: Admin dashboard pages
-    - `/user`: Staff/POS dashboard pages
-    - `/super-admin`: Platform admin pages
-    - `/onboarding`: Organization setup flow
-  - `/components`: Reusable UI components
-    - `/dashboard`: Layout-specific components
-    - `/ui`: Generic UI elements (Buttons, Inputs, Modals)
-  - `/lib`: Utility functions, hooks, and database clients
-    - `/generated/prisma`: Generated Prisma client
-    - `/db.ts`: Database connection utilities
-  - `/prisma`: Database schema definition
-  - `/scripts`: Maintenance and automation scripts
+- `/app`: App Router pages and API routes.
+  - `/api`: Backend API endpoints.
+  - `/admin`: Admin dashboard pages.
+  - `/user`: Staff/POS dashboard pages.
+  - `/super-admin`: Platform admin pages.
+- `/components`: Reusable UI components.
+  - `/dashboard`: Layout-specific components (Headers, Sidebars).
+  - `/ui`: Generic UI elements (Buttons, Inputs, Modals).
+- `/lib`: Utility functions, hooks, and database clients.
+  - `/hooks`: Custom React hooks (e.g., `useNotification`).
+  - `/services`: Business logic layer.
+  - `/models`: Database query models.
+- `/prisma`: Database schema and migrations.
+- `/public`: Static assets.
+- `/scripts`: Database maintenance and setup scripts.
 
 ## 🤝 Support
 
