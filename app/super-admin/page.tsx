@@ -164,7 +164,7 @@ export default function SuperAdminPage() {
   if (!session || session.user?.role !== "SUPER_ADMIN") return null
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 dashboard-grid pb-12">
+    <div className="min-h-screen bg-white dark:bg-slate-950 dashboard-grid pb-12">
       {/* Session Debug Banner (Development Only) */}
       {process.env.NODE_ENV === 'development' && (
         <div className="max-w-[1600px] mx-auto pt-4 px-4">

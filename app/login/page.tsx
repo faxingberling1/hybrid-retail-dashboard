@@ -35,7 +35,7 @@ export default function LoginPage() {
   const [activeFeature, setActiveFeature] = useState<number | null>(null)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [loginMethod, setLoginMethod] = useState<"quick" | "manual">("manual")
+  const [loginMethod, setLoginMethod] = useState<"quick" | "manual">("quick")
 
   useEffect(() => {
     setIsMounted(true)
@@ -99,7 +99,7 @@ export default function LoginPage() {
   const demoCredentials = {
     SUPER_ADMIN: {
       email: "superadmin@hybridpos.pk",
-      password: "demo123",
+      password: "Admin@123",
       name: "Super Admin",
       icon: <Shield className="h-6 w-6" />,
       playful: {
@@ -116,7 +116,7 @@ export default function LoginPage() {
     },
     ADMIN: {
       email: "admin@hybridpos.pk",
-      password: "demo123",
+      password: "Admin@123",
       name: "Store Admin",
       icon: <Building className="h-6 w-6" />,
       playful: {
@@ -133,7 +133,7 @@ export default function LoginPage() {
     },
     USER: {
       email: "user@hybridpos.pk",
-      password: "demo123",
+      password: "Admin@123",
       name: "Staff User",
       icon: <User className="h-6 w-6" />,
       playful: {

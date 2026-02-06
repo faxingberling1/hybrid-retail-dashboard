@@ -71,7 +71,7 @@ export default function UserPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 space-y-6 p-4 md:p-6">
+    <div className="min-h-screen bg-white space-y-6 p-4 md:p-6">
       {/* Header */}
       <UserDashboardHeader
         user={session.user}

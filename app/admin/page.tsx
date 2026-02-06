@@ -170,7 +170,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 space-y-6">
+    <div className="min-h-screen bg-white space-y-6">
       <OnboardingBanner />
 
       <div className="p-4 md:p-6 space-y-6">
