@@ -116,13 +116,11 @@ export function NotificationDropdown({ notifications, onClose }: NotificationDro
 
   return (
     <motion.div
-      {...({
-        initial: { opacity: 0, y: 10, scale: 0.95 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: 10, scale: 0.95 },
-        transition: { duration: 0.2 },
-        className: "absolute right-0 mt-3 w-[420px] bg-white rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 z-50 overflow-hidden flex flex-col max-h-[85vh]"
-      } as any)}
+      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="absolute right-0 mt-3 w-[420px] bg-white rounded-3xl shadow-2xl border border-gray-100 ring-1 ring-black/5 z-50 overflow-hidden flex flex-col max-h-[85vh]"
     >
       {/* Header */}
       <div className="p-5 border-b border-gray-100 bg-white sticky top-0 z-10">
@@ -191,24 +189,25 @@ export function NotificationDropdown({ notifications, onClose }: NotificationDro
                 </div>
                 <div className="divide-y divide-gray-50">
                   {items.map(notification => {
-                    const Icon = typeIcons[notification.type];
+                    const type = (notification.type as string)?.toLowerCase() || 'info';
+                    const Icon = typeIcons[type as keyof typeof typeIcons] || Info;
+                    const style = typeStyles[type as keyof typeof typeStyles] || typeStyles.info;
+
                     return (
                       <motion.div
-                        {...({
-                          key: notification.id,
-                          layout: true,
-                          initial: { opacity: 0 },
-                          animate: { opacity: 1 },
-                          exit: { opacity: 0 },
-                          className: `group relative p-5 transition-all hover:bg-gray-50/50 ${!notification.read ? 'bg-blue-50/10' : ''}`
-                        } as any)}
+                        key={notification.id}
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className={`group relative p-5 transition-all hover:bg-gray-50/50 ${!notification.read ? 'bg-blue-50/10' : ''}`}
                       >
                         {!notification.read && (
                           <div className="absolute left-0 top-6 w-1 h-8 bg-blue-500 rounded-r-full" />
                         )}
 
                         <div className="flex gap-4">
-                          <div className={`shrink-0 p-2.5 rounded-2xl h-fit border ${typeStyles[notification.type]}`}>
+                          <div className={`shrink-0 p-2.5 rounded-2xl h-fit border ${style}`}>
                             <Icon className="h-4 w-4" />
                           </div>
 

@@ -52,7 +52,6 @@ export default function AdminTransactionsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/20"
-                            {...({} as any)}
                         >
                             <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">{item.label}</div>
                             <div className="text-3xl font-black text-gray-900 mb-1">{item.value}</div>

@@ -30,22 +30,18 @@ export default function TransactionDetailModal({ transaction, isOpen, onClose }:
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
                     <motion.div
-                        {...({
-                            initial: { opacity: 0 },
-                            animate: { opacity: 1 },
-                            exit: { opacity: 0 },
-                            onClick: onClose,
-                            className: "absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
-                        } as any)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                     />
 
                     <motion.div
-                        {...({
-                            initial: { scale: 0.9, opacity: 0, y: 20 },
-                            animate: { scale: 1, opacity: 1, y: 0 },
-                            exit: { scale: 0.9, opacity: 0, y: 20 },
-                            className: "relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
-                        } as any)}
+                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
                     >
                         {/* Header Area */}
                         <div className="bg-gray-900 p-8 sm:p-10 text-white relative overflow-hidden">

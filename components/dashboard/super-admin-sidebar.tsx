@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   LayoutDashboard,
   Building2,
@@ -34,15 +35,34 @@ export function SuperAdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { notifications } = useNotification()
+  const [sidebarStats, setSidebarStats] = useState({ organizations: 0, users: 0, billing: 0 })
+
+  const fetchSidebarStats = async () => {
+    try {
+      const res = await fetch('/api/super-admin/sidebar-stats')
+      if (res.ok) {
+        const data = await res.json()
+        setSidebarStats(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch sidebar stats:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchSidebarStats()
+    const interval = setInterval(fetchSidebarStats, 60000) // Every minute
+    return () => clearInterval(interval)
+  }, [])
 
   const navigationItems = [
     { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/super-admin" },
     { name: "Organizations", icon: <Building2 className="h-5 w-5" />, href: "/super-admin/organizations" },
     { name: "Users", icon: <Users className="h-5 w-5" />, href: "/super-admin/users" },
+    { name: "Billing", icon: <Wallet className="h-5 w-5" />, href: "/super-admin/billing" },
     { name: "Platform Analytics", icon: <BarChart3 className="h-5 w-5" />, href: "/super-admin/analytics" },
     { name: "System Health", icon: <Server className="h-5 w-5" />, href: "/super-admin/system" },
     { name: "Database", icon: <Database className="h-5 w-5" />, href: "/super-admin/database" },
-    { name: "Billing", icon: <Wallet className="h-5 w-5" />, href: "/super-admin/billing" },
     { name: "Audit Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
     { name: "Feature Requests", icon: <FeatureIcon className="h-5 w-5" />, href: "/super-admin/features" },
     { name: "Support Hub", icon: <LifeBuoy className="h-5 w-5" />, href: "/super-admin/support" },
@@ -126,7 +146,25 @@ export function SuperAdminSidebar() {
                     {hasSupportNotification && !isActive && (
                       <div className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse ring-4 ring-red-500/20 shadow-lg shadow-red-500/40" />
                     )}
-                    {isActive && (
+                    {/* Beautiful Notification Badge */}
+                    {(() => {
+                      const count = sidebarStats[item.name.toLowerCase() as keyof typeof sidebarStats]
+                      if (count > 0 && !isActive) {
+                        return (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="ml-auto"
+                          >
+                            <span className="flex items-center px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-[8px] font-black text-white uppercase tracking-tighter shadow-lg shadow-orange-500/20 animate-bounce">
+                              New
+                            </span>
+                          </motion.div>
+                        )
+                      }
+                      return null
+                    })()}
+                    {isActive && !sidebarStats[item.name.toLowerCase() as keyof typeof sidebarStats] && (
                       <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                     )}
                   </Link>

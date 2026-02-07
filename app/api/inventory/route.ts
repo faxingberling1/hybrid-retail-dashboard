@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
             ];
         }
 
-        const products = await (prisma as any).product.findMany({
+        const products = await (prisma as any).products.findMany({
             where,
             include: {
-                category: true
+                categories: true
             },
             orderBy: { name: 'asc' }
         });
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        const product = await (prisma as any).product.create({
+        const product = await (prisma as any).products.create({
             data: {
                 name,
                 sku,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
                 // organization_id: session.user.organizationId // If organization tracking is strictly enforced
             },
             include: {
-                category: true
+                categories: true
             }
         });
 

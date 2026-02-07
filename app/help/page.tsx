@@ -96,7 +96,6 @@ export default function HelpCenterPage() {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             className="inline-flex items-center px-4 py-2 rounded-full bg-white shadow-sm border border-gray-100 mb-6"
-                            {...({} as any)}
                         >
                             <LifeBuoy className="h-4 w-4 text-blue-600 mr-2" />
                             <span className="text-xs font-bold text-gray-700 uppercase tracking-widest">Help Center</span>
@@ -131,7 +130,6 @@ export default function HelpCenterPage() {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: idx * 0.1 }}
                             className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 hover:border-blue-200 hover:-translate-y-2 transition-all group cursor-pointer"
-                            {...({} as any)}
                         >
                             <div className={`p-4 rounded-2xl bg-gradient-to-br ${category.color} text-white shadow-lg w-fit mb-6 transition-transform group-hover:scale-110`}>
                                 {category.icon}
@@ -166,7 +164,6 @@ export default function HelpCenterPage() {
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, x: 20 }}
                                             className="bg-white border border-gray-100 p-8 rounded-3xl hover:shadow-lg transition-all"
-                                            {...({} as any)}
                                         >
                                             <div className="flex items-center gap-3 mb-3">
                                                 <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
@@ -182,7 +179,6 @@ export default function HelpCenterPage() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         className="text-center py-12"
-                                        {...({} as any)}
                                     >
                                         <Book className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                                         <p className="text-gray-500 font-medium">No results found for "{searchQuery}"</p>

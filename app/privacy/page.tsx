@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 border border-blue-200 mb-4"
-                        {...({} as any)}
+
                     >
                         <Shield className="h-4 w-4 text-blue-600 mr-2" />
                         <span className="text-xs font-bold text-blue-700 uppercase tracking-widest">Privacy First</span>
@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight"
-                        {...({} as any)}
+
                     >
                         Privacy Policy
                     </motion.h1>
@@ -73,7 +73,7 @@ export default function PrivacyPolicyPage() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                         className="text-gray-600"
-                        {...({} as any)}
+
                     >
                         Last Updated: {lastUpdated}
                     </motion.p>
@@ -89,7 +89,7 @@ export default function PrivacyPolicyPage() {
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1 }}
                             className="bg-white/80 backdrop-blur-sm border border-gray-200 p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow"
-                            {...({} as any)}
+
                         >
                             <div className="flex items-start gap-6">
                                 <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/20 text-white">

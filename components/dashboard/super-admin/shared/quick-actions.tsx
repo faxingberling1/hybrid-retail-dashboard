@@ -43,7 +43,7 @@ export default function QuickActions() {
         <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            {...({ className: "glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800" } as any)}
+            className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800"
         >
             <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-[1.8rem]">
                 <div className="flex items-center justify-between mb-8">
@@ -61,7 +61,7 @@ export default function QuickActions() {
                                 key={index}
                                 whileHover={{ scale: 1.02, x: 4 }}
                                 whileTap={{ scale: 0.98 }}
-                                {...({ className: `group w-full p-5 glass rounded-2xl text-left transition-all border border-slate-100 dark:border-slate-800 hover:border-indigo-500/50 hover:shadow-xl ${action.shadow}` } as any)}
+                                className={`group w-full p-5 glass rounded-2xl text-left transition-all border border-slate-100 dark:border-slate-800 hover:border-indigo-500/50 hover:shadow-xl ${action.shadow}`}
                             >
                                 <div className="flex items-center space-x-4">
                                     <div className={`p-3 rounded-xl text-white ${action.grad} group-hover:scale-110 transition-transform`}>

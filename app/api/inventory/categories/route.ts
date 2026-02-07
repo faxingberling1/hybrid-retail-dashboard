@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const categories = await (prisma as any).category.findMany({
+        const categories = await (prisma as any).categories.findMany({
             orderBy: { name: 'asc' }
         });
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        const category = await (prisma as any).category.create({
+        const category = await (prisma as any).categories.create({
             data: {
                 name
             }

@@ -149,6 +149,24 @@ export async function POST(request: NextRequest) {
       return { organizationId, userId }
     })
 
+    // Notify SuperAdmins about new organization signup
+    try {
+      const { NotificationService } = await import('@/lib/services/notification.service');
+      await NotificationService.sendSuperAdminNotification(
+        '🚀 New Organization Signup',
+        `New organization "${data.businessName}" has signed up under the ${data.industry} industry.`,
+        'success',
+        {
+          organization_id: result.organizationId,
+          admin_email: data.adminEmail,
+          industry: data.industry,
+          action_url: `/super-admin/organizations?id=${result.organizationId}`
+        }
+      );
+    } catch (notifyError) {
+      console.error('Failed to notify super admins about signup:', notifyError);
+    }
+
     console.log('✅ Account created successfully for:', data.adminEmail)
 
     return NextResponse.json({

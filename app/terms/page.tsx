@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="inline-flex items-center px-4 py-2 rounded-full bg-amber-100 border border-amber-200 mb-4"
-                        {...({} as any)}
+
                     >
                         <Gavel className="h-4 w-4 text-amber-600 mr-2" />
                         <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">Legal Agreement</span>
@@ -64,7 +64,7 @@ export default function TermsOfServicePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight"
-                        {...({} as any)}
+
                     >
                         Terms of Service
                     </motion.h1>
@@ -73,7 +73,7 @@ export default function TermsOfServicePage() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                         className="text-gray-600"
-                        {...({} as any)}
+
                     >
                         Please read these terms carefully before using our platform.
                     </motion.p>
@@ -89,7 +89,7 @@ export default function TermsOfServicePage() {
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1 }}
                             className="bg-white/80 backdrop-blur-sm border border-gray-200 p-8 rounded-3xl shadow-sm hover:shadow-lg transition-all"
-                            {...({} as any)}
+
                         >
                             <div className="p-3 bg-amber-50 rounded-xl w-fit mb-4 text-amber-600">
                                 {point.icon}

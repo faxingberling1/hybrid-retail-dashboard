@@ -55,7 +55,6 @@ export default function AdminReportsPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.1 }}
                         className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/20 group hover:bg-gray-50/50 transition-all"
-                        {...({} as any)}
                     >
                         <div className="flex items-center justify-between mb-6">
                             <div className="p-3 bg-gray-50 rounded-2xl group-hover:bg-white transition-colors">
@@ -95,7 +94,6 @@ export default function AdminReportsPage() {
                                         initial={{ height: 0 }}
                                         animate={{ height: `${h}%` }}
                                         className={`w-full rounded-t-2xl shadow-lg transition-all group-hover:opacity-80 ${h > 70 ? 'bg-blue-500 shadow-blue-500/30' : 'bg-indigo-300 shadow-indigo-300/30'}`}
-                                        {...({} as any)}
                                     />
                                 </div>
                                 <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Day {i + 1}</div>
@@ -120,7 +118,6 @@ export default function AdminReportsPage() {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${cat.percent}%` }}
                                         className={`h-full ${cat.color} rounded-full`}
-                                        {...({} as any)}
                                     />
                                 </div>
                             </div>

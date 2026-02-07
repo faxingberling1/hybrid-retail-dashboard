@@ -74,22 +74,18 @@ export default function ReportGeneratorModal({ isOpen, onClose, onComplete }: Re
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <motion.div
-                        {...({
-                            initial: { opacity: 0 },
-                            animate: { opacity: 1 },
-                            exit: { opacity: 0 },
-                            onClick: onClose,
-                            className: "absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
-                        } as any)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                     />
 
                     <motion.div
-                        {...({
-                            initial: { scale: 0.9, opacity: 0, y: 20 },
-                            animate: { scale: 1, opacity: 1, y: 0 },
-                            exit: { scale: 0.9, opacity: 0, y: 20 },
-                            className: "relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
-                        } as any)}
+                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
                     >
                         {/* Header */}
                         <div className="p-8 border-b border-gray-50 flex justify-between items-center">
@@ -116,8 +112,8 @@ export default function ReportGeneratorModal({ isOpen, onClose, onComplete }: Re
                                                 key={opt.label}
                                                 onClick={() => setReportType(opt.label)}
                                                 className={`p-6 rounded-[2rem] border-2 text-left transition-all ${reportType === opt.label
-                                                        ? 'border-rose-500 bg-rose-50/30'
-                                                        : 'border-gray-50 bg-white hover:border-gray-200'
+                                                    ? 'border-rose-500 bg-rose-50/30'
+                                                    : 'border-gray-50 bg-white hover:border-gray-200'
                                                     }`}
                                             >
                                                 <opt.icon className={`h-6 w-6 mb-4 ${reportType === opt.label ? 'text-rose-600' : 'text-gray-400'}`} />

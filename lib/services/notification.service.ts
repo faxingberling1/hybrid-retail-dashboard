@@ -9,7 +9,8 @@ export class NotificationService {
   static async sendToUser(data: CreateNotificationDTO & { userId: string }): Promise<void> {
     await NotificationModel.create({
       ...data,
-      userId: data.userId,
+      type: data.type || 'info',
+      userId: data.userId as string,
       read: false,
       expiresAt: data.expiresIn ?
         new Date(Date.now() + data.expiresIn * 60 * 60 * 1000) :
@@ -26,6 +27,7 @@ export class NotificationService {
     const promises = userIds.map(userId =>
       NotificationModel.create({
         ...data,
+        type: data.type || 'info',
         userId,
         metadata: {
           ...data.metadata,
@@ -52,7 +54,7 @@ export class NotificationService {
   ): Promise<void> {
     const allUsers = await UserRepository.findAll();
 
-    const promises = allUsers.map(user =>
+    const promises = allUsers.map((user: any) =>
       NotificationModel.create({
         userId: user.id,
         title,
@@ -185,5 +187,12 @@ export class NotificationService {
       unreadCount,
       roleBasedCounts
     };
+  }
+
+  /**
+   * Mark all notifications of a specific category as read for a user
+   */
+  static async markCategoryAsRead(userId: string, category: string): Promise<void> {
+    await NotificationModel.markCategoryAsRead(userId, category);
   }
 }

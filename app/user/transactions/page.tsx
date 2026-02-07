@@ -143,15 +143,13 @@ export default function UserTransactionsPage() {
                 <AnimatePresence mode="popLayout">
                     {filteredTransactions.map((txn, index) => (
                         <motion.div
-                            {...({
-                                key: txn.id,
-                                initial: { opacity: 0, x: -20 },
-                                animate: { opacity: 1, x: 0 },
-                                exit: { opacity: 0, scale: 0.95 },
-                                transition: { delay: index * 0.05 },
-                                layout: true,
-                                className: "bg-white p-6 rounded-[2rem] border border-gray-100 grid grid-cols-12 gap-4 items-center hover:border-indigo-200 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group relative overflow-hidden"
-                            } as any)}
+                            key={txn.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ delay: index * 0.05 }}
+                            layout
+                            className="bg-white p-6 rounded-[2rem] border border-gray-100 grid grid-cols-12 gap-4 items-center hover:border-indigo-200 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group relative overflow-hidden"
                         >
                             {/* Visual Accent */}
                             <div className={`absolute left-0 top-0 bottom-0 w-1 ${txn.status === 'completed' ? 'bg-green-500' :
@@ -222,11 +220,9 @@ export default function UserTransactionsPage() {
 
                 {filteredTransactions.length === 0 && (
                     <motion.div
-                        {...({
-                            initial: { opacity: 0 },
-                            animate: { opacity: 1 },
-                            className: "py-20 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200"
-                        } as any)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="py-20 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200"
                     >
                         <div className="p-6 bg-white w-20 h-20 rounded-[2rem] shadow-xl mx-auto mb-6 flex items-center justify-center">
                             <Search className="h-8 w-8 text-gray-200" />

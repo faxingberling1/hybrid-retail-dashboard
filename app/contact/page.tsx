@@ -87,7 +87,6 @@ export default function ContactSalesPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="text-5xl md:text-6xl font-black text-gray-900 tracking-tight mb-6"
-                                    {...({} as any)}
                                 >
                                     Let's scale your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">business together.</span>
                                 </motion.h1>
@@ -96,7 +95,6 @@ export default function ContactSalesPage() {
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.2 }}
                                     className="text-xl text-gray-600 leading-relaxed"
-                                    {...({} as any)}
                                 >
                                     Ready to transform your retail operations? Our sales experts are here to help you find the perfect HybridPOS solution.
                                 </motion.p>
@@ -124,7 +122,6 @@ export default function ContactSalesPage() {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     className="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl shadow-blue-500/5 border border-white"
-                                    {...({} as any)}
                                 >
                                     {!submitted ? (
                                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -230,7 +227,6 @@ export default function ContactSalesPage() {
                                             initial={{ scale: 0.9, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             className="text-center py-12"
-                                            {...({} as any)}
                                         >
                                             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
                                                 <CheckCircle2 className="h-12 w-12 text-green-600" />
@@ -261,7 +257,6 @@ export default function ContactSalesPage() {
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.4 + (idx * 0.1) }}
                                             className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
-                                            {...({} as any)}
                                         >
                                             <div className="flex items-center gap-5">
                                                 <div className={`p-4 rounded-2xl ${info.bg} ${info.color} transition-transform group-hover:scale-110`}>

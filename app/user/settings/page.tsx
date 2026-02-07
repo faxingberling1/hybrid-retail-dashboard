@@ -61,13 +61,11 @@ export default function UserSettingsPage() {
             <div className="grid grid-cols-1 gap-8">
                 {sections.map((section, idx) => (
                     <motion.div
-                        {...({
-                            key: section.title,
-                            initial: { opacity: 0, y: 20 },
-                            animate: { opacity: 1, y: 0 },
-                            transition: { delay: idx * 0.1 },
-                            className: "bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm overflow-hidden relative group"
-                        } as any)}
+                        key={section.title}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm overflow-hidden relative group"
                     >
                         <div className="flex flex-col md:flex-row md:items-start gap-8">
                             <div className="md:w-1/3 xl:w-1/4">

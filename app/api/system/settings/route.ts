@@ -11,16 +11,31 @@ async function initSettingsTable() {
                 key VARCHAR(100) PRIMARY KEY,
                 value JSONB,
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                updated_by UUID
+                updated_by TEXT
             )
         `)
 
-        // Ensure updated_at column exists (migration for existing tables)
+        // Ensure updated_at column exists
         await query(`
             DO $$ 
             BEGIN 
                 IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='system_settings' AND column_name='updated_at') THEN 
                     ALTER TABLE system_settings ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP; 
+                END IF;
+            END $$;
+        `)
+
+        // Ensure updated_by column exists and is TEXT
+        await query(`
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='system_settings' AND column_name='updated_by') THEN 
+                    ALTER TABLE system_settings ADD COLUMN updated_by TEXT; 
+                ELSE
+                    -- If it exists but is UUID (old behavior), convert to TEXT
+                    IF (SELECT data_type FROM information_schema.columns WHERE table_name='system_settings' AND column_name='updated_by') = 'uuid' THEN
+                        ALTER TABLE system_settings ALTER COLUMN updated_by TYPE TEXT USING updated_by::TEXT;
+                    END IF;
                 END IF;
             END $$;
         `)
@@ -44,10 +59,21 @@ export async function GET() {
         // Handle both legacy boolean/string and new object format
         let maintenance = { active: false, endAt: null }
         if (setting?.value) {
-            if (typeof setting.value === 'object' && setting.value !== null) {
-                maintenance = { ...maintenance, ...setting.value }
-            } else {
-                maintenance.active = setting.value === true || setting.value === 'true'
+            let val = setting.value
+            if (typeof val === 'string') {
+                try {
+                    val = JSON.parse(val)
+                } catch (e) {
+                    // Fallback for raw legacy string values
+                    maintenance.active = val === 'true'
+                    val = null
+                }
+            }
+
+            if (val && typeof val === 'object') {
+                maintenance = { ...maintenance, ...val }
+            } else if (val !== null) {
+                maintenance.active = val === true
             }
         }
 
@@ -91,6 +117,24 @@ export async function POST(request: Request) {
              SET value = $1, updated_at = CURRENT_TIMESTAMP, updated_by = $2`,
             [JSON.stringify(maintenanceData), userId]
         )
+
+        // Notify SuperAdmins about maintenance mode change
+        try {
+            const { NotificationService } = await import('@/lib/services/notification.service');
+            await NotificationService.sendSuperAdminNotification(
+                '⚙️ System Setting Update',
+                `Maintenance Mode has been ${maintenanceData.active ? 'ENABLED' : 'DISABLED'} by ${session.user.name || session.user.email}.`,
+                maintenanceData.active ? 'warning' : 'success',
+                {
+                    setting: 'maintenance_mode',
+                    active: maintenanceData.active,
+                    end_at: maintenanceData.endAt,
+                    action_url: `/super-admin/settings`
+                }
+            );
+        } catch (notifyError) {
+            console.error('Failed to notify super admins about settings change:', notifyError);
+        }
 
         return NextResponse.json({ success: true, maintenanceData })
     } catch (error: any) {

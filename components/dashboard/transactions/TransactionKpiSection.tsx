@@ -21,13 +21,11 @@ export default function TransactionKpiSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {kpis.map((kpi, i) => (
                 <motion.div
-                    {...({
-                        key: kpi.label,
-                        initial: { opacity: 0, y: 20 },
-                        animate: { opacity: 1, y: 0 },
-                        transition: { delay: i * 0.1 },
-                        className: "bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500"
-                    } as any)}
+                    key={kpi.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500"
                 >
                     <div className={`absolute top-0 right-0 w-24 h-24 bg-${kpi.color}-500/5 rounded-full blur-3xl -mr-8 -mt-8 transition-transform group-hover:scale-150`}></div>
 

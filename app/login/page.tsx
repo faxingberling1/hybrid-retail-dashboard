@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [maintenance, setMaintenance] = useState({ active: false, endAt: null, startAt: null })
+  const [overrideMaintenance, setOverrideMaintenance] = useState(false)
 
   const [timeLeft, setTimeLeft] = useState("")
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -264,24 +265,7 @@ export default function LoginPage() {
             <p className="text-slate-500 font-medium uppercase text-[10px] tracking-[0.4em]">Initialize Your Session</p>
           </div>
 
-          {/* Maintenance Overlay */}
-          <AnimatePresence>
-            {maintenance.active && (
-              <MotionDiv
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-6 rounded-3xl bg-amber-50 border border-amber-100 flex items-start space-x-4 shadow-xl shadow-amber-500/5"
-              >
-                <div className="p-3 bg-white rounded-2xl shadow-sm">
-                  <Activity className="h-5 w-5 text-amber-500 animate-pulse" />
-                </div>
-                <div>
-                  <h4 className="font-black text-sm text-amber-900 tracking-tight">System Under Calibration</h4>
-                  <p className="text-xs text-amber-700 font-medium mt-1">Estimating completion in {timeLeft || "calculating..."}</p>
-                </div>
-              </MotionDiv>
-            )}
-          </AnimatePresence>
+          {/* Maintenance Overlay replaced by Modal */}
 
           <div className="bg-white p-2 rounded-[2.5rem] shadow-[0_24px_80px_rgba(0,0,0,0.04)] border border-slate-100 relative overflow-hidden">
             <div className="p-2 flex mb-8">
@@ -422,6 +406,87 @@ export default function LoginPage() {
             </div>
             <Link href="/home" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">contact sales</Link>
           </div>
+
+          {/* Maintenance Modal Overlay */}
+          <AnimatePresence>
+            {maintenance.active && !overrideMaintenance && (
+              <MotionDiv
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-x-0 -inset-y-32 z-50 flex items-center justify-center p-4 lg:p-8"
+              >
+                <div className="absolute inset-0 bg-slate-50/90 backdrop-blur-2xl" />
+
+                <MotionDiv
+                  initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  className="relative w-full max-w-md bg-white p-1 rounded-[3rem] shadow-2xl border border-slate-200/50 overflow-hidden"
+                >
+                  <div className="p-10 text-center space-y-8">
+                    <div className="flex justify-center">
+                      <div className="relative">
+                        <MotionDiv
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                          className="absolute -inset-4 bg-gradient-to-tr from-amber-500/20 via-orange-500/10 to-transparent rounded-full blur-xl"
+                        />
+                        <div className="relative h-20 w-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-orange-500/30 border border-white/20">
+                          <Activity className="h-10 w-10 text-white animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-3xl font-black tracking-tighter text-slate-900 uppercase">System Sync</h3>
+                      <p className="text-sm text-slate-500 font-medium max-w-[260px] mx-auto">
+                        Infrastructure optimization in progress. Neural nodes are standardizing.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
+                        <Timer className="h-4 w-4 text-amber-500 mx-auto mb-2" />
+                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estimated</div>
+                        <div className="text-lg font-black text-slate-900 tabular-nums">{timeLeft || "Checking..."}</div>
+                      </div>
+                      <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
+                        <Lock className="h-4 w-4 text-indigo-500 mx-auto mb-2" />
+                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</div>
+                        <div className="text-lg font-black text-slate-900 uppercase">Active</div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 space-y-4">
+                      <button
+                        onClick={() => setOverrideMaintenance(true)}
+                        className="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center group"
+                      >
+                        <span>Administrative Bypass</span>
+                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                      <Link
+                        href="/home"
+                        className="block text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors"
+                      >
+                        Return to Public Gateway
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Progress Line */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-100">
+                    <MotionDiv
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 30, repeat: Infinity }}
+                      className="h-full bg-gradient-to-r from-amber-500 to-orange-600"
+                    />
+                  </div>
+                </MotionDiv>
+              </MotionDiv>
+            )}
+          </AnimatePresence>
         </MotionDiv>
       </section>
     </div>

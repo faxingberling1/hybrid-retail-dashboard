@@ -88,6 +88,8 @@ export async function POST(
             // Notify user about the reply
             if (ticket.user_id !== session.user.id) {
                 try {
+                    const { NotificationService } = await import('@/lib/services/notification.service');
+
                     // Determine redirect URL based on user role
                     const targetUserRole = ticket.user?.role?.toUpperCase() || 'USER';
                     let actionUrl = '/user/support';
@@ -96,16 +98,17 @@ export async function POST(
                         actionUrl = '/admin/support';
                     }
 
-                    await (prisma as any).notifications.create({
-                        data: {
-                            user_id: ticket.user_id,
-                            title: 'New Reply Received',
-                            message: `Support has replied to your ticket "${ticket.subject}".`,
-                            type: 'info',
-                            priority: 'medium',
-                            action_url: `${actionUrl}?ticketId=${ticket.id}`,
-                            action_label: 'View Reply',
-                            metadata: { ticket_id: ticket.id, reply_id: reply.id, role: targetUserRole }
+                    await NotificationService.sendToUser({
+                        userId: ticket.user_id,
+                        title: 'New Reply Received',
+                        message: `Support has replied to your ticket "${ticket.subject}".`,
+                        type: 'info',
+                        priority: 'medium',
+                        metadata: {
+                            ticket_id: ticket.id,
+                            reply_id: reply.id,
+                            role: targetUserRole as any,
+                            action_url: `${actionUrl}?ticketId=${ticket.id}`
                         }
                     });
                 } catch (notifyError) {
@@ -115,77 +118,75 @@ export async function POST(
 
             // If it's an Org Admin replying, we might still want to notify Super Admins
             if (isOrgAdmin) {
-                await notifySuperAdmins(id, ticket.subject, session.user.name || session.user.email, reply.id);
+                try {
+                    const { NotificationService } = await import('@/lib/services/notification.service');
+                    await NotificationService.sendSuperAdminNotification(
+                        'New Org Admin Reply',
+                        `Org Admin ${session.user.name || session.user.email} replied to ticket "${ticket.subject}".`,
+                        'info',
+                        {
+                            ticket_id: ticket.id,
+                            reply_id: reply.id,
+                            action_url: `/super-admin/support?ticketId=${ticket.id}`
+                        }
+                    );
+                } catch (err) {
+                    console.error('Failed to notify super admins about org admin reply:', err);
+                }
             }
         } else {
             // Regular User replied, notify Super Admins AND Org Admins
-            await notifySuperAdmins(id, ticket.subject, session.user.name || session.user.email, reply.id);
-            await notifyOrgAdmins(ticket.user?.organization_id || undefined, id, ticket.subject, session.user.name || session.user.email, reply.id);
+            try {
+                const { NotificationService } = await import('@/lib/services/notification.service');
+
+                // Notify Super Admins
+                await NotificationService.sendSuperAdminNotification(
+                    'New Ticket Reply',
+                    `${session.user.name || session.user.email} replied to ticket "${ticket.subject}".`,
+                    'info',
+                    {
+                        ticket_id: ticket.id,
+                        reply_id: reply.id,
+                        action_url: `/super-admin/support?ticketId=${ticket.id}`
+                    }
+                );
+
+                // Notify Org Admins
+                if (ticket.user?.organization_id) {
+                    const orgAdmins = await prisma.user.findMany({
+                        where: {
+                            organization_id: ticket.user.organization_id,
+                            role: { in: ['ADMIN', 'MANAGER'] },
+                            id: { not: session.user.id }
+                        },
+                        select: { id: true }
+                    });
+
+                    for (const admin of orgAdmins) {
+                        await NotificationService.sendToUser({
+                            userId: admin.id,
+                            title: 'New Ticket Reply (Org)',
+                            message: `${session.user.name || session.user.email} replied to ticket "${ticket.subject}".`,
+                            type: 'info',
+                            priority: 'low',
+                            metadata: {
+                                ticket_id: ticket.id,
+                                reply_id: reply.id,
+                                role: 'ADMIN',
+                                dashboard: 'admin',
+                                action_url: `/admin/support?ticketId=${ticket.id}`
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to notify admins about user reply:', err);
+            }
         }
 
         return NextResponse.json(reply, { status: 201 });
     } catch (error) {
         console.error('Error creating reply:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
-}
-
-async function notifySuperAdmins(ticketId: string, subject: string, senderName: string, replyId: string) {
-    try {
-        const superAdmins = await prisma.user.findMany({
-            where: { role: { in: ['SUPER_ADMIN', 'SUPERADMIN'] } },
-            select: { id: true }
-        });
-
-        if (superAdmins.length > 0) {
-            const notifications = superAdmins.map((admin: any) => ({
-                user_id: admin.id,
-                title: 'New Reply in Ticket',
-                message: `${senderName} replied to "${subject}".`,
-                type: 'info',
-                priority: 'low',
-                action_url: `/super-admin/support?ticketId=${ticketId}`,
-                action_label: 'View Reply',
-                metadata: { ticket_id: ticketId, reply_id: replyId }
-            }));
-
-            await (prisma as any).notifications.createMany({
-                data: notifications
-            });
-        }
-    } catch (error) {
-        console.error('Failed to notify super admins:', error);
-    }
-}
-
-async function notifyOrgAdmins(orgId: string | undefined, ticketId: string, subject: string, senderName: string, replyId: string) {
-    if (!orgId) return;
-    try {
-        const orgAdmins = await prisma.user.findMany({
-            where: {
-                organization_id: orgId,
-                role: { in: ['ADMIN', 'MANAGER'] }
-            },
-            select: { id: true }
-        });
-
-        if (orgAdmins.length > 0) {
-            const notifications = orgAdmins.map((admin: any) => ({
-                user_id: admin.id,
-                title: 'New Reply in Organization Ticket',
-                message: `${senderName} replied to "${subject}".`,
-                type: 'info',
-                priority: 'low',
-                action_url: `/admin/support?ticketId=${ticketId}`,
-                action_label: 'View Reply',
-                metadata: { ticket_id: ticketId, reply_id: replyId }
-            }));
-
-            await (prisma as any).notifications.createMany({
-                data: notifications
-            });
-        }
-    } catch (error) {
-        console.error('Failed to notify organization admins:', error);
     }
 }

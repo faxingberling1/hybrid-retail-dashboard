@@ -6,11 +6,9 @@ import { ArrowRight, ArrowUpRight } from "lucide-react"
 export default function ReportAnalyticsChart() {
     return (
         <motion.div
-            {...({
-                initial: { opacity: 0, scale: 0.95 },
-                animate: { opacity: 1, scale: 1 },
-                className: "lg:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[3.5rem] p-10 text-white relative overflow-hidden shadow-2xl"
-            } as any)}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="lg:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[3.5rem] p-10 text-white relative overflow-hidden shadow-2xl"
         >
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[120px] -mr-64 -mt-64 text-white/5 font-black text-8xl leading-none flex items-center justify-center pointer-events-none">DATA</div>
 
@@ -87,11 +85,9 @@ export default function ReportAnalyticsChart() {
                         <div key={i} className="flex-1 flex flex-col items-center gap-3 group/bar relative z-10">
                             <div className="w-full relative h-[300px] flex items-end">
                                 <motion.div
-                                    {...({
-                                        initial: { height: 0 },
-                                        animate: { height: `${h}%` },
-                                        className: "w-full bg-gradient-to-t from-rose-600/40 to-rose-400/10 rounded-2xl border border-rose-500/20 group-hover/bar:from-rose-600 group-hover/bar:to-rose-400 group-hover/bar:border-rose-400 transition-all duration-500 relative overflow-hidden"
-                                    } as any)}
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${h}%` }}
+                                    className="w-full bg-gradient-to-t from-rose-600/40 to-rose-400/10 rounded-2xl border border-rose-500/20 group-hover/bar:from-rose-600 group-hover/bar:to-rose-400 group-hover/bar:border-rose-400 transition-all duration-500 relative overflow-hidden"
                                 >
                                     <div className="absolute top-0 inset-x-0 h-1 bg-white/30 hidden group-hover/bar:block"></div>
                                 </motion.div>

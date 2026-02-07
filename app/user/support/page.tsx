@@ -329,7 +329,6 @@ export default function UserSupportPage() {
                                 initial={{ opacity: 0, scale: 0.98 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="flex flex-col h-full"
-                                {...({} as any)}
                             >
                                 {/* Active Header */}
                                 <div className="p-6 lg:p-8 border-b border-gray-50 bg-white">
@@ -418,7 +417,6 @@ export default function UserSupportPage() {
                                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                                                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                                                                 className="absolute bottom-full right-0 mb-4 p-3 bg-white rounded-2xl shadow-2xl border border-gray-100 flex gap-2 z-50 overflow-hidden min-w-[300px] flex-wrap justify-center backdrop-blur-xl bg-white/90"
-                                                                {...({} as any)}
                                                             >
                                                                 {EMOJIS.map(emoji => (
                                                                     <button
@@ -472,7 +470,6 @@ export default function UserSupportPage() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 30 }}
                             className="bg-white w-full max-w-2xl rounded-[48px] shadow-2xl overflow-hidden border border-white/20"
-                            {...({} as any)}
                         >
                             <div className="px-10 py-8 bg-gradient-to-r from-green-900 to-emerald-900 text-white flex items-center justify-between">
                                 <div>

@@ -125,59 +125,46 @@ export async function POST(request: NextRequest) {
 
         // Notify Super Admins and Org Admins
         try {
-            const superAdmins = await prisma.user.findMany({
-                where: {
-                    role: { in: ['SUPER_ADMIN', 'SUPERADMIN'] }
-                },
-                select: { id: true }
-            });
+            const { NotificationService } = await import('@/lib/services/notification.service');
 
-            const userOrgId = session.user.organizationId;
-            const orgAdmins = userOrgId ? await prisma.user.findMany({
-                where: {
-                    organization_id: userOrgId,
-                    role: { in: ['ADMIN', 'MANAGER'] },
-                    id: { not: session.user.id } // Don't notify self
-                },
-                select: { id: true }
-            }) : [];
+            // Notify Super Admins
+            await NotificationService.sendSuperAdminNotification(
+                'New Support Ticket',
+                `A new ticket "${subject}" has been created by ${session.user.name || session.user.email}.`,
+                'info',
+                { ticket_id: ticket.id, action_url: `/super-admin/support?ticketId=${ticket.id}` }
+            );
 
-            const notifications: any[] = [];
-
-            if (superAdmins.length > 0) {
-                superAdmins.forEach((admin: any) => {
-                    notifications.push({
-                        user_id: admin.id,
-                        title: 'New Support Ticket',
-                        message: `A new ticket "${subject}" has been created by ${session.user.name || session.user.email}.`,
-                        type: 'info',
-                        priority: 'medium',
-                        action_url: `/super-admin/support?ticketId=${ticket.id}`,
-                        action_label: 'View Ticket',
-                        metadata: { ticket_id: ticket.id }
-                    });
+            // Notify Org Admins if the user belongs to an organization
+            if (session.user.organizationId) {
+                // We need a way to notify admins of a SPECIFIC organization.
+                // Looking at NotificationService, it has sendToRole which sends to ALL users of a role.
+                // Direct Prisma call for org-specific admins might still be needed or we extend the service.
+                // For now, let's keep it simple or use a new service method if available.
+                const orgAdmins = await prisma.user.findMany({
+                    where: {
+                        organization_id: session.user.organizationId,
+                        role: { in: ['ADMIN', 'MANAGER'] },
+                        id: { not: session.user.id }
+                    },
+                    select: { id: true }
                 });
-            }
 
-            if (orgAdmins.length > 0) {
-                orgAdmins.forEach((admin: any) => {
-                    notifications.push({
-                        user_id: admin.id,
+                for (const admin of orgAdmins) {
+                    await NotificationService.sendToUser({
+                        userId: admin.id,
                         title: 'New Organization Ticket',
                         message: `${session.user.name || session.user.email} created a new support ticket: "${subject}".`,
                         type: 'info',
                         priority: 'low',
-                        action_url: `/admin/support?ticketId=${ticket.id}`,
-                        action_label: 'View Ticket',
-                        metadata: { ticket_id: ticket.id }
+                        metadata: {
+                            ticket_id: ticket.id,
+                            role: 'ADMIN',
+                            dashboard: 'admin',
+                            action_url: `/admin/support?ticketId=${ticket.id}`
+                        }
                     });
-                });
-            }
-
-            if (notifications.length > 0) {
-                await (prisma as any).notifications.createMany({
-                    data: notifications
-                });
+                }
             }
         } catch (notifyError) {
             console.error('Failed to notify admins:', notifyError);

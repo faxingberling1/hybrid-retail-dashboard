@@ -558,6 +558,20 @@ export class NotificationModel {
   }
 
   /**
+   * Mark all notifications of a specific category as read for a user
+   */
+  static async markCategoryAsRead(userId: string, category: string): Promise<void> {
+    const sql = `
+      UPDATE notifications 
+      SET read = true 
+      WHERE user_id = $1 
+      AND read = false 
+      AND metadata->>'category' = $2
+    `;
+    await query(sql, [userId, category.toUpperCase()]);
+  }
+
+  /**
    * Get paginated notifications with filters
    */
   static async getPaginated(

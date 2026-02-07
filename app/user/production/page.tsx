@@ -81,12 +81,10 @@ export default function UserProductionPage() {
                 {stats.map((stat, i) => (
                     <motion.div
                         key={stat.label}
-                        {...({
-                            initial: { opacity: 0, y: 20 },
-                            animate: { opacity: 1, y: 0 },
-                            transition: { delay: i * 0.1 },
-                            className: "bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group"
-                        } as any)}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group"
                     >
                         <div className="absolute right-0 top-0 w-24 h-24 bg-indigo-50/30 rounded-full blur-3xl group-hover:bg-indigo-100/50 transition-colors duration-500"></div>
                         <div className="relative flex items-center gap-5">
@@ -147,12 +145,10 @@ export default function UserProductionPage() {
                 {viewMode === 'table' ? (
                     <motion.div
                         key="table"
-                        {...({
-                            initial: { opacity: 0, x: -20 },
-                            animate: { opacity: 1, x: 0 },
-                            exit: { opacity: 0, x: 20 },
-                            className: "bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden"
-                        } as any)}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden"
                     >
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-separate border-spacing-0">
@@ -170,12 +166,10 @@ export default function UserProductionPage() {
                                     {productions.map((prd, idx) => (
                                         <motion.tr
                                             key={prd.id}
-                                            {...({
-                                                initial: { opacity: 0 },
-                                                animate: { opacity: 1 },
-                                                transition: { delay: idx * 0.05 },
-                                                className: "group hover:bg-indigo-50/30 transition-all duration-300"
-                                            } as any)}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            className="group hover:bg-indigo-50/30 transition-all duration-300"
                                         >
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-5">
@@ -236,20 +230,16 @@ export default function UserProductionPage() {
                 ) : (
                     <motion.div
                         key="grid"
-                        {...({
-                            initial: { opacity: 0, x: 20 },
-                            animate: { opacity: 1, x: 0 },
-                            exit: { opacity: 0, x: -20 },
-                            className: "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-                        } as any)}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
                     >
                         {productions.map((prd, idx) => (
                             <motion.div
                                 key={prd.id}
-                                {...({
-                                    layout: true,
-                                    className: "bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[300px]"
-                                } as any)}
+                                layout
+                                className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[300px]"
                             >
                                 <div className="absolute right-0 top-0 h-40 w-40 bg-gray-50 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-indigo-50 transition-colors duration-500"></div>
                                 <div className="relative">
@@ -299,21 +289,17 @@ export default function UserProductionPage() {
                 {isAddModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div
-                            {...({
-                                initial: { opacity: 0 },
-                                animate: { opacity: 1 },
-                                exit: { opacity: 0 },
-                                onClick: () => setIsAddModalOpen(false),
-                                className: "absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
-                            } as any)}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsAddModalOpen(false)}
+                            className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                         />
                         <motion.div
-                            {...({
-                                initial: { scale: 0.9, opacity: 0, y: 20 },
-                                animate: { scale: 1, opacity: 1, y: 0 },
-                                exit: { scale: 0.9, opacity: 0, y: 20 },
-                                className: "relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
-                            } as any)}
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden"
                         >
                             <div className="p-10">
                                 <div className="flex justify-between items-start mb-10">

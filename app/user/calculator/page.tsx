@@ -100,7 +100,7 @@ export default function UserCalculatorPage() {
     const handleCopy = () => {
         navigator.clipboard.writeText(display)
         setCopied(true)
-        setTimeout(() => setCopied(null), 2000)
+        setTimeout(() => setCopied(false), 2000)
     }
 
     // Keyboard support
@@ -196,20 +196,18 @@ export default function UserCalculatorPage() {
                     <div className="grid grid-cols-4 gap-4 pb-4">
                         {buttons.map((btn, i) => (
                             <motion.button
-                                {...({
-                                    key: btn.label + i,
-                                    whileHover: { scale: 1.05, y: -2 },
-                                    whileTap: { scale: 0.95 },
-                                    onClick: () => handlePress(btn),
-                                    className: `
+                                key={btn.label + i}
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handlePress(btn)}
+                                className={`
                                         aspect-square rounded-[1.5rem] text-xl font-bold flex items-center justify-center transition-all border
                                         ${btn.type === 'operator' ? 'bg-indigo-600/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-500/30' :
-                                            btn.type === 'equals' ? 'bg-gradient-to-br from-indigo-600 to-blue-700 border-transparent text-white shadow-xl shadow-indigo-900/40 rounded-[2rem]' :
-                                                btn.type === 'clear' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white' :
-                                                    btn.type === 'delete' ? 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10' :
-                                                        'bg-white/5 border-white/5 text-white hover:bg-white/10 hover:border-white/10'}
-                                    `
-                                } as any)}
+                                        btn.type === 'equals' ? 'bg-gradient-to-br from-indigo-600 to-blue-700 border-transparent text-white shadow-xl shadow-indigo-900/40 rounded-[2rem]' :
+                                            btn.type === 'clear' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white' :
+                                                btn.type === 'delete' ? 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10' :
+                                                    'bg-white/5 border-white/5 text-white hover:bg-white/10 hover:border-white/10'}
+                                    `}
                             >
                                 {btn.label === 'DEL' ? <Delete className="h-6 w-6" /> :
                                     btn.label === '÷' ? <Divide className="h-6 w-6" /> :

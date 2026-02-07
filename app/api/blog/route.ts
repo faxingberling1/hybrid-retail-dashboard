@@ -83,6 +83,24 @@ export async function POST(request: NextRequest) {
             },
         });
 
+        // Notify SuperAdmins about new blog activity
+        try {
+            const { NotificationService } = await import('@/lib/services/notification.service');
+            await NotificationService.sendSuperAdminNotification(
+                '📝 New Blog Post Activity',
+                `A new blog post "${title}" has been ${published ? 'published' : 'created as draft'} by ${session.user.name || session.user.email}.`,
+                'info',
+                {
+                    post_id: post.id,
+                    slug: post.slug,
+                    status: published ? 'published' : 'draft',
+                    action_url: `/super-admin/cms/blog`
+                }
+            );
+        } catch (notifyError) {
+            console.error('Failed to notify super admins about blog activity:', notifyError);
+        }
+
         return NextResponse.json(post, { status: 201 });
     } catch (error: any) {
         console.error("Error creating blog post:", error);

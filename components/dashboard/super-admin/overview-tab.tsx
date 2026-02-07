@@ -194,7 +194,7 @@ export default function OverviewTab({
                                             initial={{ opacity: 0, x: 20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.1 }}
-                                            {...({ className: "group flex items-center justify-between p-3 rounded-2xl hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer" } as any)}
+                                            className="group flex items-center justify-between p-3 rounded-2xl hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer"
                                         >
                                             <div className="flex items-center space-x-3">
                                                 <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />

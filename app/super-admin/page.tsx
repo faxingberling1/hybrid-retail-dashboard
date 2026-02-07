@@ -116,7 +116,7 @@ export default function SuperAdminPage() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'organizations', label: 'Organizations', icon: Building2 },
+    { id: 'organizations', label: 'Organization Management', icon: Building2 },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'system', label: 'System', icon: Server },
     { id: 'control-hub', label: 'Control Hub', icon: Zap },
@@ -258,7 +258,7 @@ export default function SuperAdminPage() {
                         <motion.div
                           layoutId="activeTab"
                           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                          {...({ className: "absolute inset-0 grad-indigo rounded-xl shadow-lg" } as any)}
+                          className="absolute inset-0 grad-indigo rounded-xl shadow-lg"
                         />
                       </div>
                     )}
@@ -291,7 +291,7 @@ export default function SuperAdminPage() {
                   />
                 )}
 
-                {activeTab === 'organizations' && <OrganizationsTab topOrganizations={topOrganizations} />}
+                {activeTab === 'organizations' && <OrganizationsTab />}
                 {activeTab === 'security' && <SecurityTab securityAlerts={securityAlerts} />}
                 {activeTab === 'system' && <SystemTab />}
                 {activeTab === 'control-hub' && <ControlHubTab />}

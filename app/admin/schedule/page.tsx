@@ -72,7 +72,6 @@ export default function AdminSchedulePage() {
                   aspect-square rounded-2xl p-4 border transition-all cursor-pointer relative group
                   ${day === 3 ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-500/40 translate-y-[-4px]' : 'bg-gray-50/50 border-transparent hover:bg-white hover:border-blue-100 hover:shadow-lg'}
                 `}
-                                {...({} as any)}
                             >
                                 <div className={`text-sm font-black ${day === 3 ? 'text-white' : 'text-gray-900'}`}>{day}</div>
                                 {day === 3 && <div className="absolute bottom-4 left-4 right-4 h-1.5 bg-white/20 rounded-full" />}

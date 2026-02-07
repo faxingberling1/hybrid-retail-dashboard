@@ -39,7 +39,23 @@ export const authOptions: NextAuthOptions = {
 
           // === MAINTENANCE MODE LOGIN BLOCK ===
           const maintenanceSetting = await queryOne("SELECT value FROM system_settings WHERE key = 'maintenance_mode'")
-          const isMaintenanceActive = maintenanceSetting?.value === true || maintenanceSetting?.value === 'true'
+
+          let isMaintenanceActive = false
+          if (maintenanceSetting?.value) {
+            const val = maintenanceSetting.value
+            if (typeof val === 'object' && val !== null) {
+              isMaintenanceActive = !!val.active
+            } else if (typeof val === 'string') {
+              try {
+                const parsed = JSON.parse(val)
+                isMaintenanceActive = !!parsed.active
+              } catch {
+                isMaintenanceActive = val === 'true'
+              }
+            } else {
+              isMaintenanceActive = val === true
+            }
+          }
 
           if (isMaintenanceActive && user.role !== 'SUPER_ADMIN') {
             console.warn(`🚧 Login blocked for ${user.email}: Maintenance mode active`)

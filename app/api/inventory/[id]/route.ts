@@ -27,11 +27,11 @@ export async function PATCH(
         if (description !== undefined) updateData.description = description;
         if (unit !== undefined) updateData.unit = unit;
 
-        const product = await (prisma as any).product.update({
+        const product = await (prisma as any).products.update({
             where: { id },
             data: updateData,
             include: {
-                category: true
+                categories: true
             }
         });
 
@@ -55,7 +55,7 @@ export async function DELETE(
         const id = params.id;
 
         // check if has transactions
-        const transactionCount = await (prisma as any).transactionItem.count({
+        const transactionCount = await (prisma as any).transaction_items.count({
             where: { product_id: id }
         });
 
@@ -65,7 +65,7 @@ export async function DELETE(
             }, { status: 400 });
         }
 
-        await (prisma as any).product.delete({
+        await (prisma as any).products.delete({
             where: { id }
         });
 

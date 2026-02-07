@@ -52,7 +52,6 @@ export default function AdminCustomersPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.1 }}
                         className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/10 hover:shadow-2xl transition-all group"
-                        {...({} as any)}
                     >
                         <div className={`p-4 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 w-fit mb-4 group-hover:scale-110 transition-transform`}>
                             {stat.icon}

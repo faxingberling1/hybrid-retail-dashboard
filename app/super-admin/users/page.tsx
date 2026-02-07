@@ -2,1083 +2,547 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { 
-  Search, Filter, Plus, Download, MoreVertical, 
-  Users as UsersIcon, User, Mail, Phone, Building2, 
-  Shield, CheckCircle, XCircle, Clock, Edit,
-  Trash2, Eye, Key, ChevronRight, Calendar,
-  TrendingUp, Tag, ExternalLink, MessageSquare,
-  BarChart3, Lock, Globe, Smartphone, CreditCard,
-  MapPin, Activity, Award, Bell, Send,
-  ArrowLeft, ArrowRight, RefreshCw, UserPlus,
-  MailCheck, PhoneCall, UserCheck, UserX
+import {
+  Search, Filter, RefreshCw, Download,
+  Users, UserCheck, UserPlus, Activity,
+  Mail, Key, Eye, Ban, CheckCircle, XCircle,
+  Building2, Shield, User as UserIcon, Clock,
+  TrendingUp, MoreVertical, Send, ChevronDown,
+  ChevronRight, ChefHat, ShoppingBag, Truck,
+  Globe, Package
 } from "lucide-react"
+import { toast } from "sonner"
+import { AnimatePresence } from "framer-motion"
 
-// Mock data
-const organizations = [
-  { id: "org-001", name: "FashionHub Retail", type: "Clothing" },
-  { id: "org-002", name: "TechGadget Store", type: "Electronics" },
-  { id: "org-003", name: "FreshMart Superstore", type: "Grocery" },
-  { id: "org-004", name: "PharmaCare Pharmacy", type: "Pharmacy" },
-  { id: "org-005", name: "HomeStyle Furniture", type: "Furniture" },
-  { id: "org-006", name: "BookWorm Library", type: "Books" },
-]
+// Industry icon mapping
+const INDUSTRY_ICONS: Record<string, any> = {
+  retail: ShoppingBag,
+  restaurant: ChefHat,
+  pharmacy: Shield,
+  ecommerce: Globe,
+  grocery: Package,
+  healthcare: Activity,
+  education: Building2,
+  manufacturing: Truck,
+  default: Building2
+}
 
-const mockUsers = [
-  {
-    id: "user-001",
-    name: "Ahmed Khan",
-    email: "ahmed@fashionhub.com",
-    phone: "+92 300 1234567",
-    role: "ADMIN",
-    organization: "FashionHub Retail",
-    organizationId: "org-001",
-    status: "active",
-    joinDate: "2023-12-15",
-    lastLogin: "2 hours ago",
-    loginCount: 142,
-    permissions: ["manage_inventory", "view_reports", "manage_staff"],
-    plan: "Enterprise",
-    department: "Management",
-    avatarColor: "bg-blue-500"
-  },
-  {
-    id: "user-002",
-    name: "Sara Ahmed",
-    email: "sara@techgadget.com",
-    phone: "+92 321 7654321",
-    role: "USER",
-    organization: "TechGadget Store",
-    organizationId: "org-002",
-    status: "active",
-    joinDate: "2024-01-10",
-    lastLogin: "1 day ago",
-    loginCount: 67,
-    permissions: ["view_inventory", "process_sales"],
-    plan: "Pro",
-    department: "Sales",
-    avatarColor: "bg-purple-500"
-  },
-  {
-    id: "user-003",
-    name: "Ali Raza",
-    email: "ali@freshmart.com",
-    phone: "+92 345 9876543",
-    role: "SUPER_ADMIN",
-    organization: "FreshMart Superstore",
-    organizationId: "org-003",
-    status: "active",
-    joinDate: "2023-11-20",
-    lastLogin: "Just now",
-    loginCount: 289,
-    permissions: ["full_access"],
-    plan: "Enterprise",
-    department: "IT",
-    avatarColor: "bg-green-500"
-  },
-  {
-    id: "user-004",
-    name: "Fatima Javed",
-    email: "fatima@pharmacare.com",
-    phone: "+92 333 1234567",
-    role: "ADMIN",
-    organization: "PharmaCare Pharmacy",
-    organizationId: "org-004",
-    status: "inactive",
-    joinDate: "2024-01-05",
-    lastLogin: "2 weeks ago",
-    loginCount: 34,
-    permissions: ["manage_inventory", "view_reports"],
-    plan: "Business",
-    department: "Operations",
-    avatarColor: "bg-pink-500"
-  },
-  {
-    id: "user-005",
-    name: "Bilal Ahmed",
-    email: "bilal@homestyle.com",
-    phone: "+92 311 4567890",
-    role: "USER",
-    organization: "HomeStyle Furniture",
-    organizationId: "org-005",
-    status: "suspended",
-    joinDate: "2023-12-28",
-    lastLogin: "1 month ago",
-    loginCount: 12,
-    permissions: ["view_inventory"],
-    plan: "Starter",
-    department: "Warehouse",
-    avatarColor: "bg-orange-500"
-  },
-  {
-    id: "user-006",
-    name: "Zainab Malik",
-    email: "zainab@bookworm.com",
-    phone: "+92 341 2345678",
-    role: "ADMIN",
-    organization: "BookWorm Library",
-    organizationId: "org-006",
-    status: "active",
-    joinDate: "2024-01-15",
-    lastLogin: "3 hours ago",
-    loginCount: 89,
-    permissions: ["manage_inventory", "view_reports", "manage_staff"],
-    plan: "Business",
-    department: "Management",
-    avatarColor: "bg-indigo-500"
-  },
-  {
-    id: "user-007",
-    name: "Usman Khalid",
-    email: "usman@fashionhub.com",
-    phone: "+92 300 9876543",
-    role: "USER",
-    organization: "FashionHub Retail",
-    organizationId: "org-001",
-    status: "active",
-    joinDate: "2024-01-20",
-    lastLogin: "1 hour ago",
-    loginCount: 45,
-    permissions: ["process_sales", "view_inventory"],
-    plan: "Enterprise",
-    department: "Sales",
-    avatarColor: "bg-teal-500"
-  },
-  {
-    id: "user-008",
-    name: "Ayesha Tariq",
-    email: "ayesha@techgadget.com",
-    phone: "+92 321 1234567",
-    role: "USER",
-    organization: "TechGadget Store",
-    organizationId: "org-002",
-    status: "pending",
-    joinDate: "2024-02-01",
-    lastLogin: "Never",
-    loginCount: 0,
-    permissions: [],
-    plan: "Pro",
-    department: "Customer Service",
-    avatarColor: "bg-red-500"
-  },
-]
-
-const stats = [
-  { title: "Total Users", value: "1,248", change: "+12%", icon: <UsersIcon className="h-5 w-5" />, color: "bg-blue-100 text-blue-600" },
-  { title: "Active Users", value: "1,142", change: "+8%", icon: <UserCheck className="h-5 w-5" />, color: "bg-green-100 text-green-600" },
-  { title: "Admins", value: "248", change: "+15%", icon: <Shield className="h-5 w-5" />, color: "bg-purple-100 text-purple-600" },
-  { title: "Pending Invites", value: "42", change: "-5%", icon: <Clock className="h-5 w-5" />, color: "bg-yellow-100 text-yellow-600" },
-]
-
-const roles = [
-  { id: "super_admin", name: "Super Admin", description: "Full system access", color: "bg-red-100 text-red-800", icon: <Shield className="h-4 w-4" /> },
-  { id: "admin", name: "Admin", description: "Organization management", color: "bg-purple-100 text-purple-800", icon: <Award className="h-4 w-4" /> },
-  { id: "user", name: "User", description: "Standard access", color: "bg-blue-100 text-blue-800", icon: <User className="h-4 w-4" /> },
-  { id: "viewer", name: "Viewer", description: "Read-only access", color: "bg-gray-100 text-gray-800", icon: <Eye className="h-4 w-4" /> },
-]
+// Role badge colors
+const ROLE_COLORS: Record<string, string> = {
+  SUPER_ADMIN: "bg-gradient-to-r from-purple-500 to-indigo-500 text-white",
+  ADMIN: "bg-gradient-to-r from-blue-500 to-cyan-500 text-white",
+  USER: "bg-slate-100 text-slate-700 border border-slate-200"
+}
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<any[]>([])
+  const [organizations, setOrganizations] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedStatus, setSelectedStatus] = useState("all")
+  const [selectedOrg, setSelectedOrg] = useState("all")
   const [selectedRole, setSelectedRole] = useState("all")
-  const [selectedOrganization, setSelectedOrganization] = useState("all")
-  const [showAddUserModal, setShowAddUserModal] = useState(false)
-  const [showUserDetailsModal, setShowUserDetailsModal] = useState(false)
-  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState("all")
   const [selectedUser, setSelectedUser] = useState<any>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(8)
-  const [sortBy, setSortBy] = useState("name")
-  const [sortOrder, setSortOrder] = useState("asc")
-  const [activeTab, setActiveTab] = useState("all") // all, active, inactive, pending
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set())
 
-  // Filter and sort users
-  const filteredUsers = mockUsers.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         user.organization.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = selectedStatus === "all" || user.status === selectedStatus
-    const matchesRole = selectedRole === "all" || user.role === selectedRole
-    const matchesOrg = selectedOrganization === "all" || user.organizationId === selectedOrganization
-    const matchesTab = activeTab === "all" || user.status === activeTab
-    
-    return matchesSearch && matchesStatus && matchesRole && matchesOrg && matchesTab
-  })
+  const fetchData = async () => {
+    setIsLoading(true)
+    try {
+      const [usersRes, orgsRes] = await Promise.all([
+        fetch('/api/super-admin/users'),
+        fetch('/api/super-admin/organizations')
+      ])
 
-  // Sort users
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    if (sortBy === "name") {
-      return sortOrder === "asc" 
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    }
-    if (sortBy === "joinDate") {
-      return sortOrder === "asc"
-        ? new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime()
-        : new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime()
-    }
-    return 0
-  })
+      if (!usersRes.ok || !orgsRes.ok) throw new Error("Failed to fetch data")
 
-  // Pagination
-  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedUsers = sortedUsers.slice(startIndex, endIndex)
+      const [usersData, orgsData] = await Promise.all([
+        usersRes.json(),
+        orgsRes.json()
+      ])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-green-100 text-green-800"
-      case "inactive": return "bg-gray-100 text-gray-800"
-      case "suspended": return "bg-red-100 text-red-800"
-      case "pending": return "bg-yellow-100 text-yellow-800"
-      default: return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active": return <CheckCircle className="h-4 w-4" />
-      case "inactive": return <Clock className="h-4 w-4" />
-      case "suspended": return <XCircle className="h-4 w-4" />
-      case "pending": return <Clock className="h-4 w-4" />
-      default: return <Clock className="h-4 w-4" />
-    }
-  }
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "SUPER_ADMIN": return "bg-red-100 text-red-800"
-      case "ADMIN": return "bg-purple-100 text-purple-800"
-      case "USER": return "bg-blue-100 text-blue-800"
-      default: return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const handleViewDetails = (user: any) => {
-    setSelectedUser(user)
-    setShowUserDetailsModal(true)
-  }
-
-  const handleInviteUser = () => {
-    setShowInviteModal(true)
-  }
-
-  const handleSendWelcome = (user: any) => {
-    alert(`Welcome email sent to ${user.email}`)
-  }
-
-  const handleResetPassword = (user: any) => {
-    alert(`Password reset link sent to ${user.email}`)
-  }
-
-  const toggleUserStatus = (user: any) => {
-    alert(`${user.status === 'active' ? 'Deactivating' : 'Activating'} user ${user.name}`)
-  }
-
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-    } else {
-      setSortBy(column)
-      setSortOrder("asc")
+      setUsers(Array.isArray(usersData) ? usersData : [])
+      setOrganizations(Array.isArray(orgsData) ? orgsData : [])
+    } catch (error) {
+      console.error(error)
+      toast.error("Could not load unified data")
+      setUsers([])
+      setOrganizations([])
+    } finally {
+      setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    setCurrentPage(1)
-  }, [searchQuery, selectedStatus, selectedRole, selectedOrganization, activeTab])
+    const init = async () => {
+      // Auto-acknowledge notifications when viewing this page
+      try {
+        await fetch('/api/super-admin/notifications/acknowledge-view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category: 'USER' })
+        })
+      } catch (error) {
+        console.error('Failed to acknowledge user notifications:', error)
+      }
+
+      // Fetch data after acknowledgment to ensure is_unread is updated
+      fetchData()
+    }
+    init()
+  }, [])
+
+  const handleResetPassword = async (userId: string, userEmail: string) => {
+    if (!confirm(`Reset password for ${userEmail}?`)) return
+
+    setActionLoading(userId)
+    try {
+      const res = await fetch(`/api/super-admin/users/${userId}/reset-password`, {
+        method: 'POST'
+      })
+      if (!res.ok) throw new Error("Failed to reset password")
+      const data = await res.json()
+      toast.success(`Password reset! Temporary password: ${data.temporaryPassword}`)
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to reset password")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleSendWelcomeEmail = async (userId: string, userEmail: string) => {
+    setActionLoading(userId)
+    try {
+      const res = await fetch(`/api/super-admin/users/${userId}/welcome-email`, {
+        method: 'POST'
+      })
+      if (!res.ok) throw new Error("Failed to send email")
+      toast.success(`Welcome email sent to ${userEmail}`)
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to send welcome email")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
+    setActionLoading(userId)
+    try {
+      const res = await fetch('/api/super-admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId, is_active: !currentStatus })
+      })
+      if (!res.ok) throw new Error("Failed to update status")
+      toast.success(`User ${!currentStatus ? 'activated' : 'suspended'}`)
+      fetchData()
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to update user status")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  // Calculate stats
+  const totalUsers = users?.length || 0
+  const activeUsers = users?.filter(u => u.is_active).length || 0
+  const recentSignups = users?.filter(u => {
+    const created = new Date(u.created_at)
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    return created > thirtyDaysAgo
+  }).length || 0
+
+  // Organization breakdown from live organizations list
+  const orgBreakdown = organizations.reduce((acc: Record<string, number>, org) => {
+    acc[org.name] = parseInt(org.user_count) || 0
+    return acc
+  }, {})
+
+  const filteredUsers = (users || []).filter(user => {
+    const matchesSearch = user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.organization_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesOrg = selectedOrg === "all" || user.organization_name === selectedOrg
+    const matchesRole = selectedRole === "all" || user.role === selectedRole
+    const matchesStatus = selectedStatus === "all" ||
+      (selectedStatus === "active" && user.is_active) ||
+      (selectedStatus === "inactive" && !user.is_active)
+    return matchesSearch && matchesOrg && matchesRole && matchesStatus
+  })
+
+  const stats = [
+    { title: "Total Users", value: totalUsers, change: "+12%", icon: <Users className="h-5 w-5" />, color: "bg-indigo-500/10 text-indigo-500" },
+    { title: "Active Users", value: activeUsers, change: `${Math.round((activeUsers / totalUsers) * 100)}%`, icon: <UserCheck className="h-5 w-5" />, color: "bg-emerald-500/10 text-emerald-500" },
+    { title: "Recent Signups", value: recentSignups, change: "Last 30 days", icon: <UserPlus className="h-5 w-5" />, color: "bg-violet-500/10 text-violet-500" },
+    { title: "Organizations", value: Object.keys(orgBreakdown).length, change: "Active", icon: <Building2 className="h-5 w-5" />, color: "bg-amber-500/10 text-amber-500" },
+  ]
+
+  const getRelativeTime = (date: string) => {
+    if (!date) return 'Never'
+    const now = new Date()
+    const then = new Date(date)
+    const diff = now.getTime() - then.getTime()
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    if (days === 0) return 'Today'
+    if (days === 1) return 'Yesterday'
+    if (days < 7) return `${days} days ago`
+    if (days < 30) return `${Math.floor(days / 7)} weeks ago`
+    return `${Math.floor(days / 30)} months ago`
+  }
+
+  const toggleOrg = (orgName: string) => {
+    setExpandedOrgs(prev => {
+      const next = new Set(prev)
+      if (next.has(orgName)) next.delete(orgName)
+      else next.add(orgName)
+      return next
+    })
+  }
+
+  const groupedUsers = filteredUsers.reduce((acc: Record<string, any[]>, user) => {
+    const org = user.organization_name || 'Individual Users'
+    if (!acc[org]) acc[org] = []
+    acc[org].push(user)
+    return acc
+  }, {})
+
+  // Source of truth for organizations in the tree
+  const treeOrgs = organizations.map(o => ({
+    name: o.name,
+    industry: o.industry,
+    status: o.status,
+    plan: o.current_plan,
+    user_count: parseInt(o.user_count) || 0
+  })).sort((a, b) => a.name.localeCompare(b.name))
+
+  // Add "Individual Users" group if there are any
+  if (groupedUsers['Individual Users']) {
+    treeOrgs.push({
+      name: 'Individual Users',
+      industry: 'default',
+      status: 'active',
+      plan: 'N/A',
+      user_count: groupedUsers['Individual Users'].length
+    })
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-2">Manage all users across organizations</p>
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="h-2 w-8 grad-indigo rounded-full" />
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-500">User Registry</span>
+          </div>
+          <h1 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
+            User Management
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium mt-2">
+            Comprehensive user administration across all organizations
+          </p>
         </div>
-        <div className="flex items-center space-x-3 mt-4 lg:mt-0">
-          <button 
-            onClick={handleInviteUser}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center"
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchData}
+            className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:bg-slate-50 transition-all shadow-sm"
           >
-            <UserPlus className="h-4 w-4 mr-2" />
-            Invite Users
+            <RefreshCw className={`h-5 w-5 text-slate-400 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
-          <button 
-            onClick={() => setShowAddUserModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add User
+          <button className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-50 transition-colors flex items-center shadow-sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export
           </button>
         </div>
       </div>
 
-      {/* Stats */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-  {stats.map((stat, index) => (
-    <motion.div
-      key={stat.title}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-    >
-      <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-        <div className="flex items-center justify-between mb-4">
-          <div className={`p-3 rounded-lg ${stat.color}`}>
-            {stat.icon}
-          </div>
-          <div className={`flex items-center ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-            <TrendingUp className="h-4 w-4 mr-1" />
-            <span className="text-sm font-medium">{stat.change}</span>
-          </div>
-        </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
-        <p className="text-gray-600 text-sm">{stat.title}</p>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-900/[0.05] dark:border-slate-800/50 p-6 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-xl ${stat.color}`}>
+                {stat.icon}
+              </div>
+              <div className="flex items-center text-emerald-500">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                <span className="text-sm font-bold">{stat.change}</span>
+              </div>
+            </div>
+            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-1">{stat.value}</h3>
+            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{stat.title}</p>
+          </motion.div>
+        ))}
       </div>
-    </motion.div>
-  ))}
-</div>
+
+      {/* Organization Distribution */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-900/[0.05] dark:border-slate-800/50 p-6 shadow-sm">
+        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest mb-4 flex items-center">
+          <Building2 className="h-4 w-4 mr-2 text-indigo-500" />
+          Users by Organization
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {Object.entries(orgBreakdown).map(([org, count]) => (
+            <div key={org} className="text-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+              <div className="text-2xl font-black text-slate-900 dark:text-white">{count}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 truncate">{org}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Filters & Search */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-900/[0.05] dark:border-slate-800/50 p-6 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search users by name, email, or organization..."
+                placeholder="Search users, emails, organizations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-white"
               />
             </div>
           </div>
-          
+
           <div className="flex flex-wrap gap-3">
-            <select 
-              value={selectedOrganization}
-              onChange={(e) => setSelectedOrganization(e.target.value)}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            <select
+              value={selectedOrg}
+              onChange={(e) => setSelectedOrg(e.target.value)}
+              className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-white"
             >
               <option value="all">All Organizations</option>
               {organizations.map(org => (
-                <option key={org.id} value={org.id}>{org.name}</option>
+                <option key={org.id} value={org.name}>{org.name}</option>
               ))}
+              {groupedUsers['Individual Users'] && (
+                <option value="Individual Users">Individual Users</option>
+              )}
             </select>
-            
-            <select 
+
+            <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-white"
             >
               <option value="all">All Roles</option>
               <option value="SUPER_ADMIN">Super Admin</option>
               <option value="ADMIN">Admin</option>
               <option value="USER">User</option>
             </select>
-            
-            <select 
+
+            <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-white"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
-              <option value="pending">Pending</option>
             </select>
           </div>
         </div>
-
-        {/* Quick Filter Tabs */}
-        <div className="flex space-x-1">
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "all" ? "bg-purple-100 text-purple-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
-          >
-            All Users
-          </button>
-          <button
-            onClick={() => setActiveTab("active")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "active" ? "bg-green-100 text-green-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
-          >
-            <div className="flex items-center">
-              <UserCheck className="h-4 w-4 mr-2" />
-              Active
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab("inactive")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "inactive" ? "bg-gray-100 text-gray-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
-          >
-            <div className="flex items-center">
-              <UserX className="h-4 w-4 mr-2" />
-              Inactive
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab("pending")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "pending" ? "bg-yellow-100 text-yellow-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
-          >
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-2" />
-              Pending
-            </div>
-          </button>
-        </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">All Users</h2>
-            <p className="text-sm text-gray-600">{sortedUsers.length} users found</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </button>
-            <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-              <RefreshCw className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center">
-                    User
-                    {sortBy === "name" && (
-                      <ChevronRight className={`h-4 w-4 ml-1 transform ${sortOrder === "desc" ? "rotate-90" : "-rotate-90"}`} />
-                    )}
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {paginatedUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <div className={`h-10 w-10 rounded-full ${user.avatarColor} flex items-center justify-center`}>
-                        <span className="text-white font-semibold">
-                          {user.name.split(' ').map(n => n[0]).join('')}
-                        </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                        <div className="text-xs text-gray-400 flex items-center mt-1">
-                          <Phone className="h-3 w-3 mr-1" />
-                          {user.phone}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <Building2 className="h-4 w-4 text-gray-400 mr-2" />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{user.organization}</div>
-                        <div className="text-xs text-gray-500">{user.department}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${getRoleColor(user.role)}`}>
-                      <Shield className="h-3 w-3 mr-1" />
-                      {user.role.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <span className={`px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${getStatusColor(user.status)}`}>
-                        {getStatusIcon(user.status)}
-                        <span className="ml-1">{user.status}</span>
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{user.lastLogin}</div>
-                    <div className="text-xs text-gray-500">{user.loginCount} logins</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleViewDetails(user)}
-                        className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="View Details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleSendWelcome(user)}
-                        className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
-                        title="Send Welcome"
-                      >
-                        <MailCheck className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleResetPassword(user)}
-                        className="p-1.5 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 rounded-lg transition-colors"
-                        title="Reset Password"
-                      >
-                        <Key className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => toggleUserStatus(user)}
-                        className="p-1.5 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors"
-                        title={user.status === 'active' ? 'Deactivate' : 'Activate'}
-                      >
-                        {user.status === 'active' ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
-                      </button>
-                      <button className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+      {/* Users Organization Tree */}
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-900/[0.05] dark:border-slate-800/50 p-6 shadow-sm">
+            <div className="animate-pulse space-y-4">
+              {Array(3).fill(0).map((_, i) => (
+                <div key={i} className="h-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl" />
               ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-gray-700 mb-4 sm:mb-0">
-              Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-              <span className="font-medium">{Math.min(endIndex, sortedUsers.length)}</span> of{' '}
-              <span className="font-medium">{sortedUsers.length}</span> users
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg flex items-center ${
-                  currentPage === 1
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Previous
-              </button>
-              
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum
-                if (totalPages <= 5) {
-                  pageNum = i + 1
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i
-                } else {
-                  pageNum = currentPage - 2 + i
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-lg ${
-                      currentPage === pageNum
-                        ? 'text-white bg-purple-600 border border-purple-600'
-                        : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                )
-              })}
-              
-              {totalPages > 5 && currentPage < totalPages - 2 && (
-                <>
-                  <span className="px-2 text-gray-500">...</span>
-                  <button
-                    onClick={() => setCurrentPage(totalPages)}
-                    className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    {totalPages}
-                  </button>
-                </>
-              )}
-              
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg flex items-center ${
-                  currentPage === totalPages
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                Next
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </button>
             </div>
           </div>
-        </div>
+        ) : treeOrgs.length === 0 ? (
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-900/[0.05] dark:border-slate-800/50 p-20 text-center shadow-sm">
+            <Users className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+            <div className="text-sm font-black text-slate-400 uppercase tracking-widest">No organizations found</div>
+          </div>
+        ) : treeOrgs.map((org) => {
+          const orgUsers = groupedUsers[org.name] || []
+          const isExpanded = expandedOrgs.has(org.name)
+          const industry = org.industry?.toLowerCase() || 'default'
+          const IndustryIcon = INDUSTRY_ICONS[industry] || INDUSTRY_ICONS.default
+
+          return (
+            <motion.div
+              key={org.name}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`bg-white dark:bg-slate-900 rounded-3xl border border-slate-900/[0.05] dark:border-slate-800/50 shadow-sm overflow-hidden ${org.status === 'suspended' ? 'opacity-75 grayscale-[0.5]' : ''}`}
+            >
+              <button
+                onClick={() => toggleOrg(org.name)}
+                className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className={`h-12 w-12 p-0.5 rounded-2xl flex-shrink-0 ${org.status === 'suspended' ? 'bg-slate-200' : 'grad-indigo'}`}>
+                    <div className="h-full w-full bg-white dark:bg-slate-900 rounded-[0.9rem] flex items-center justify-center">
+                      <IndustryIcon className={`h-5 w-5 ${org.status === 'suspended' ? 'text-slate-400' : 'text-indigo-500'}`} />
+                    </div>
+                  </div>
+                  <div className="text-left">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none">
+                        {org.name}
+                      </h3>
+                      {org.status === 'suspended' && (
+                        <span className="px-2 py-0.5 bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase tracking-widest rounded-md border border-rose-500/20">
+                          Suspended
+                        </span>
+                      )}
+                      {org.plan && (
+                        <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-500 text-[8px] font-black uppercase tracking-widest rounded-md border border-indigo-500/20">
+                          {org.plan}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-3 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                      <span>{orgUsers.length || org.user_count} Users</span>
+                      <span className="h-1 w-1 bg-slate-300 rounded-full" />
+                      <span>{orgUsers.filter(u => u.is_active).length} Active</span>
+                      {org.industry && (
+                        <>
+                          <span className="h-1 w-1 bg-slate-300 rounded-full" />
+                          <span className="text-indigo-400">{org.industry}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className={`p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="border-t border-slate-100 dark:border-slate-800"
+                  >
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-slate-50/50 dark:bg-slate-800/20">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest pl-20">User</th>
+                            <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
+                            <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                            <th className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Last Login</th>
+                            <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest pr-8">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {orgUsers.map((user) => (
+                            <tr key={user.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/10 transition-colors group">
+                              <td className="px-6 py-4 pl-20">
+                                <div className="flex items-center space-x-4">
+                                  <div className="h-10 w-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                                    {user.avatar_url ? (
+                                      <img src={user.avatar_url} alt={user.email} className="h-full w-full rounded-xl object-cover" />
+                                    ) : (
+                                      <UserIcon className="h-4 w-4 text-slate-400" />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-slate-900 dark:text-white leading-tight flex items-center space-x-2">
+                                      <span>{user.first_name || user.last_name ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : user.name || 'Unnamed User'}</span>
+                                      {user.is_unread && (
+                                        <motion.span
+                                          initial={{ scale: 0.8, opacity: 0 }}
+                                          animate={{ scale: 1, opacity: 1 }}
+                                          className="px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] font-black uppercase tracking-widest rounded-md shadow-lg shadow-orange-500/20 animate-pulse"
+                                        >
+                                          New
+                                        </motion.span>
+                                      )}
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 font-medium">{user.email}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-md inline-block ${ROLE_COLORS[user.role] || ROLE_COLORS.USER}`}>
+                                  {user.role}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-md border flex items-center space-x-2 w-fit ${user.is_active ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border-rose-500/20'}`}>
+                                  <div className={`h-1 w-1 rounded-full ${user.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                                  <span>{user.is_active ? 'Active' : 'Inactive'}</span>
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center text-xs text-slate-500 font-medium">
+                                  <Clock className="h-3 w-3 mr-2 opacity-50" />
+                                  {getRelativeTime(user.last_login_at)}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 pr-8 text-right">
+                                <div className="flex items-center justify-end space-x-2">
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleResetPassword(user.id, user.email); }}
+                                    disabled={actionLoading === user.id}
+                                    className="p-1.5 bg-slate-50 hover:bg-amber-500 hover:text-white dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-amber-500 dark:hover:text-white rounded-lg transition-all disabled:opacity-50"
+                                    title="Reset Password"
+                                  >
+                                    <Key className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleSendWelcomeEmail(user.id, user.email); }}
+                                    disabled={actionLoading === user.id}
+                                    className="p-1.5 bg-slate-50 hover:bg-blue-500 hover:text-white dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all disabled:opacity-50"
+                                    title="Send Welcome Email"
+                                  >
+                                    <Send className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id, user.is_active); }}
+                                    disabled={actionLoading === user.id}
+                                    className={`p-1.5 rounded-lg transition-all disabled:opacity-50 ${user.is_active ? 'bg-slate-50 hover:bg-rose-500 hover:text-white dark:bg-slate-800 dark:hover:bg-rose-500' : 'bg-slate-50 hover:bg-emerald-500 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-500'}`}
+                                    title={user.is_active ? 'Suspend User' : 'Activate User'}
+                                  >
+                                    {user.is_active ? <Ban className="h-3.5 w-3.5" /> : <CheckCircle className="h-3.5 w-3.5" />}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )
+        })}
       </div>
 
-      {/* Add User Modal */}
-      {showAddUserModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowAddUserModal(false)} />
-            
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-              <div className="px-6 py-4 bg-white border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Add New User</h3>
-                <p className="text-sm text-gray-500 mt-1">Create a new user account</p>
-              </div>
-              
-              <div className="px-6 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Left Column */}
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="+92 300 1234567"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Department
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Sales, Management, IT, etc."
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Right Column */}
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Organization *
-                      </label>
-                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                        <option value="">Select Organization</option>
-                        {organizations.map(org => (
-                          <option key={org.id} value={org.id}>{org.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Role *
-                      </label>
-                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                        <option value="">Select Role</option>
-                        <option value="USER">User</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="SUPER_ADMIN">Super Admin</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Permissions
-                      </label>
-                      <div className="space-y-2">
-                        {["View Inventory", "Manage Inventory", "Process Sales", "View Reports", "Manage Staff", "Full Access"].map((perm) => (
-                          <label key={perm} className="flex items-center">
-                            <input type="checkbox" className="h-4 w-4 text-purple-600 rounded border-gray-300" />
-                            <span className="ml-2 text-sm text-gray-700">{perm}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Send Welcome Email
-                      </label>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="h-4 w-4 text-purple-600 rounded border-gray-300"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Send account details to user's email</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowAddUserModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-lg hover:bg-purple-700">
-                  Create User
-                </button>
-              </div>
-            </div>
+      {/* Pagination */}
+      <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-slate-700 dark:text-slate-300 font-bold">
+            Showing <span className="font-black">{filteredUsers.length}</span> of <span className="font-black">{totalUsers}</span> users
           </div>
-        </div>
-      )}
-
-      {/* User Details Modal */}
-      {showUserDetailsModal && selectedUser && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowUserDetailsModal(false)} />
-            
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              {/* Header */}
-              <div className="px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className={`h-16 w-16 rounded-full ${selectedUser.avatarColor} flex items-center justify-center`}>
-                      <span className="text-white text-xl font-bold">
-                        {selectedUser.name.split(' ').map((n: string) => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-xl font-bold">{selectedUser.name}</h3>
-                      <p className="text-purple-200">{selectedUser.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-3 py-1 inline-flex items-center text-sm font-semibold rounded-full bg-white/20`}>
-                      {getStatusIcon(selectedUser.status)}
-                      <span className="ml-2">{selectedUser.status.toUpperCase()}</span>
-                    </span>
-                    <button onClick={() => setShowUserDetailsModal(false)} className="p-2 hover:bg-white/20 rounded-lg">
-                      <ChevronRight className="h-5 w-5 rotate-90" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="px-6 py-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column - Basic Info */}
-                  <div className="lg:col-span-2 space-y-6">
-                    {/* Basic Information */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">Basic Information</h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-xs text-gray-500">Role</div>
-                          <div className="flex items-center mt-1">
-                            <span className={`px-2 py-1 text-xs font-semibold rounded ${getRoleColor(selectedUser.role)}`}>
-                              {selectedUser.role.replace('_', ' ')}
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500">Department</div>
-                          <div className="text-sm font-medium mt-1">{selectedUser.department}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500">Join Date</div>
-                          <div className="text-sm font-medium mt-1">{selectedUser.joinDate}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500">Plan</div>
-                          <div className="text-sm font-medium mt-1">{selectedUser.plan}</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Contact Information */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">Contact Information</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center">
-                          <Mail className="h-4 w-4 text-gray-400 mr-3" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">Email</div>
-                            <div className="text-sm text-gray-600">{selectedUser.email}</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Phone className="h-4 w-4 text-gray-400 mr-3" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">Phone</div>
-                            <div className="text-sm text-gray-600">{selectedUser.phone}</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Building2 className="h-4 w-4 text-gray-400 mr-3" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">Organization</div>
-                            <div className="text-sm text-gray-600">{selectedUser.organization}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Permissions */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">Permissions</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedUser.permissions.map((perm: string, index: number) => (
-                          <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                            {perm.replace('_', ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Right Column - Activity & Actions */}
-                  <div className="space-y-6">
-                    {/* Activity Stats */}
-                    <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">Activity</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <Activity className="h-4 w-4 text-purple-600 mr-2" />
-                            <span className="text-sm text-gray-700">Last Login</span>
-                          </div>
-                          <span className="text-sm font-medium">{selectedUser.lastLogin}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <BarChart3 className="h-4 w-4 text-purple-600 mr-2" />
-                            <span className="text-sm text-gray-700">Total Logins</span>
-                          </div>
-                          <span className="text-sm font-medium">{selectedUser.loginCount}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 text-purple-600 mr-2" />
-                            <span className="text-sm text-gray-700">Member Since</span>
-                          </div>
-                          <span className="text-sm font-medium">{selectedUser.joinDate}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Quick Actions */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h4>
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => handleSendWelcome(selectedUser)}
-                          className="w-full flex items-center justify-between p-3 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center">
-                            <MailCheck className="h-4 w-4 text-green-600 mr-3" />
-                            <span className="text-sm font-medium">Send Welcome Email</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-gray-400" />
-                        </button>
-                        <button
-                          onClick={() => handleResetPassword(selectedUser)}
-                          className="w-full flex items-center justify-between p-3 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center">
-                            <Key className="h-4 w-4 text-yellow-600 mr-3" />
-                            <span className="text-sm font-medium">Reset Password</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-gray-400" />
-                        </button>
-                        <button
-                          onClick={() => toggleUserStatus(selectedUser)}
-                          className="w-full flex items-center justify-between p-3 text-left bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center">
-                            {selectedUser.status === 'active' ? (
-                              <UserX className="h-4 w-4 text-red-600 mr-3" />
-                            ) : (
-                              <UserCheck className="h-4 w-4 text-green-600 mr-3" />
-                            )}
-                            <span className="text-sm font-medium">
-                              {selectedUser.status === 'active' ? 'Deactivate User' : 'Activate User'}
-                            </span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-gray-400" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Danger Zone */}
-                    <div className="border border-red-200 rounded-lg p-4">
-                      <h4 className="text-sm font-semibold text-red-900 mb-3">Danger Zone</h4>
-                      <button className="w-full py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete User Account
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
-                <div className="text-sm text-gray-600">
-                  User ID: {selectedUser.id}
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => setShowUserDetailsModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Close
-                  </button>
-                  <button className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-lg hover:bg-purple-700 flex items-center">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit User
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Invite Users Modal */}
-      {showInviteModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity bg-black bg-opacity-50" onClick={() => setShowInviteModal(false)} />
-            
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="px-6 py-4 bg-white border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Invite Users</h3>
-                <p className="text-sm text-gray-500 mt-1">Send invitation emails to new users</p>
-              </div>
-              
-              <div className="px-6 py-4">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Addresses
-                    </label>
-                    <textarea
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Enter email addresses, one per line..."
-                      defaultValue="john@example.com"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">Separate multiple emails with commas or new lines</p>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Organization
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                      <option value="">Select Organization</option>
-                      {organizations.map(org => (
-                        <option key={org.id} value={org.id}>{org.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Default Role
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                      <option value="USER">User</option>
-                      <option value="ADMIN">Admin</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Custom Message (Optional)
-                    </label>
-                    <textarea
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Add a personal message to the invitation..."
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowInviteModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-lg hover:bg-purple-700 flex items-center">
-                  <Send className="h-4 w-4 mr-2" />
-                  Send Invitations
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Actions Bar (Visible when users are selected) */}
-      <div className="fixed bottom-6 right-6 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-        <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-gray-900">3 users selected</span>
-          <select className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-lg">
-            <option>Bulk Actions</option>
-            <option>Activate</option>
-            <option>Deactivate</option>
-            <option>Change Role</option>
-            <option>Send Email</option>
-            <option>Export Selected</option>
-          </select>
-          <button className="px-3 py-1.5 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
-            Apply
-          </button>
         </div>
       </div>
     </div>

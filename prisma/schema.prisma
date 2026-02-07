@@ -88,18 +88,25 @@ model BlogPost {
 }
 
 model organizations {
-  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name           String
-  status         String?          @default("active")
-  industry       String?
-  created_at     DateTime?        @default(now())
-  updated_at     DateTime?        @default(now())
-  activity_logs  activity_logs[]
-  analytics_data analytics_data[]
-  api_keys       api_keys[]
-  invoices       invoices[]
-  subscriptions  subscriptions[]
-  transactions   transactions[]
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  status          String?          @default("active")
+  industry        String?          @db.VarChar(100)
+  business_type   String?          @db.VarChar(100)
+  contact_person  String?          @db.VarChar(255)
+  contact_email   String?          @db.VarChar(255)
+  contact_phone   String?          @db.VarChar(50)
+  address         String?
+  city            String?          @db.VarChar(100)
+  country         String?          @default("Pakistan") @db.VarChar(100)
+  created_at      DateTime?        @default(now())
+  updated_at      DateTime?        @default(now())
+  activity_logs   activity_logs[]
+  analytics_data  analytics_data[]
+  api_keys        api_keys[]
+  invoices        invoices[]
+  subscriptions   subscriptions[]
+  transactions    transactions[]
 }
 
 model system_settings {
@@ -248,6 +255,7 @@ model subscriptions {
   id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   organization_id      String?
   plan                 String         @db.VarChar(50)
+  add_ons              Json?
   status               String?        @default("active") @db.VarChar(20)
   current_period_start DateTime       @db.Timestamptz(6)
   current_period_end   DateTime       @db.Timestamptz(6)

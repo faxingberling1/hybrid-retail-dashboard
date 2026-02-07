@@ -55,7 +55,6 @@ export default function AdminSalesPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/20"
-                        {...({} as any)}
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-3 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600`}>

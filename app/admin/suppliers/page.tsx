@@ -53,7 +53,6 @@ export default function AdminSuppliersPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.1 }}
                         className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/20 group cursor-default"
-                        {...({} as any)}
                     >
                         <div className={`p-4 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 w-fit mb-6 transition-transform group-hover:scale-110`}>
                             {stat.icon}

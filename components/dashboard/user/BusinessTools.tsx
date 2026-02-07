@@ -169,11 +169,9 @@ export default function BusinessTools({ onResultLoad }: { onResultLoad?: (val: s
 
                         {idealSalePrice !== null && (
                             <motion.div
-                                {...({
-                                    initial: { opacity: 0, height: 0 },
-                                    animate: { opacity: 1, height: 'auto' },
-                                    className: "p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex justify-between items-center"
-                                } as any)}
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex justify-between items-center"
                             >
                                 <div className="overflow-hidden">
                                     <p className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Target Sale Price</p>

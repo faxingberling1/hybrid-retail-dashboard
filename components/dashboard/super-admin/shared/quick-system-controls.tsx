@@ -26,7 +26,7 @@ export default function QuickSystemControls() {
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            {...({ className: "glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800" } as any)}
+            className="glass-card p-1 rounded-[2rem] overflow-hidden border border-slate-200 dark:border-slate-800"
         >
             <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-[1.8rem]">
                 <div className="flex items-center justify-between mb-8">
@@ -65,7 +65,7 @@ export default function QuickSystemControls() {
                                 >
                                     <motion.div
                                         animate={{ x: control.active ? 26 : 2 }}
-                                        {...({ className: "absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow-sm" } as any)}
+                                        className="absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow-sm"
                                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                     />
                                 </button>
