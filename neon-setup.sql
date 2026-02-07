@@ -2,6 +2,13 @@
 -- Run this in Neon SQL Editor: https://console.neon.tech/
 
 -- ============================================
+-- STEP 0: Clean up existing tables (ensure fresh start)
+-- ============================================
+DROP TABLE IF EXISTS "users" CASCADE;
+DROP TABLE IF EXISTS "organizations" CASCADE;
+DROP TABLE IF EXISTS "system_settings" CASCADE;
+
+-- ============================================
 -- STEP 1: Create Users Table (matches auth.ts schema)
 -- ============================================
 CREATE TABLE IF NOT EXISTS "users" (

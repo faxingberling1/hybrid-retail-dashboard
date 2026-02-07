@@ -47,16 +47,28 @@ const nextConfig = {
     ],
   },
 
-  // Explicitly rewrite / and /home to index.html
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+    ]
+  },
   async rewrites() {
     return [
       {
-        source: '/',
-        destination: '/index.html',
+        source: '/docs',
+        destination: '/docs.html',
       },
       {
-        source: '/home',
-        destination: '/index.html',
+        source: '/compliance',
+        destination: '/compliance.html',
+      },
+      {
+        source: '/support-hub',
+        destination: '/support.html',
       },
     ]
   },

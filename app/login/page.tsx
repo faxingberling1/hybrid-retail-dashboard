@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  Shield, ShoppingCart, User, ArrowRight, Sparkles,
+  Shield, Store, ShoppingCart, User, ArrowRight, Sparkles,
   Lock, AlertTriangle, Building, Users, Activity,
   Timer, Rocket, Globe, Zap, Database
 } from "lucide-react"
@@ -162,8 +162,8 @@ export default function LoginPage() {
         {/* Content */}
         <div className="relative z-10">
           <Link href="/home" className="flex items-center space-x-3 group w-fit">
-            <div className="p-2.5 bg-sky-500 text-white rounded-2xl shadow-lg shadow-sky-500/20 group-hover:scale-110 transition-transform">
-              <ShoppingCart className="h-6 w-6" />
+            <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-black/5 group-hover:scale-110 transition-transform duration-500">
+              <Store className="h-6 w-6 text-white" />
             </div>
             <span className="text-2xl font-black tracking-tighter text-white">HybridPOS</span>
           </Link>
@@ -251,9 +251,9 @@ export default function LoginPage() {
         >
           {/* Header Mobile Only */}
           <div className="lg:hidden flex justify-center mb-12">
-            <Link href="/home" className="flex items-center space-x-3 group">
-              <div className="p-2.5 bg-sky-500 text-white rounded-2xl shadow-lg">
-                <ShoppingCart className="h-6 w-6" />
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-black/5 group-hover:scale-110 transition-transform duration-500">
+                <Store className="h-6 w-6 text-white" />
               </div>
               <span className="text-2xl font-black tracking-tighter text-slate-900">HybridPOS</span>
             </Link>

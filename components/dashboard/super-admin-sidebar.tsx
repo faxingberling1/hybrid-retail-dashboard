@@ -18,7 +18,12 @@ import {
   Server,
   Database,
   Globe,
-  LifeBuoy
+  LifeBuoy,
+  LayoutTemplate,
+  Sparkles,
+  CreditCard,
+  PenTool,
+  Library
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { useNotification } from "@/lib/hooks/use-notification"
@@ -40,6 +45,14 @@ export function SuperAdminSidebar() {
     { name: "Audit Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
     { name: "Support Hub", icon: <LifeBuoy className="h-5 w-5" />, href: "/super-admin/support" },
     { name: "Global Settings", icon: <Settings className="h-5 w-5" />, href: "/super-admin/settings" },
+  ]
+
+  const cmsItems = [
+    { name: "Hero Section", icon: <LayoutTemplate className="h-5 w-5" />, href: "/super-admin/cms/hero" },
+    { name: "Features", icon: <Sparkles className="h-5 w-5" />, href: "/super-admin/cms/features" },
+    { name: "Pricing", icon: <CreditCard className="h-5 w-5" />, href: "/super-admin/cms/pricing" },
+    { name: "Blog", icon: <PenTool className="h-5 w-5" />, href: "/super-admin/cms/blog" },
+    { name: "Resources", icon: <Library className="h-5 w-5" />, href: "/super-admin/cms/resources" },
   ]
 
   const handleLogout = async () => {
@@ -111,6 +124,37 @@ export function SuperAdminSidebar() {
                     {hasSupportNotification && !isActive && (
                       <div className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse ring-4 ring-red-500/20 shadow-lg shadow-red-500/40" />
                     )}
+                    {isActive && (
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+                    )}
+                  </Link>
+                </li>
+              )
+            })}
+
+            {/* CMS Section */}
+            <li className="pt-6 pb-2 px-4">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Content Management</span>
+            </li>
+            {cmsItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <li key={item.name}>
+                  <Link
+                    href={item.href as any}
+                    className={`
+                      group flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 font-medium text-sm
+                      ${isActive
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xl shadow-purple-500/20 translate-x-1'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50/80 hover:translate-x-1'
+                      }
+                    `}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <span className={`mr-3.5 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-purple-600'}`}>
+                      {item.icon}
+                    </span>
+                    <span>{item.name}</span>
                     {isActive && (
                       <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                     )}

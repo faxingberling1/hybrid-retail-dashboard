@@ -38,6 +38,8 @@ export async function middleware(request: NextRequest) {
     '/fonts', // Allow font assets
     '/icon.svg', // Allow favicon
     '/manifest.json', // Allow PWA manifest
+    '/blog', // Public blog page
+    '/api/blog', // Public blog API (GET)
   ]
 
 

@@ -1,12 +1,12 @@
 // scripts/test-db-connection.ts
-import { testSupabaseConnection } from '../lib/db'
+import { db } from '../lib/db'
 
 async function main() {
-  console.log('🔌 Testing Supabase Database Connection')
+  console.log('🔌 Testing Database Connection')
   console.log('='.repeat(50))
-  
-  const success = await testSupabaseConnection()
-  
+
+  const success = await db.testConnection()
+
   if (success) {
     console.log('\n✅ Database connection is working correctly!')
     console.log('   You can now run: npm run dev')
