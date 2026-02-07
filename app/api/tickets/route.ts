@@ -18,7 +18,20 @@ export async function GET(request: NextRequest) {
         const where: any = {};
 
         // Role-based access control
-        if (session.user.role !== 'SUPER_ADMIN' && session.user.role !== 'SUPERADMIN') {
+        const userRole = (session.user.role as string)?.toUpperCase();
+        const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'SUPERADMIN';
+        const isAdmin = userRole === 'ADMIN' || userRole === 'MANAGER';
+        const organizationId = session.user.organizationId;
+
+        if (isSuperAdmin) {
+            // Super admins see everything
+        } else if (isAdmin && organizationId) {
+            // Admins/Managers see all tickets in their organization
+            where.user = {
+                organization_id: organizationId
+            };
+        } else {
+            // Regular users see only their own tickets
             where.user_id = session.user.id;
         }
 
@@ -28,12 +41,22 @@ export async function GET(request: NextRequest) {
 
         const tickets = await prisma.ticket.findMany({
             where,
-            include: {
+            select: {
+                id: true,
+                subject: true,
+                description: true,
+                status: true,
+                priority: true,
+                category: true,
+                user_id: true,
+                created_at: true,
+                updated_at: true,
                 user: {
                     select: {
                         id: true,
                         name: true,
-                        email: true
+                        email: true,
+                        organization_id: true
                     }
                 },
                 _count: {
@@ -47,9 +70,7 @@ export async function GET(request: NextRequest) {
     } catch (error: any) {
         console.error('Error fetching tickets:', error);
         return NextResponse.json({
-            error: 'Internal Server Error',
-            message: error.message,
-            stack: error.stack
+            error: 'Internal Server Error'
         }, { status: 500 });
     }
 }
@@ -76,46 +97,90 @@ export async function POST(request: NextRequest) {
                 category,
                 user_id: session.user.id,
             },
-            include: {
+            select: {
+                id: true,
+                subject: true,
+                description: true,
+                status: true,
+                priority: true,
+                category: true,
+                user_id: true,
+                created_at: true,
+                updated_at: true,
                 user: {
                     select: {
                         id: true,
                         name: true,
+                        role: true,
                         email: true,
+                        organization_id: true
                     }
                 }
             }
         });
 
-        // Notify Super Admins
+        if (!ticket) {
+            throw new Error('Failed to create ticket record');
+        }
+
+        // Notify Super Admins and Org Admins
         try {
             const superAdmins = await prisma.user.findMany({
                 where: {
-                    role: 'SUPER_ADMIN'
+                    role: { in: ['SUPER_ADMIN', 'SUPERADMIN'] }
                 },
                 select: { id: true }
             });
 
-            if (superAdmins.length > 0) {
-                const notifications = superAdmins.map((admin: any) => ({
-                    id: crypto.randomUUID(),
-                    user_id: admin.id,
-                    title: 'New Support Ticket',
-                    message: `A new ticket "${subject}" has been created by ${session.user.name || session.user.email}.`,
-                    type: 'info',
-                    priority: 'medium',
-                    action_url: `/super-admin/support?ticketId=${ticket.id}`,
-                    action_label: 'View Ticket',
-                    metadata: { ticket_id: ticket.id }
-                }));
+            const userOrgId = session.user.organizationId;
+            const orgAdmins = userOrgId ? await prisma.user.findMany({
+                where: {
+                    organization_id: userOrgId,
+                    role: { in: ['ADMIN', 'MANAGER'] },
+                    id: { not: session.user.id } // Don't notify self
+                },
+                select: { id: true }
+            }) : [];
 
-                await prisma.notifications.createMany({
+            const notifications: any[] = [];
+
+            if (superAdmins.length > 0) {
+                superAdmins.forEach((admin: any) => {
+                    notifications.push({
+                        user_id: admin.id,
+                        title: 'New Support Ticket',
+                        message: `A new ticket "${subject}" has been created by ${session.user.name || session.user.email}.`,
+                        type: 'info',
+                        priority: 'medium',
+                        action_url: `/super-admin/support?ticketId=${ticket.id}`,
+                        action_label: 'View Ticket',
+                        metadata: { ticket_id: ticket.id }
+                    });
+                });
+            }
+
+            if (orgAdmins.length > 0) {
+                orgAdmins.forEach((admin: any) => {
+                    notifications.push({
+                        user_id: admin.id,
+                        title: 'New Organization Ticket',
+                        message: `${session.user.name || session.user.email} created a new support ticket: "${subject}".`,
+                        type: 'info',
+                        priority: 'low',
+                        action_url: `/admin/support?ticketId=${ticket.id}`,
+                        action_label: 'View Ticket',
+                        metadata: { ticket_id: ticket.id }
+                    });
+                });
+            }
+
+            if (notifications.length > 0) {
+                await (prisma as any).notifications.createMany({
                     data: notifications
                 });
             }
         } catch (notifyError) {
-            console.error('Failed to notify super admins:', notifyError);
-            // Don't fail the request if notifications fail
+            console.error('Failed to notify admins:', notifyError);
         }
 
         return NextResponse.json(ticket, { status: 201 });

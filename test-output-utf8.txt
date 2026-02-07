@@ -1,0 +1,70 @@
+﻿≡ƒôª Fresh Prisma Client Initialized. Available models: [
+  '_originalClient',
+  '_runtimeDataModel',
+  '_requestHandler',
+  '_connectionPromise',
+  '_disconnectionPromise',
+  '_engineConfig',
+  '_accelerateEngineConfig',
+  '_clientVersion',
+  '_errorFormat',
+  '_tracingHelper',
+  '_previewFeatures',
+  '_activeProvider',
+  '_globalOmit',
+  '_extensions',
+  '_engine',
+  '_appliedParent',
+  '_createPrismaPromise',
+  'constructor',
+  '_transactionWithArray',
+  '_transactionWithCallback',
+  '_createItxClient',
+  '_request',
+  '_executeRequest',
+  '_hasPreviewFlag',
+  'organizations',
+  'system_settings',
+  'notification_preferences',
+  'notifications',
+  'activity_logs',
+  'analytics_data',
+  'api_keys',
+  'categories',
+  'invoices',
+  'onboarding_progress',
+  'products',
+  'role_permissions',
+  'subscriptions',
+  'transaction_items',
+  'transactions',
+  'user_invitations',
+  'user_sessions',
+  'user',
+  'ticket',
+  'ticketReply',
+  'blogPost',
+  'featureRequest'
+]
+Testing Ticket.findMany...
+node.exe : Γ¥î Error in testTickets: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+At C:\Program Files\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo              : NotSpecified: (Γ    ¥î Error in te...ust     be a string:String) [    ], RemoteException
+    + FullyQualifiedError    Id : NativeCommandErr    or
+ 
+    at C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async PrismaPgAdapter.performIO (C:\Users\Zah 
+Computers\Downloads\hybrid-retail-dashboard\node_modules\@prisma\adapter-pg\dist\index.js:652:22)
+    at async PrismaPgAdapter.queryRaw (C:\Users\Zah 
+Computers\Downloads\hybrid-retail-dashboard\node_modules\@prisma\adapter-pg\dist\index.js:602:30)
+    at async e.interpretNode (C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\lib\generated\prisma\runtime\client.js:15:43167)
+    at async e.interpretNode (C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\lib\generated\prisma\runtime\client.js:15:42296)
+    at async e.interpretNode (C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\lib\generated\prisma\runtime\client.js:15:44796)
+    at async e.run (C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\lib\generated\prisma\runtime\client.js:15:41887)
+    at async e.execute (C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\lib\generated\prisma\runtime\client.js:61:815)
+    at async Dt.request (C:\Users\Zah Computers\Downloads\hybrid-retail-dashboard\lib\generated\prisma\runtime\client.js:62:2102) {
+  clientVersion: '7.3.0'
+}

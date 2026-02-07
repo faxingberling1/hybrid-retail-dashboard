@@ -5,8 +5,9 @@ import prisma from '@/lib/prisma';
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
@@ -18,12 +19,16 @@ export async function POST(
             return NextResponse.json({ error: 'Message is required' }, { status: 400 });
         }
 
-        const ticket = await (prisma as any).ticket.findUnique({
-            where: { id: params.id },
-            include: {
+        const ticket = await prisma.ticket.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                subject: true,
+                user_id: true,
                 user: {
                     select: {
-                        role: true
+                        role: true,
+                        organization_id: true
                     }
                 }
             }
@@ -34,21 +39,28 @@ export async function POST(
         }
 
         // Role-based access control
-        if (
-            session.user.role !== 'SUPER_ADMIN' &&
-            session.user.role !== 'SUPERADMIN' &&
-            ticket.user_id !== session.user.id
-        ) {
+        const userRole = (session.user.role as string)?.toUpperCase();
+        const isSuperAdmin = userRole === 'SUPER_ADMIN' || userRole === 'SUPERADMIN';
+        const isAdmin = userRole === 'ADMIN' || userRole === 'MANAGER';
+        const isOwner = ticket.user_id === session.user.id;
+        const organizationId = session.user.organizationId;
+        const isOrgAdmin = isAdmin && ticket.user?.organization_id === organizationId;
+
+        if (!isSuperAdmin && !isOwner && !isOrgAdmin) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const reply = await (prisma as any).ticketReply.create({
+        const reply = await prisma.ticketReply.create({
             data: {
                 message,
-                ticket_id: params.id,
+                ticket_id: id,
                 user_id: session.user.id,
             },
-            include: {
+            select: {
+                id: true,
+                message: true,
+                user_id: true,
+                created_at: true,
                 user: {
                     select: {
                         id: true,
@@ -61,15 +73,15 @@ export async function POST(
         });
 
         // Always update parent ticket's updated_at for sorting
-        await (prisma as any).ticket.update({
-            where: { id: params.id },
+        await prisma.ticket.update({
+            where: { id },
             data: { updated_at: new Date() }
         });
 
-        // Automatically update ticket status if super admin replies
-        if (session.user.role === 'SUPER_ADMIN' || session.user.role === 'SUPERADMIN') {
-            await (prisma as any).ticket.update({
-                where: { id: params.id },
+        // Automatically update ticket status if super admin or org admin replies
+        if (isSuperAdmin || isOrgAdmin) {
+            await prisma.ticket.update({
+                where: { id },
                 data: { status: 'IN_PROGRESS' }
             });
 
@@ -77,13 +89,11 @@ export async function POST(
             if (ticket.user_id !== session.user.id) {
                 try {
                     // Determine redirect URL based on user role
-                    const userRole = ticket.user?.role?.toUpperCase() || 'USER';
+                    const targetUserRole = ticket.user?.role?.toUpperCase() || 'USER';
                     let actionUrl = '/user/support';
 
-                    if (userRole === 'ADMIN') {
+                    if (targetUserRole === 'ADMIN' || targetUserRole === 'MANAGER') {
                         actionUrl = '/admin/support';
-                    } else if (userRole === 'MANAGER') {
-                        actionUrl = '/user/support';
                     }
 
                     await (prisma as any).notifications.create({
@@ -95,45 +105,87 @@ export async function POST(
                             priority: 'medium',
                             action_url: `${actionUrl}?ticketId=${ticket.id}`,
                             action_label: 'View Reply',
-                            metadata: { ticket_id: ticket.id, reply_id: reply.id, role: userRole }
+                            metadata: { ticket_id: ticket.id, reply_id: reply.id, role: targetUserRole }
                         }
                     });
                 } catch (notifyError) {
                     console.error('Failed to notify user about reply:', notifyError);
                 }
             }
-        } else {
-            // User replied, notify Super Admins
-            try {
-                const superAdmins = await (prisma as any).user.findMany({
-                    where: { role: 'SUPER_ADMIN' },
-                    select: { id: true }
-                });
 
-                if (superAdmins.length > 0) {
-                    const notifications = superAdmins.map((admin: any) => ({
-                        user_id: admin.id,
-                        title: 'New Reply in Ticket',
-                        message: `${session.user.name || session.user.email} replied to "${ticket.subject}".`,
-                        type: 'info',
-                        priority: 'low',
-                        action_url: `/super-admin/support?ticketId=${ticket.id}`,
-                        action_label: 'View Reply',
-                        metadata: { ticket_id: ticket.id, reply_id: reply.id }
-                    }));
-
-                    await (prisma as any).notifications.createMany({
-                        data: notifications
-                    });
-                }
-            } catch (notifyError) {
-                console.error('Failed to notify super admins about reply:', notifyError);
+            // If it's an Org Admin replying, we might still want to notify Super Admins
+            if (isOrgAdmin) {
+                await notifySuperAdmins(id, ticket.subject, session.user.name || session.user.email, reply.id);
             }
+        } else {
+            // Regular User replied, notify Super Admins AND Org Admins
+            await notifySuperAdmins(id, ticket.subject, session.user.name || session.user.email, reply.id);
+            await notifyOrgAdmins(ticket.user?.organization_id || undefined, id, ticket.subject, session.user.name || session.user.email, reply.id);
         }
 
         return NextResponse.json(reply, { status: 201 });
     } catch (error) {
         console.error('Error creating reply:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+async function notifySuperAdmins(ticketId: string, subject: string, senderName: string, replyId: string) {
+    try {
+        const superAdmins = await prisma.user.findMany({
+            where: { role: { in: ['SUPER_ADMIN', 'SUPERADMIN'] } },
+            select: { id: true }
+        });
+
+        if (superAdmins.length > 0) {
+            const notifications = superAdmins.map((admin: any) => ({
+                user_id: admin.id,
+                title: 'New Reply in Ticket',
+                message: `${senderName} replied to "${subject}".`,
+                type: 'info',
+                priority: 'low',
+                action_url: `/super-admin/support?ticketId=${ticketId}`,
+                action_label: 'View Reply',
+                metadata: { ticket_id: ticketId, reply_id: replyId }
+            }));
+
+            await (prisma as any).notifications.createMany({
+                data: notifications
+            });
+        }
+    } catch (error) {
+        console.error('Failed to notify super admins:', error);
+    }
+}
+
+async function notifyOrgAdmins(orgId: string | undefined, ticketId: string, subject: string, senderName: string, replyId: string) {
+    if (!orgId) return;
+    try {
+        const orgAdmins = await prisma.user.findMany({
+            where: {
+                organization_id: orgId,
+                role: { in: ['ADMIN', 'MANAGER'] }
+            },
+            select: { id: true }
+        });
+
+        if (orgAdmins.length > 0) {
+            const notifications = orgAdmins.map((admin: any) => ({
+                user_id: admin.id,
+                title: 'New Reply in Organization Ticket',
+                message: `${senderName} replied to "${subject}".`,
+                type: 'info',
+                priority: 'low',
+                action_url: `/admin/support?ticketId=${ticketId}`,
+                action_label: 'View Reply',
+                metadata: { ticket_id: ticketId, reply_id: replyId }
+            }));
+
+            await (prisma as any).notifications.createMany({
+                data: notifications
+            });
+        }
+    } catch (error) {
+        console.error('Failed to notify organization admins:', error);
     }
 }

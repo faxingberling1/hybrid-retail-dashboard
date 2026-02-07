@@ -1,4 +1,11 @@
 import { Pool, PoolConfig } from 'pg'
+import dotenv from 'dotenv'
+import path from 'path'
+
+// Load environment variables early
+const envPath = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.local'
+dotenv.config({ path: path.resolve(process.cwd(), envPath) })
+dotenv.config() // Fallback
 
 // Only disable native if explicitly requested
 if (process.env.PG_DISABLE_NATIVE === 'true') {

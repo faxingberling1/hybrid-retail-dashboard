@@ -5,8 +5,8 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: false
+  connectionString: process.env.DATABASE_URL,
+  ssl: false
 });
 
 const sql = `
@@ -32,13 +32,13 @@ CREATE INDEX IF NOT EXISTS "blog_posts_authorId_idx" ON "blog_posts"("authorId")
 `;
 
 async function main() {
-    console.log('🚀 Creating blog_posts table on local database...');
-    console.log('📡 Using URL:', process.env.DATABASE_URL?.replace(/:([^:@]+)@/, ':****@'));
+  console.log('🚀 Creating blog_posts table on local database...');
+  console.log('📡 Using URL:', process.env.DATABASE_URL?.replace(/:([^:@]+)@/, ':****@'));
 
-    try {
-        const start = Date.now();
-        await pool.query(sql);
-        console.log(\`✅ table "blog_posts" created successfully! (\${Date.now() - start}ms)\`);
+  try {
+    const start = Date.now();
+    await pool.query(sql);
+    console.log(`✅ table "blog_posts" created successfully! (${Date.now() - start}ms)`);
   } catch (error) {
     console.error('❌ Error creating table:', error);
   } finally {
