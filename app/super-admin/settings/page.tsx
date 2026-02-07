@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { 
+import {
   Settings, User, Shield, Bell, CreditCard, Globe,
   Database, Server, Key, Lock, Upload, Download,
   Mail, Phone, Building2, Users, Calendar,
@@ -1005,8 +1005,8 @@ export default function SettingsPage() {
 
   // Integration handlers
   const toggleIntegration = (integrationId: string) => {
-    setIntegrations(prev => prev.map(int => 
-      int.id === integrationId 
+    setIntegrations(prev => prev.map(int =>
+      int.id === integrationId
         ? { ...int, status: int.status === 'active' ? 'inactive' : 'active' }
         : int
     ))
@@ -1014,8 +1014,8 @@ export default function SettingsPage() {
 
   const regenerateApiKey = (integrationId: string) => {
     if (confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
-      setIntegrations(prev => prev.map(int => 
-        int.id === integrationId 
+      setIntegrations(prev => prev.map(int =>
+        int.id === integrationId
           ? { ...int, apiKey: `new_key_${Math.random().toString(36).substr(2, 9)}` }
           : int
       ))
@@ -1094,10 +1094,10 @@ export default function SettingsPage() {
   }
 
   const handleDownloadLogs = () => {
-    const logText = logs.map(log => 
+    const logText = logs.map(log =>
       `${log.timestamp} [${log.level.toUpperCase()}] ${log.message} (${log.source})`
     ).join('\n')
-    
+
     const blob = new Blob([logText], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -1136,14 +1136,14 @@ export default function SettingsPage() {
           <p className="text-gray-600 mt-2">Manage your account, security, and preferences</p>
         </div>
         <div className="flex items-center space-x-3 mt-4 lg:mt-0">
-          <button 
+          <button
             onClick={exportSettings}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center"
           >
             <Download className="h-4 w-4 mr-2" />
             Export Settings
           </button>
-          <button 
+          <button
             onClick={resetSettings}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center"
           >
@@ -1165,11 +1165,10 @@ export default function SettingsPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === tab.id
+                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
                         ? 'bg-purple-50 text-purple-700'
                         : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <Icon className="h-5 w-5" />
                     <span>{tab.label}</span>
@@ -1216,7 +1215,7 @@ export default function SettingsPage() {
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}>
-                
+
                 <div className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
                   <span className="text-green-800 font-medium">Settings saved successfully!</span>
@@ -1233,13 +1232,13 @@ export default function SettingsPage() {
             <div className="p-6">
               {/* General Settings */}
               {activeTab === 'general' && (
-                 <div className="space-y-8">
+                <div className="space-y-8">
                   {/* ProfileSection doesn't need any props */}
                   <ProfileSection />
-                                    
+
                   <ThemeSection />
-                  
-                  <RegionalSection/>
+
+                  <RegionalSection />
                 </div>
               )}
 
@@ -1380,24 +1379,24 @@ export default function SettingsPage() {
                   nextBackup={nextBackup}
                   onExportData={handleExportData}
                   onImportData={handleImportData}
-                  
+
                   // API Access
                   apiToken={apiToken}
                   onGenerateToken={handleGenerateToken}
                   apiUsage={apiUsage}
-                  
+
                   // System Information
                   systemInfo={systemInfo}
-                  
+
                   // Logs
                   logs={logs}
                   onSearchLogs={handleSearchLogs}
                   onDownloadLogs={handleDownloadLogs}
                   onClearLogs={handleClearLogs}
-                  
+
                   // Debug Tools
                   debugTools={debugTools}
-                  
+
                   // Danger Zone
                   dangerZoneActions={dangerZoneActions}
                 />
@@ -1438,18 +1437,18 @@ export default function SettingsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}>
-            
+
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <AlertTriangle className="h-6 w-6 text-red-600 mr-3" />
                 <h3 className="text-lg font-semibold text-gray-900">Delete Account</h3>
               </div>
-              
+
               <div className="space-y-4">
                 <p className="text-sm text-gray-600">
                   Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted.
                 </p>
-                
+
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="text-sm text-red-700">
                     <strong>Warning:</strong> This will immediately delete:

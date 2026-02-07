@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         if (priority) where.priority = priority;
         if (category) where.category = category;
 
-        const tickets = await (prisma as any).ticket.findMany({
+        const tickets = await prisma.ticket.findMany({
             where,
             include: {
                 user: {
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        const ticket = await (prisma as any).ticket.create({
+        const ticket = await prisma.ticket.create({
             data: {
                 subject,
                 description,
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
         // Notify Super Admins
         try {
-            const superAdmins = await (prisma as any).user.findMany({
+            const superAdmins = await prisma.user.findMany({
                 where: {
                     role: 'SUPER_ADMIN'
                 },
@@ -98,6 +98,7 @@ export async function POST(request: NextRequest) {
 
             if (superAdmins.length > 0) {
                 const notifications = superAdmins.map((admin: any) => ({
+                    id: crypto.randomUUID(),
                     user_id: admin.id,
                     title: 'New Support Ticket',
                     message: `A new ticket "${subject}" has been created by ${session.user.name || session.user.email}.`,
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
                     metadata: { ticket_id: ticket.id }
                 }));
 
-                await (prisma as any).notifications.createMany({
+                await prisma.notifications.createMany({
                     data: notifications
                 });
             }

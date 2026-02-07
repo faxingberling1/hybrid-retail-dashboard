@@ -23,7 +23,8 @@ import {
   Sparkles,
   CreditCard,
   PenTool,
-  Library
+  Library,
+  MessageSquare as FeatureIcon
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { useNotification } from "@/lib/hooks/use-notification"
@@ -43,6 +44,7 @@ export function SuperAdminSidebar() {
     { name: "Database", icon: <Database className="h-5 w-5" />, href: "/super-admin/database" },
     { name: "Billing", icon: <Wallet className="h-5 w-5" />, href: "/super-admin/billing" },
     { name: "Audit Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
+    { name: "Feature Requests", icon: <FeatureIcon className="h-5 w-5" />, href: "/super-admin/features" },
     { name: "Support Hub", icon: <LifeBuoy className="h-5 w-5" />, href: "/super-admin/support" },
     { name: "Global Settings", icon: <Settings className="h-5 w-5" />, href: "/super-admin/settings" },
   ]

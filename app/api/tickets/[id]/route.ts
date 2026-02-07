@@ -13,7 +13,7 @@ export async function GET(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const ticket = await (prisma as any).ticket.findUnique({
+        const ticket = await prisma.ticket.findUnique({
             where: { id: params.id },
             include: {
                 user: {
@@ -73,7 +73,7 @@ export async function PATCH(
         const body = await request.json();
         const { status, priority } = body;
 
-        const ticket = await (prisma as any).ticket.findUnique({
+        const ticket = await prisma.ticket.findUnique({
             where: { id: params.id },
             include: {
                 user: {
@@ -100,7 +100,7 @@ export async function PATCH(
             return NextResponse.json({ error: 'Only admins can change priority' }, { status: 403 });
         }
 
-        const updatedTicket = await (prisma as any).ticket.update({
+        const updatedTicket = await prisma.ticket.update({
             where: { id: params.id },
             data: {
                 ...(status && { status }),

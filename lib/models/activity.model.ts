@@ -18,13 +18,13 @@ export class ActivityModel {
   static async create(data: Omit<Activity, 'id' | 'createdAt'>): Promise<Activity> {
     const pool = await connectDB();
     const query = `
-      INSERT INTO activities (
+      INSERT INTO activity_logs (
         organization_id, user_id, action, entity_type, entity_id,
         details, ip_address, user_agent
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
-    
+
     const result = await pool.query(query, [
       data.organizationId,
       data.userId,
@@ -35,27 +35,27 @@ export class ActivityModel {
       data.ipAddress,
       data.userAgent
     ]);
-    
+
     return this.mapActivity(result.rows[0]);
   }
 
   static async findByOrganization(organizationId: string, limit: number = 100): Promise<Activity[]> {
     const pool = await connectDB();
     const result = await pool.query(
-      'SELECT * FROM activities WHERE organization_id = $1 ORDER BY created_at DESC LIMIT $2',
+      'SELECT * FROM activity_logs WHERE organization_id = $1 ORDER BY created_at DESC LIMIT $2',
       [organizationId, limit]
     );
-    
+
     return result.rows.map(row => this.mapActivity(row));
   }
 
   static async findByUser(userId: string, limit: number = 50): Promise<Activity[]> {
     const pool = await connectDB();
     const result = await pool.query(
-      'SELECT * FROM activities WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2',
+      'SELECT * FROM activity_logs WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2',
       [userId, limit]
     );
-    
+
     return result.rows.map(row => this.mapActivity(row));
   }
 

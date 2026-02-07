@@ -123,7 +123,7 @@ export default function ThemeSection({ onThemeChange }: ThemeSectionProps) {
   // Apply theme mode
   const applyThemeMode = (mode: 'light' | 'dark' | 'system') => {
     const root = document.documentElement
-    
+
     if (mode === 'dark') {
       root.classList.add('dark')
     } else if (mode === 'light') {
@@ -143,7 +143,7 @@ export default function ThemeSection({ onThemeChange }: ThemeSectionProps) {
   const applyPrimaryColor = (color: string) => {
     const root = document.documentElement
     root.style.setProperty('--primary-color', color)
-    
+
     // Also update shades for Tailwind compatibility
     const shades = generateColorShades(color)
     Object.entries(shades).forEach(([shade, value]) => {
@@ -256,11 +256,10 @@ export default function ThemeSection({ onThemeChange }: ThemeSectionProps) {
           </div>
           <button
             onClick={handlePreview}
-            className={`px-4 py-2 rounded-lg font-medium flex items-center ${
-              previewMode
+            className={`px-4 py-2 rounded-lg font-medium flex items-center ${previewMode
                 ? 'bg-purple-600 text-white hover:bg-purple-700'
                 : 'bg-white text-purple-600 border border-purple-300 hover:bg-purple-50'
-            }`}
+              }`}
           >
             <Eye className="h-4 w-4 mr-2" />
             {previewMode ? 'Exit Preview' : 'Preview Changes'}
@@ -285,7 +284,7 @@ export default function ThemeSection({ onThemeChange }: ThemeSectionProps) {
             colors={primaryColors}
             disabled={isLoading}
           />
-          
+
           {showCustomColor && (
             <div className="mt-4 p-4 border border-gray-200 rounded-lg">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -354,7 +353,7 @@ export default function ThemeSection({ onThemeChange }: ThemeSectionProps) {
           <h4 className="font-medium text-gray-900 mb-3">Theme Preview</h4>
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
-              <div 
+              <div
                 className="h-8 w-8 rounded-full"
                 style={{ backgroundColor: theme.primaryColor }}
               />
@@ -367,7 +366,7 @@ export default function ThemeSection({ onThemeChange }: ThemeSectionProps) {
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[1, 2, 3].map((i) => (
-                <div 
+                <div
                   key={i}
                   className="h-20 rounded-lg border flex items-center justify-center"
                   style={{
