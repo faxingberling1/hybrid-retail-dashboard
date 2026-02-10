@@ -359,7 +359,7 @@ export default function LoginPage() {
                             href="/auth/forgot-password"
                             className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-sky-600 transition-colors"
                           >
-                            Forgot Secure Key?
+                            Forgot Password?
                           </Link>
                         </div>
                       </div>

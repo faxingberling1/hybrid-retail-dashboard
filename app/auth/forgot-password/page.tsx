@@ -112,8 +112,8 @@ export default function ForgotPasswordPage() {
                                                     setError(null);
                                                 }}
                                                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${method === t.id
-                                                        ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
-                                                        : 'text-slate-400 hover:text-white'
+                                                    ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
+                                                    : 'text-slate-400 hover:text-white'
                                                     }`}
                                             >
                                                 <t.icon className="h-3.5 w-3.5" />
@@ -174,7 +174,7 @@ export default function ForgotPasswordPage() {
                                     <div className="text-center pt-4">
                                         <Link href="/login" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
                                             <ArrowLeft className="h-3 w-3" />
-                                            Return to Access Gateway
+                                            Return To Login?
                                         </Link>
                                     </div>
                                 </MotionDiv>
