@@ -9,35 +9,31 @@ datasource db {
 }
 
 model User {
-  id                 String    @id
-  email              String    @unique
-  password_hash      String
-  first_name         String?
-  last_name          String?
-  name               String?
-  role               String?   @default("USER")
-  avatar_url         String?
-  organization_id    String?
-  is_active          Boolean?  @default(true)
-  created_at         DateTime? @default(now())
-  updated_at         DateTime? @default(now()) @updatedAt
-  deleted_at         DateTime? @db.Timestamp(6)
-  phone              String?   @db.VarChar(255)
-  is_verified        Boolean?  @default(false)
-  last_login_at      DateTime? @db.Timestamp(6)
-  two_factor_enabled Boolean?  @default(false)
-  email_verified_at  DateTime? @db.Timestamp(6)
-  phone_verified_at  DateTime? @db.Timestamp(6)
-  reset_token        String?   @unique @db.VarChar(255)
-  reset_token_expires DateTime? @db.Timestamp(6)
-  otp_code           String?   @db.VarChar(10)
-  otp_expires        DateTime? @db.Timestamp(6)
+  id              String    @id
+  email           String    @unique
+  password_hash   String
+  first_name      String?
+  last_name       String?
+  name            String?
+  role            String?   @default("USER")
+  phone           String?
+  avatar_url      String?
+  organization_id String?
+  is_active       Boolean?  @default(true)
+  is_verified     Boolean?  @default(false)
+  last_login_at   DateTime?
+  created_at      DateTime? @default(now())
+  updated_at      DateTime? @default(now()) @updatedAt
+  deleted_at      DateTime? @db.Timestamp(6)
+  activities      activity_logs[]
+  tickets         Ticket[]
+  ticket_replies  TicketReply[]
 
   @@map("users")
 }
 
 model Ticket {
-  id          String           @id @default(dbgenerated("gen_random_uuid()"))
+  id          String           @id @default(cuid())
   subject     String           @db.VarChar(255)
   description String
   status      ticket_status?   @default(OPEN)
@@ -46,16 +42,20 @@ model Ticket {
   user_id     String
   created_at  DateTime?        @default(now()) @db.Timestamptz(6)
   updated_at  DateTime?        @default(now()) @updatedAt @db.Timestamptz(6)
+  user        User             @relation(fields: [user_id], references: [id])
+  replies     TicketReply[]
 
   @@map("tickets")
 }
 
 model TicketReply {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id         String    @id @default(cuid())
   message    String
   ticket_id  String
   user_id    String
   created_at DateTime? @default(now()) @db.Timestamptz(6)
+  ticket     Ticket    @relation(fields: [ticket_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id])
 
   @@map("ticket_replies")
 }
@@ -88,25 +88,25 @@ model BlogPost {
 }
 
 model organizations {
-  id             String           @id
-  name           String
-  status         String?          @default("active")
-  industry       String?          @db.VarChar(100)
-  created_at     DateTime?        @default(now())
-  updated_at     DateTime?        @default(now())
-  business_type  String?          @db.VarChar(100)
-  contact_person String?          @db.VarChar(255)
-  contact_email  String?          @db.VarChar(255)
-  contact_phone  String?          @db.VarChar(50)
-  address        String?
-  city           String?          @db.VarChar(100)
-  country        String?          @default("Pakistan") @db.VarChar(100)
-  activity_logs  activity_logs[]
-  analytics_data analytics_data[]
-  api_keys       api_keys[]
-  invoices       invoices[]
-  subscriptions  subscriptions[]
-  transactions   transactions[]
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  status          String?          @default("active")
+  industry        String?          @db.VarChar(100)
+  business_type   String?          @db.VarChar(100)
+  contact_person  String?          @db.VarChar(255)
+  contact_email   String?          @db.VarChar(255)
+  contact_phone   String?          @db.VarChar(50)
+  address         String?
+  city            String?          @db.VarChar(100)
+  country         String?          @default("Pakistan") @db.VarChar(100)
+  created_at      DateTime?        @default(now())
+  updated_at      DateTime?        @default(now())
+  activity_logs   activity_logs[]
+  analytics_data  analytics_data[]
+  api_keys        api_keys[]
+  invoices        invoices[]
+  subscriptions   subscriptions[]
+  transactions    transactions[]
 }
 
 model system_settings {
@@ -114,7 +114,6 @@ model system_settings {
   value      String?
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
-  updated_by String?
 }
 
 model notification_preferences {
@@ -129,6 +128,7 @@ model notification_preferences {
 }
 
 model notifications {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id      String
   title        String    @db.VarChar(255)
   message      String
@@ -141,7 +141,6 @@ model notifications {
   action_label String?   @db.VarChar(100)
   created_at   DateTime? @default(now()) @db.Timestamptz(6)
   updated_at   DateTime? @db.Timestamptz(6)
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   @@index([created_at(sort: Desc)], map: "idx_notifications_created_at")
   @@index([user_id], map: "idx_notifications_user_id")
@@ -159,6 +158,7 @@ model activity_logs {
   user_agent      String?
   status          String?        @default("success") @db.VarChar(20)
   created_at      DateTime?      @default(now()) @db.Timestamptz(6)
+  user            User?          @relation(fields: [user_id], references: [id])
   organizations   organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
@@ -209,11 +209,10 @@ model invoices {
   due_date        DateTime?      @db.Timestamptz(6)
   paid_at         DateTime?      @db.Timestamptz(6)
   pdf_url         String?
-  created_at      DateTime?      @default(now()) @db.Timestamptz(6)
   is_shared       Boolean?       @default(false)
   shared_at       DateTime?      @db.Timestamptz(6)
   notes           String?
-  items           Json?
+  created_at      DateTime?      @default(now()) @db.Timestamptz(6)
   organizations   organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   subscriptions   subscriptions? @relation(fields: [subscription_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -259,6 +258,7 @@ model subscriptions {
   id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   organization_id      String?
   plan                 String         @db.VarChar(50)
+  add_ons              Json?
   status               String?        @default("active") @db.VarChar(20)
   current_period_start DateTime       @db.Timestamptz(6)
   current_period_end   DateTime       @db.Timestamptz(6)
@@ -268,7 +268,6 @@ model subscriptions {
   trial_end            DateTime?      @db.Timestamptz(6)
   created_at           DateTime?      @default(now()) @db.Timestamptz(6)
   updated_at           DateTime?      @default(now()) @db.Timestamptz(6)
-  add_ons              Json?
   invoices             invoices[]
   organizations        organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -340,6 +339,20 @@ model FeatureRequest {
   @@map("feature_requests")
 }
 
+enum ticket_priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ticket_status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
 model Plan {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String   @unique
@@ -362,21 +375,6 @@ model Addon {
   is_active   Boolean  @default(true)
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-  interval    String   @default("month")
 
   @@map("addons")
-}
-
-enum ticket_priority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum ticket_status {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
 }

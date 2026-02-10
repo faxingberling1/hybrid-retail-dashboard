@@ -13,8 +13,8 @@ declare global {
 
 let internalPrisma = globalThis.prisma
 
-if (internalPrisma && !(internalPrisma as any).product) {
-    console.log('\ud83d\udd04 Stale Prisma client detected, re-initializing...')
+if (internalPrisma && (!(internalPrisma as any).product || !(internalPrisma as any).plan)) {
+    console.log('🔄 Stale Prisma client detected (missing Plan/Addon support), re-initializing...')
     internalPrisma = undefined
 }
 

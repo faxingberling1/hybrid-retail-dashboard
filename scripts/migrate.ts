@@ -44,7 +44,18 @@ async function migrate() {
         is_verified BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        deleted_at TIMESTAMP DEFAULT NULL
+        deleted_at TIMESTAMP DEFAULT NULL,
+        avatar_url VARCHAR(512),
+        organization_id TEXT,
+        phone VARCHAR(255),
+        last_login_at TIMESTAMP,
+        two_factor_enabled BOOLEAN DEFAULT FALSE,
+        email_verified_at TIMESTAMP,
+        phone_verified_at TIMESTAMP,
+        reset_token VARCHAR(255) UNIQUE,
+        reset_token_expires TIMESTAMP,
+        otp_code VARCHAR(10),
+        otp_expires TIMESTAMP
       )
     `)
     console.log('✅ Created users table')

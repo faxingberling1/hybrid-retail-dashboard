@@ -354,6 +354,14 @@ export default function LoginPage() {
                             className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-50 focus:border-sky-500/20 focus:bg-white rounded-[1.5rem] outline-none transition-all text-sm font-medium text-slate-900"
                           />
                         </div>
+                        <div className="flex justify-end px-2">
+                          <Link
+                            href="/auth/forgot-password"
+                            className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-sky-600 transition-colors"
+                          >
+                            Forgot Secure Key?
+                          </Link>
+                        </div>
                       </div>
                     </div>
 
