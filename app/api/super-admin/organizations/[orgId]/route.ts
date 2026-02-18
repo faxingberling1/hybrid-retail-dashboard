@@ -18,16 +18,16 @@ export async function GET(
         // Fetch deep organization details
         const [org, subscription, invoices, transactions, users, logs] = await Promise.all([
             // Basic Org Info
-            db.queryOne('SELECT * FROM organizations WHERE id = $1', [orgId]),
+            db.queryOne('SELECT * FROM organizations WHERE id = $1::uuid', [orgId]),
 
             // Current Subscription
-            db.queryOne('SELECT * FROM subscriptions WHERE organization_id = $1 AND status = \'active\' LIMIT 1', [orgId]),
+            db.queryOne('SELECT * FROM subscriptions WHERE organization_id = $1::uuid AND status = \'active\' LIMIT 1', [orgId]),
 
             // Recent Invoices
-            db.query('SELECT * FROM invoices WHERE organization_id = $1 ORDER BY created_at DESC LIMIT 10', [orgId]),
+            db.query('SELECT * FROM invoices WHERE organization_id = $1::uuid ORDER BY created_at DESC LIMIT 10', [orgId]),
 
             // Recent Transactions
-            db.query('SELECT * FROM transactions WHERE organization_id = $1 ORDER BY created_at DESC LIMIT 10', [orgId]),
+            db.query('SELECT * FROM transactions WHERE organization_id = $1::uuid ORDER BY created_at DESC LIMIT 10', [orgId]),
 
             // Linked Users
             db.query(`
@@ -41,7 +41,7 @@ export async function GET(
                         AND n.metadata->>'category' = 'USER'
                     ) as is_unread
                 FROM users u 
-                WHERE organization_id = $2::text
+                WHERE organization_id = $2::uuid
             `, [session.user.id, orgId]),
 
             // Activity Logs
@@ -49,7 +49,7 @@ export async function GET(
                 SELECT al.*, u.name as user_name 
                 FROM activity_logs al 
                 LEFT JOIN users u ON al.user_id = u.id 
-                WHERE al.organization_id = $1 
+                WHERE al.organization_id = $1::uuid
                 ORDER BY al.created_at DESC 
                 LIMIT 20
             `, [orgId])
@@ -89,14 +89,14 @@ export async function DELETE(
         }
 
         // Get organization name for logging before deletion
-        const org = await db.queryOne('SELECT name FROM organizations WHERE id = $1', [orgId])
+        const org = await db.queryOne('SELECT name FROM organizations WHERE id = $1::uuid', [orgId])
         if (!org) {
             return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
         }
 
         // Perform deletion
         // Note: Depending on foreign key constraints, this might require cascading or manual cleanup of related data
-        await db.query('DELETE FROM organizations WHERE id = $1', [orgId])
+        await db.query('DELETE FROM organizations WHERE id = $1::uuid', [orgId])
 
         // Log the action
         await db.query(

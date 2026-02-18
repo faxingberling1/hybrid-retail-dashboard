@@ -66,6 +66,7 @@ export function SuperAdminSidebar() {
     { name: "Audit Logs", icon: <FileText className="h-5 w-5" />, href: "/super-admin/logs" },
     { name: "Feature Requests", icon: <FeatureIcon className="h-5 w-5" />, href: "/super-admin/features" },
     { name: "Support Hub", icon: <LifeBuoy className="h-5 w-5" />, href: "/super-admin/support" },
+    { name: "POS System", icon: <LayoutDashboard className="h-5 w-5" />, href: "/super-admin/pos-system" },
     { name: "Global Settings", icon: <Settings className="h-5 w-5" />, href: "/super-admin/settings" },
   ]
 
