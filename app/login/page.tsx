@@ -412,7 +412,7 @@ export default function LoginPage() {
               <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Core Active</span>
             </div>
-            <Link href="/home" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">contact sales</Link>
+            <Link href="/contact" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">contact sales</Link>
           </div>
 
           {/* Maintenance Modal Overlay */}

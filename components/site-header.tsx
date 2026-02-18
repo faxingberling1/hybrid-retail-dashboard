@@ -67,7 +67,7 @@ export function SiteHeader({ cms }: { cms?: any }) {
                             </button>
 
                             <div className="flex items-center gap-3">
-                                <Link href="/login" className="hidden lg:flex px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all items-center gap-2">
+                                <Link href="/call-us" className="hidden lg:flex px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all items-center gap-2">
                                     <Smartphone className="h-4 w-4" />
                                     <span>Call Us</span>
                                 </Link>

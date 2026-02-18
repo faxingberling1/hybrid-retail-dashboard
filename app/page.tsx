@@ -211,7 +211,7 @@ export default function LandingPage() {
                                     <ArrowRight className="ml-3 h-5 w-5 transform group-hover:translate-x-2 transition-transform" />
                                 </MotionButton>
                             </Link>
-                            <Link href="/demo">
+                            <Link href="/contact">
                                 <MotionButton
                                     whileHover={{ y: -5, scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
@@ -427,7 +427,7 @@ export default function LandingPage() {
                         </div>
 
                         <div className="text-center">
-                            <Link href="/login">
+                            <Link href="/contact">
                                 <MotionButton
                                     whileHover={{ y: -5, scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
