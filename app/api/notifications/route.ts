@@ -17,10 +17,13 @@ function isFilterRole(role: string): boolean {
 }
 
 export async function GET(request: NextRequest) {
+  console.log('🔔 GET /api/notifications triggered');
   try {
     const session = await getServerSession(authOptions)
+    console.log('👤 Session lookup:', !!session, session?.user?.email);
 
     if (!session?.user?.id || !session?.user?.role) {
+      console.log('⚠️ No session user id or role found');
       return NextResponse.json({
         notifications: [],
         unreadCount: 0,
@@ -38,6 +41,7 @@ export async function GET(request: NextRequest) {
 
     // Normalize user role from session
     const userRole = session.user.role.toUpperCase() as UserRole;
+    console.log('🛠️ Fetching for role:', userRole);
 
     // Get notifications based on user's role
     const result = await NotificationService.getNotificationsByUserRole(
@@ -49,6 +53,7 @@ export async function GET(request: NextRequest) {
         unreadOnly,
       }
     );
+    console.log('✅ Fetch result:', result.notifications.length, 'notifications found');
 
     // Apply additional filters
     let filteredNotifications = result.notifications;
@@ -76,14 +81,16 @@ export async function GET(request: NextRequest) {
         total: filteredNotifications.length,
       },
     })
-  } catch (error) {
-    console.error("Failed to fetch notifications:", error)
+  } catch (error: any) {
+    console.error("❌ Failed to fetch notifications:", error.message);
+    console.error("📄 Error stack:", error.stack);
     return NextResponse.json(
       {
         notifications: [],
         unreadCount: 0,
         roleBasedCounts: { all: 0 },
-        error: "Failed to fetch notifications"
+        error: "Failed to fetch notifications",
+        message: error.message
       },
       { status: 500 }
     )

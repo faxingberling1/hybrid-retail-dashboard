@@ -20,6 +20,8 @@ import { SiteFooter } from "@/components/site-footer"
 export default function LandingPage() {
     const { theme, setTheme, resolvedTheme } = useTheme()
     const [isMounted, setIsMounted] = useState(false)
+    const [cmsContent, setCmsContent] = useState<any>(null)
+    const [showAnnouncement, setShowAnnouncement] = useState(true)
 
     const { scrollYProgress } = useScroll()
     const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
@@ -27,6 +29,10 @@ export default function LandingPage() {
 
     useEffect(() => {
         setIsMounted(true)
+        fetch('/api/super-admin/cms')
+            .then(res => res.json())
+            .then(data => setCmsContent(data))
+            .catch(err => console.error("CMS Load Error:", err))
     }, [])
 
     const MotionDiv = motion.div as any
@@ -35,44 +41,51 @@ export default function LandingPage() {
 
     if (!isMounted) return null
 
-    const features = [
-        {
-            icon: <ShoppingCart className="h-6 w-6" />,
-            title: "Dynamic POS Engine",
-            desc: "Zero-latency transaction processing with offline resilience and multi-terminal sync.",
-            color: "from-sky-500 to-blue-600"
+    // Fallback data if CMS fails to load
+    const content = cmsContent || {
+        hero: {
+            badge: "Pakistan's No.1 Retail Management System",
+            title: "Retail Perfected.",
+            subtitle: "The high-fidelity ecosystem for professional commerce. Real-time synchronization, neural inventory, and zero-latency performance.",
+            ctaPrimary: "Get Started Free",
+            ctaSecondary: "Schedule a Demo"
         },
-        {
-            icon: <Package className="h-6 w-6" />,
-            title: "Intelligent Inventory",
-            desc: "Neural-driven stock monitoring with automated reordering and predictive analytics.",
-            color: "from-emerald-500 to-teal-600"
+        branding: {
+            vibrancy: 'Elite',
+            typography: 'Modern'
         },
-        {
-            icon: <PieChart className="h-6 w-6" />,
-            title: "Growth Intelligence",
-            desc: "Real-time visual reports and AI-powered business insights for rapid scaling.",
-            color: "from-violet-500 to-purple-600"
-        },
-        {
-            icon: <Users className="h-6 w-6" />,
-            title: "Staff Optimization",
-            desc: "Advanced shift management, performance tracking, and granular access control.",
-            color: "from-rose-500 to-pink-600"
-        },
-        {
-            icon: <Globe className="h-6 w-6" />,
-            title: "Regional Mesh",
-            desc: "Distributed database architecture ensuring speed and data integrity anywhere.",
-            color: "from-amber-500 to-orange-600"
-        },
-        {
-            icon: <Shield className="h-6 w-6" />,
-            title: "Hardened Security",
-            desc: "Bank-grade encryption with multi-factor authentication and audit logging.",
-            color: "from-indigo-500 to-cyan-600"
+        features: [
+            { icon: "ShoppingCart", title: "Dynamic POS Engine", desc: "Zero-latency transaction processing with offline resilience and multi-terminal sync.", color: "from-sky-500 to-blue-600" },
+            { icon: "Package", title: "Intelligent Inventory", desc: "Neural-driven stock monitoring with automated reordering and predictive analytics.", color: "from-emerald-500 to-teal-600" },
+            { icon: "PieChart", title: "Growth Intelligence", desc: "Real-time visual reports and AI-powered business insights for rapid scaling.", color: "from-violet-500 to-purple-600" },
+            { icon: "Users", title: "Staff Optimization", desc: "Advanced shift management, performance tracking, and granular access control.", color: "from-rose-500 to-pink-600" },
+            { icon: "Globe", title: "Regional Mesh", desc: "Distributed database architecture ensuring speed and data integrity anywhere.", color: "from-amber-500 to-orange-600" },
+            { icon: "Shield", title: "Hardened Security", desc: "Bank-grade encryption with multi-factor authentication and audit logging.", color: "from-indigo-500 to-cyan-600" }
+        ],
+        enterprise: {
+            badge: "Mission Critical",
+            title: "Command Your Enterprise.",
+            subtitle: "The scale-out infrastructure for retail giants. Dedicated zones, custom sharding, and 24/7 priority support.",
+            cta: "Deploy Enterprise",
+            features: [
+                { title: "Global Sharding", desc: "Private mesh nodes isolated from public traffic.", icon: "Globe" },
+                { title: "Granular Access", desc: "Role-based permission scaling with biometrics.", icon: "Users" },
+                { title: "Forensic Logs", desc: "Immutable activity tracking with 7-year retention.", icon: "Lock" }
+            ]
         }
-    ]
+    }
+
+    const iconMap: any = {
+        ShoppingCart: <ShoppingCart className="h-6 w-6" />,
+        Package: <Package className="h-6 w-6" />,
+        PieChart: <PieChart className="h-6 w-6" />,
+        Users: <Users className="h-6 w-6" />,
+        Globe: <Globe className="h-6 w-6" />,
+        Shield: <Shield className="h-6 w-6" />,
+        Zap: <Zap className="h-6 w-6" />,
+        Lock: <Lock className="h-6 w-6" />,
+    }
+
 
     return (
         <div className={`min-h-screen font-sans selection:bg-sky-500/10 overflow-x-hidden transition-colors duration-500 ${isDark ? 'bg-[#020412] text-white selection:bg-violet-500/20' : 'bg-white text-slate-900'}`}>
@@ -96,42 +109,92 @@ export default function LandingPage() {
             </div>
 
 
+            {/* Announcement Bar */}
+            <AnimatePresence>
+                {showAnnouncement && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="relative z-50 overflow-hidden"
+                    >
+                        <div className={`relative py-3 px-6 text-center ${isDark
+                            ? 'bg-gradient-to-r from-violet-600/90 via-indigo-600/90 to-blue-600/90'
+                            : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600'
+                            }`}>
+                            {/* Shimmer effect */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                <motion.div
+                                    animate={{ x: ['-100%', '200%'] }}
+                                    transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 2 }}
+                                    className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                                />
+                            </div>
+
+                            <div className="container mx-auto flex items-center justify-center gap-4 relative">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60" />
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                                </span>
+                                <p className="text-[11px] md:text-xs font-bold text-white tracking-wide">
+                                    🚀 <span className="font-black">HybridPOS 3.0 is here</span> — Neural inventory, real-time sync, and blazing-fast checkout.
+                                    <Link href="/features" className="ml-2 inline-flex items-center gap-1 font-black underline underline-offset-2 decoration-white/40 hover:decoration-white transition-all">
+                                        Explore what&apos;s new <ArrowRight className="h-3 w-3" />
+                                    </Link>
+                                </p>
+                                <button
+                                    onClick={() => setShowAnnouncement(false)}
+                                    className="absolute right-0 p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Floating Header */}
-            <SiteHeader />
+            <SiteHeader cms={content.header} />
 
             {/* Hero Section */}
 
             {/* Hero Section */}
             <section className="relative pt-64 pb-32 overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 text-center">
-                    <MotionDiv
-                        style={{ opacity, scale }}
-                        className="space-y-12 max-w-5xl mx-auto"
-                    >
+                    <div className="space-y-12 max-w-5xl mx-auto">
                         <MotionDiv
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className={`inline-flex items-center px-4 py-1.5 rounded-full border shadow-sm ${isDark ? 'bg-violet-500/10 border-violet-500/20 text-violet-300' : 'bg-sky-50 border-sky-100 text-sky-600'}`}
+                            className={`inline-flex items-center px-4 py-1.5 rounded-full border shadow-sm transition-all duration-500 ${content.branding?.vibrancy === 'Ultra'
+                                ? 'bg-blue-500/20 border-blue-500/30 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]'
+                                : isDark ? 'bg-violet-500/10 border-violet-500/20 text-violet-300' : 'bg-sky-50 border-sky-100 text-sky-600'
+                                }`}
                         >
                             <Sparkles className="h-4 w-4 mr-2" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Pakistan's No.1 Retail Management System</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{content.hero.badge}</span>
                         </MotionDiv>
 
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className={`text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-8 leading-[0.85] ${isDark ? 'text-white' : 'text-slate-900'}`}
+                            className={`tracking-tighter mb-8 leading-[0.85] transition-all duration-700 ${content.branding?.typography === 'Heavy' ? 'text-7xl md:text-9xl lg:text-[10rem] font-black' :
+                                content.branding?.typography === 'Bold' ? 'text-6xl md:text-8xl lg:text-9xl font-extrabold' :
+                                    'text-6xl md:text-8xl lg:text-9xl font-black'
+                                } ${isDark ? 'text-white' : 'text-slate-900'}`}
                         >
-                            Retail <br />
-                            <span className={`bg-clip-text text-transparent bg-gradient-to-r ${isDark ? 'from-violet-400 via-fuchsia-400 to-white' : 'from-blue-600 via-indigo-600 to-sky-500'}`}>
-                                Perfected.
+                            {content.hero.title.split('\n')[0]} <br />
+                            <span className={`bg-clip-text text-transparent bg-gradient-to-r transition-all duration-1000 ${content.branding?.vibrancy === 'Ultra'
+                                ? 'from-blue-400 via-indigo-400 to-purple-400 drop-shadow-[0_0_30px_rgba(129,140,248,0.5)]'
+                                : isDark ? 'from-violet-400 via-fuchsia-400 to-white' : 'from-blue-600 via-indigo-600 to-sky-500'
+                                }`}>
+                                {content.hero.title.split('\n')[1] || "Perfected."}
                             </span>
                         </motion.h1>
 
-                        <p className={`text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                            The high-fidelity ecosystem for professional commerce.
-                            Real-time synchronization, neural inventory, and zero-latency performance.
+                        <p className={`text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed transition-colors duration-500 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            {content.hero.subtitle}
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
@@ -139,9 +202,12 @@ export default function LandingPage() {
                                 <MotionButton
                                     whileHover={{ y: -5, scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className={`px-10 py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] flex items-center group shadow-2xl ${isDark ? 'bg-white text-slate-900 shadow-white/20' : 'bg-slate-900 text-white shadow-slate-900/20'}`}
+                                    className={`px-10 py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] flex items-center group shadow-2xl transition-all duration-300 ${content.branding?.vibrancy === 'Ultra'
+                                        ? 'bg-blue-600 text-white shadow-blue-500/40 hover:bg-blue-500'
+                                        : isDark ? 'bg-white text-slate-900 shadow-white/20' : 'bg-slate-900 text-white shadow-slate-900/20'
+                                        }`}
                                 >
-                                    Get Started Free
+                                    {content.hero.ctaPrimary}
                                     <ArrowRight className="ml-3 h-5 w-5 transform group-hover:translate-x-2 transition-transform" />
                                 </MotionButton>
                             </Link>
@@ -149,13 +215,13 @@ export default function LandingPage() {
                                 <MotionButton
                                     whileHover={{ y: -5, scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className={`px-10 py-6 border-2 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] flex items-center shadow-xl transition-all ${isDark ? 'bg-transparent border-white/20 text-white hover:border-violet-400 shadow-violet-500/10' : 'bg-white text-slate-900 border-slate-100 shadow-slate-200/50 hover:border-sky-200'}`}
+                                    className={`px-10 py-6 border-2 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] flex items-center shadow-xl transition-all duration-300 ${isDark ? 'bg-transparent border-white/20 text-white hover:border-violet-400 shadow-violet-500/10' : 'bg-white text-slate-900 border-slate-100 shadow-slate-200/50 hover:border-sky-200'}`}
                                 >
-                                    Schedule a Demo
+                                    {content.hero.ctaSecondary}
                                 </MotionButton>
                             </Link>
                         </div>
-                    </MotionDiv>
+                    </div>
 
                     {/* Floating UI Elements */}
                     <div className="mt-40 grid lg:grid-cols-3 gap-8 relative max-w-7xl mx-auto">
@@ -248,7 +314,7 @@ export default function LandingPage() {
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {features.map((feature, idx) => (
+                        {content.features.map((feature: any, idx: number) => (
                             <MotionDiv
                                 key={idx}
                                 initial={{ opacity: 0, y: 30 }}
@@ -259,7 +325,7 @@ export default function LandingPage() {
                                 className={`p-10 rounded-[3rem] border transition-all group ${isDark ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:shadow-violet-500/5' : 'bg-white border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-sky-500/5'}`}
                             >
                                 <div className={`p-4 bg-gradient-to-br ${feature.color} text-white rounded-2xl w-fit mb-8 shadow-lg`}>
-                                    {feature.icon}
+                                    {iconMap[feature.icon] || <Sparkles className="h-6 w-6" />}
                                 </div>
                                 <h3 className={`text-2xl font-black tracking-tight mb-4 group-hover:text-opacity-80 transition-colors ${isDark ? 'text-white' : 'text-slate-900 group-hover:text-sky-500'}`}>
                                     {feature.title}
@@ -278,11 +344,11 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6">
                     <div className="mb-20 space-y-6 max-w-2xl">
                         <div className={`inline-flex items-center px-4 py-1.5 rounded-full border shadow-sm ${isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600'}`}>
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Operational Hub</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{content.map?.badge || "Operational Hub"}</span>
                         </div>
                         <h2 className={`text-6xl font-black tracking-tighter leading-[0.9] ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            Karachi <br />
-                            <span className="text-emerald-500">Command Center.</span>
+                            {(content.map?.title || "Karachi").split('\n')[0]} <br />
+                            <span className="text-emerald-500">{(content.map?.title || "Command Center.").split('\n')[1] || ""}</span>
                         </h2>
                         <p className={`text-xl font-medium leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             Orchestrating the unified mesh from the heart of the digital corridor.
@@ -292,10 +358,10 @@ export default function LandingPage() {
 
                     <div className="rounded-[3rem] overflow-hidden border border-slate-200 shadow-2xl h-[500px] relative">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d924234.6302710465!2d66.59499551722738!3d25.193389469968414!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb33e06651d4bbf%3A0x9cf92f44555a0c23!2sKarachi%2C%20Karachi%20City%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1707248512345!5m2!1sen!2s"
+                            src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d924234.6302710465!2d${content.map?.lng || 66.594}!3d${content.map?.lat || 25.193}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb33e06651d4bbf%3A0x9cf92f44555a0c23!2sKarachi%2C%20Karachi%20City%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1707248512345!5m2!1sen!2s`}
                             width="100%"
                             height="100%"
-                            style={{ border: 0, filter: isDark ? 'invert(90%) hue-rotate(180deg)' : 'none' }}
+                            style={{ border: 0, filter: content.map?.style === 'Dark' ? 'invert(90%) hue-rotate(180deg)' : (isDark ? 'invert(90%) hue-rotate(180deg)' : 'none') }}
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
@@ -329,37 +395,20 @@ export default function LandingPage() {
                         <div className="text-center mb-20 space-y-8">
                             <div className="inline-flex items-center px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-emerald-400 mb-8 backdrop-blur-xl">
                                 <ShieldCheck className="h-4 w-4 mr-2" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em]">Mission Critical</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em]">{content.enterprise.badge}</span>
                             </div>
                             <h2 className="text-7xl md:text-9xl font-black tracking-tighter text-white leading-[0.85]">
-                                Command Your <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">Enterprise.</span>
+                                {content.enterprise.title.split('\n')[0]} <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">{content.enterprise.title.split('\n')[1] || "Enterprise."}</span>
                             </h2>
                             <p className="text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed text-slate-400">
-                                The scale-out infrastructure for retail giants.
-                                Dedicated zones, custom sharding, and 24/7 priority support.
+                                {content.enterprise.subtitle}
                             </p>
                         </div>
 
                         {/* Enterprise Features */}
                         <div className="grid md:grid-cols-3 gap-8 mb-20">
-                            {[
-                                {
-                                    title: "Global Sharding",
-                                    desc: "Private mesh nodes isolated from public traffic for zero-latency operations.",
-                                    icon: Globe
-                                },
-                                {
-                                    title: "Granular Access",
-                                    desc: "Role-based permission scaling with biometric authentication support.",
-                                    icon: Users
-                                },
-                                {
-                                    title: "Forensic Logs",
-                                    desc: "Immutable activity tracking with 7-year retention for compliance.",
-                                    icon: Lock
-                                }
-                            ].map((item, i) => (
+                            {content.enterprise.features.map((item: any, i: number) => (
                                 <MotionDiv
                                     key={i}
                                     initial={{ opacity: 0, y: 20 }}
@@ -369,7 +418,7 @@ export default function LandingPage() {
                                     className="p-10 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-white/10 transition-all group"
                                 >
                                     <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-6 text-emerald-400 group-hover:scale-110 transition-transform">
-                                        <item.icon className="h-7 w-7" />
+                                        {iconMap[item.icon] || <Zap className="h-7 w-7" />}
                                     </div>
                                     <h3 className="text-2xl font-black tracking-tight text-white mb-4">{item.title}</h3>
                                     <p className="text-slate-400 font-medium leading-relaxed">{item.desc}</p>
@@ -384,7 +433,7 @@ export default function LandingPage() {
                                     whileTap={{ scale: 0.98 }}
                                     className="px-16 py-8 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-emerald-900/20 group inline-flex items-center bg-emerald-500 text-white hover:bg-emerald-400 transition-all"
                                 >
-                                    Deploy Enterprise
+                                    {content.enterprise.cta}
                                     <ArrowRight className="ml-4 h-6 w-6 group-hover:translate-x-3 transition-transform" />
                                 </MotionButton>
                             </Link>
@@ -397,7 +446,7 @@ export default function LandingPage() {
             </section>
 
             {/* Footer */}
-            <SiteFooter />
+            <SiteFooter cms={content.footer} />
 
 
 

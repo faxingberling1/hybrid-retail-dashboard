@@ -6,11 +6,23 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Store, Moon, Sun, Smartphone, ArrowRight, Menu, X } from "lucide-react"
 import { useTheme } from "@/app/providers"
 
-export function SiteHeader() {
+export function SiteHeader({ cms }: { cms?: any }) {
     const { theme, setTheme, resolvedTheme } = useTheme()
     const [isMounted, setIsMounted] = useState(false)
     const [scrolled, setScrolled] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+    const header = cms || {
+        logoText: "HybridPOS",
+        logoSubtext: "Enterprise Unified",
+        links: [
+            { label: "Features", href: "/features" },
+            { label: "Pricing", href: "/pricing" },
+            { label: "Blog", href: "/blog" }
+        ],
+        ctaText: "Login",
+        ctaHref: "/login"
+    }
 
     useEffect(() => {
         setIsMounted(true)
@@ -32,31 +44,17 @@ export function SiteHeader() {
                                 <Store className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <span className={`text-xl font-black tracking-tighter block leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>HybridPOS</span>
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Enterprise Unified</span>
+                                <span className={`text-xl font-black tracking-tighter block leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>{header.logoText}</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{header.logoSubtext}</span>
                             </div>
                         </Link>
 
                         <div className="hidden lg:flex items-center space-x-12">
-                            <Link href="/features" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-sky-500 transition-colors">Features</Link>
-                            <Link href="/pricing" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-sky-500 transition-colors">Pricing</Link>
-
-                            {/* Resources Dropdown */}
-                            <div className="relative group">
-                                <button className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-sky-500 transition-colors flex items-center">
-                                    Resources
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1 transform group-hover:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2`}>
-                                    <div className={`p-4 rounded-2xl shadow-xl w-48 border flex flex-col gap-2 ${isDark ? 'bg-black/90 border-white/10 backdrop-blur-xl' : 'bg-white border-slate-100'}`}>
-                                        <Link href="/blog" className={`text-xs font-bold px-4 py-2 rounded-xl transition-colors ${isDark ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-sky-500'}`}>Blog</Link>
-                                        <Link href="/knowledge-base" className={`text-xs font-bold px-4 py-2 rounded-xl transition-colors ${isDark ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-sky-500'}`}>Knowledge Base</Link>
-                                        <Link href="/feedback" className={`text-xs font-bold px-4 py-2 rounded-xl transition-colors ${isDark ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-sky-500'}`}>Request Feature</Link>
-                                    </div>
-                                </div>
-                            </div>
+                            {header.links.map((link: any, idx: number) => (
+                                <Link key={idx} href={link.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-sky-500 transition-colors">
+                                    {link.label}
+                                </Link>
+                            ))}
                         </div>
 
                         <div className="flex items-center space-x-4">
@@ -74,13 +72,13 @@ export function SiteHeader() {
                                     <span>Call Us</span>
                                 </Link>
 
-                                <Link href="/login">
+                                <Link href={header.ctaHref}>
                                     <MotionButton
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         className={`hidden md:flex px-6 py-2.5 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all items-center ${isDark ? 'bg-violet-600 shadow-violet-600/20 hover:bg-violet-500' : 'bg-slate-900 shadow-slate-900/10 hover:bg-slate-800'}`}
                                     >
-                                        Login
+                                        {header.ctaText}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </MotionButton>
                                 </Link>
@@ -112,14 +110,14 @@ export function SiteHeader() {
                         >
                             <X className="h-6 w-6" />
                         </button>
-                        {[{ n: 'Features', l: '/features' }, { n: 'Pricing', l: '/pricing' }, { n: 'Blog', l: '/blog' }, { n: 'Knowledge', l: '/knowledge-base' }, { n: 'Login', l: '/login' }].map((link) => (
+                        {header.links.map((link: any, idx: number) => (
                             <Link
-                                key={link.n}
-                                href={link.l}
+                                key={idx}
+                                href={link.href}
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={`text-4xl font-black tracking-tighter hover:text-sky-500 ${isDark ? 'text-white' : 'text-slate-900'}`}
                             >
-                                {link.n}
+                                {link.label}
                             </Link>
                         ))}
                         <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>

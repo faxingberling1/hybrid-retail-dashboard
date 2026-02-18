@@ -71,7 +71,7 @@ export function SuperAdminSidebar() {
   ]
 
   const cmsItems = [
-    { name: "Hero Section", icon: <LayoutTemplate className="h-5 w-5" />, href: "/super-admin/cms/hero" },
+    { name: "CMS", icon: <LayoutTemplate className="h-5 w-5" />, href: "/super-admin/cms" },
     { name: "Features", icon: <Sparkles className="h-5 w-5" />, href: "/super-admin/cms/features" },
     { name: "Pricing", icon: <CreditCard className="h-5 w-5" />, href: "/super-admin/cms/pricing" },
     { name: "Blog", icon: <PenTool className="h-5 w-5" />, href: "/super-admin/cms/blog" },

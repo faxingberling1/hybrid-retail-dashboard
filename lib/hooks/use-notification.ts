@@ -44,18 +44,24 @@ export function useNotification(): NotificationResult {
       setLoading(true)
       setError(null)
       const response = await fetch("/api/notifications")
-      
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.status}`)
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          errorData = { message: `HTTP error ${response.status}` };
+        }
+        throw new Error(errorData.message || errorData.error || `Failed to fetch: ${response.status}`);
       }
-      
+
       const data = await response.json()
       setNotifications(data.notifications || [])
       setUnreadCount(data.unreadCount || 0)
       setRoleBasedCounts(data.roleBasedCounts || { all: 0 })
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch notifications:", error)
-      setError("Failed to load notifications")
+      setError(error.message || "Failed to load notifications")
       setNotifications([])
       setUnreadCount(0)
       setRoleBasedCounts({ superAdmin: 0, admin: 0, user: 0, all: 0 })
@@ -66,10 +72,10 @@ export function useNotification(): NotificationResult {
 
   useEffect(() => {
     fetchNotifications()
-    
+
     // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000)
-    
+
     return () => clearInterval(interval)
   }, [fetchNotifications])
 
