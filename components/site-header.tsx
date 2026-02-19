@@ -21,7 +21,9 @@ export function SiteHeader({ cms }: { cms?: any }) {
             { label: "Blog", href: "/blog" }
         ],
         ctaText: "Login",
-        ctaHref: "/login"
+        ctaHref: "/login",
+        ctaSecondaryText: "Get Started",
+        ctaSecondaryHref: "/auth/signup"
     }
 
     useEffect(() => {
@@ -76,9 +78,19 @@ export function SiteHeader({ cms }: { cms?: any }) {
                                     <MotionButton
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className={`hidden md:flex px-6 py-2.5 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all items-center ${isDark ? 'bg-violet-600 shadow-violet-600/20 hover:bg-violet-500' : 'bg-slate-900 shadow-slate-900/10 hover:bg-slate-800'}`}
+                                        className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all items-center border-2 ${isDark ? 'bg-transparent border-white/20 text-white hover:border-violet-400' : 'bg-white text-slate-900 border-slate-200 hover:border-sky-500 shadow-sm'}`}
                                     >
                                         {header.ctaText}
+                                    </MotionButton>
+                                </Link>
+
+                                <Link href={header.ctaSecondaryHref || "/auth/signup"}>
+                                    <MotionButton
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className={`px-6 py-2.5 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all items-center flex ${isDark ? 'bg-violet-600 shadow-violet-600/20 hover:bg-violet-500' : 'bg-slate-900 shadow-slate-900/10 hover:bg-slate-800'}`}
+                                    >
+                                        {header.ctaSecondaryText || "Get Started"}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </MotionButton>
                                 </Link>
