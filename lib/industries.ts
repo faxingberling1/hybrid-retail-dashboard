@@ -40,7 +40,7 @@ export const industryConfigs = {
       'configure_compliance'
     ]
   },
-  
+
   fashion: {
     name: 'Fashion & Retail',
     defaultSettings: {
@@ -81,7 +81,7 @@ export const industryConfigs = {
       'configure_shipping'
     ]
   },
-  
+
   education: {
     name: 'Education',
     defaultSettings: {
@@ -122,7 +122,7 @@ export const industryConfigs = {
       'configure_portal'
     ]
   },
-  
+
   healthcare: {
     name: 'Healthcare',
     defaultSettings: {
@@ -164,7 +164,7 @@ export const industryConfigs = {
       'configure_compliance'
     ]
   },
-  
+
   corporate: {
     name: 'Corporate',
     defaultSettings: {
@@ -199,6 +199,114 @@ export const industryConfigs = {
       'configure_projects',
       'setup_documentation',
       'configure_workflows'
+    ]
+  },
+
+  retail: {
+    name: 'Retail',
+    defaultSettings: {
+      theme: 'sky',
+      features: {
+        inventoryManagement: true,
+        posIntegration: true,
+        customerLoyalty: true,
+        multiStore: true,
+        ecommerce: true
+      },
+      modules: ['inventory', 'sales', 'customers', 'stores', 'marketing'],
+    },
+    adminPermissions: [
+      'manage_inventory',
+      'manage_sales',
+      'view_analytics',
+      'manage_customers',
+      'configure_pos',
+      'manage_stores'
+    ],
+    userPermissions: [
+      'process_sales',
+      'update_stock',
+      'view_customers',
+      'access_pos'
+    ],
+    onboardingSteps: [
+      'setup_inventory',
+      'configure_pos',
+      'setup_payment_gateways',
+      'import_products',
+      'configure_stores'
+    ]
+  },
+
+  restaurant: {
+    name: 'Restaurant',
+    defaultSettings: {
+      theme: 'orange',
+      features: {
+        menuManagement: true,
+        tableBooking: true,
+        kitchenDisplay: true,
+        onlineOrdering: true,
+        staffScheduling: true
+      },
+      modules: ['menu', 'tables', 'orders', 'kitchen', 'staff'],
+    },
+    adminPermissions: [
+      'manage_menu',
+      'manage_tables',
+      'view_sales_reports',
+      'manage_staff',
+      'configure_restaurant',
+      'inventory_access'
+    ],
+    userPermissions: [
+      'take_orders',
+      'update_table_status',
+      'view_menu',
+      'view_personal_schedule'
+    ],
+    onboardingSteps: [
+      'setup_menu',
+      'create_floorplan',
+      'configure_kitchen',
+      'setup_online_ordering',
+      'import_staff'
+    ]
+  },
+
+  manufacturing: {
+    name: 'Manufacturing',
+    defaultSettings: {
+      theme: 'amber',
+      features: {
+        productionPlanning: true,
+        qualityControl: true,
+        supplyChain: true,
+        assetManagement: true,
+        workforceOptimization: true
+      },
+      modules: ['production', 'quality', 'supply_chain', 'assets', 'workforce'],
+    },
+    adminPermissions: [
+      'manage_production',
+      'manage_quality',
+      'view_supply_chain',
+      'manage_assets',
+      'configure_factory',
+      'workforce_planning'
+    ],
+    userPermissions: [
+      'update_production_status',
+      'perform_quality_checks',
+      'view_assigned_tasks',
+      'report_asset_issues'
+    ],
+    onboardingSteps: [
+      'define_production_lines',
+      'setup_quality_standards',
+      'configure_supply_chain',
+      'import_assets',
+      'setup_workforce'
     ]
   }
 };

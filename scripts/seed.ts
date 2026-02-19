@@ -6,6 +6,7 @@ dotenv.config()
 
 import bcrypt from 'bcryptjs'
 import { Client } from 'pg'
+import crypto from 'crypto'
 
 async function seed() {
   console.log('🌱 Starting database seeding...')
@@ -57,93 +58,143 @@ async function seed() {
         password_hash: passwordHash,
         is_active: true,
         is_verified: true
-      },
-      {
-        email: 'user@hybridpos.pk',
-        first_name: 'Staff',
-        last_name: 'User',
-        role: 'USER',
-        password_hash: passwordHash,
-        is_active: true,
-        is_verified: true
       }
     ]
 
-    console.log('📝 Inserting demo users...')
+    console.log('📝 Inserting core demo users...')
 
     for (const user of demoUsers) {
       try {
-        // Check if user exists
+        const existingUser = await client.query('SELECT id FROM users WHERE email = $1', [user.email])
+        if (existingUser.rows.length > 0) {
+          await client.query(`
+            UPDATE users SET first_name = $2, last_name = $3, role = $4, password_hash = $5, is_active = $6, is_verified = $7, updated_at = CURRENT_TIMESTAMP
+            WHERE email = $1
+          `, [user.email, user.first_name, user.last_name, user.role, user.password_hash, user.is_active, user.is_verified])
+          console.log(`🔄 Updated demo user: ${user.email}`)
+        } else {
+          await client.query(`
+            INSERT INTO users (email, first_name, last_name, role, password_hash, is_active, is_verified)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `, [user.email, user.first_name, user.last_name, user.role, user.password_hash, user.is_active, user.is_verified])
+          console.log(`✅ Created demo user: ${user.email}`)
+        }
+      } catch (error: any) {
+        console.error(`❌ Failed demo user ${user.email}:`, error.message)
+      }
+    }
+
+    // List of industries to seed
+    const industries = [
+      'pharmacy',
+      'fashion',
+      'education',
+      'healthcare',
+      'corporate',
+      'retail',
+      'restaurant',
+      'manufacturing'
+    ]
+
+    console.log('📝 Seeding industry-specific organizations and users...')
+
+    for (const industry of industries) {
+      const orgName = `${industry.charAt(0).toUpperCase() + industry.slice(1)} Test Org`
+      const email = `${industry}@hybridpos.pk`
+
+      try {
+        // 1. Create or get Organization
+        let orgId;
+        const existingOrg = await client.query(
+          'SELECT id FROM organizations WHERE name = $1',
+          [orgName]
+        )
+
+        if (existingOrg.rows.length > 0) {
+          orgId = existingOrg.rows[0].id
+          await client.query(
+            'UPDATE organizations SET industry = $2, business_type = $3 WHERE id = $1',
+            [orgId, industry, industry]
+          )
+          console.log(`🏢 Updated organization: ${orgName}`)
+        } else {
+          const newOrg = await client.query(
+            'INSERT INTO organizations (id, name, industry, business_type, status) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [crypto.randomUUID(), orgName, industry, industry, 'active']
+          )
+          orgId = newOrg.rows[0].id
+          console.log(`🏢 Created organization: ${orgName}`)
+        }
+
+        // 2. Create or update User
         const existingUser = await client.query(
           'SELECT id FROM users WHERE email = $1',
-          [user.email]
+          [email]
         )
 
         if (existingUser.rows.length > 0) {
-          // Update existing user
           await client.query(`
             UPDATE users SET
               first_name = $2,
               last_name = $3,
               role = $4,
               password_hash = $5,
-              is_active = $6,
-              is_verified = $7,
+              organization_id = $6,
+              is_active = $7,
+              is_verified = $8,
               updated_at = CURRENT_TIMESTAMP
             WHERE email = $1
           `, [
-            user.email,
-            user.first_name,
-            user.last_name,
-            user.role,
-            user.password_hash,
-            user.is_active,
-            user.is_verified
+            email,
+            industry.charAt(0).toUpperCase() + industry.slice(1),
+            'Admin',
+            'ADMIN',
+            passwordHash,
+            orgId,
+            true,
+            true
           ])
-          console.log(`🔄 Updated existing user: ${user.email} (${user.role})`)
+          console.log(`👤 Updated user: ${email}`)
         } else {
-          // Insert new user
           await client.query(`
             INSERT INTO users (
               email, first_name, last_name, role, password_hash,
-              is_active, is_verified
+              organization_id, is_active, is_verified
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
           `, [
-            user.email,
-            user.first_name,
-            user.last_name,
-            user.role,
-            user.password_hash,
-            user.is_active,
-            user.is_verified
+            email,
+            industry.charAt(0).toUpperCase() + industry.slice(1),
+            'Admin',
+            'ADMIN',
+            passwordHash,
+            orgId,
+            true,
+            true
           ])
-          console.log(`✅ Created new user: ${user.email} (${user.role})`)
+          console.log(`👤 Created user: ${email}`)
         }
-
       } catch (error: any) {
-        console.error(`❌ Failed to process user ${user.email}:`, error.message)
-        console.error('SQL error details:', error)
+        console.error(`❌ Error seeding ${industry}:`, error.message)
       }
     }
 
     // Verify inserted users
     const result = await client.query(`
       SELECT 
-        id, 
-        email, 
-        CONCAT(first_name, ' ', last_name) as full_name, 
-        role, 
-        is_active,
-        created_at 
-      FROM users 
-      WHERE deleted_at IS NULL
-      ORDER BY created_at DESC
+        u.email, 
+        o.name as organization,
+        o.industry,
+        u.role
+      FROM users u
+      LEFT JOIN organizations o ON u.organization_id = o.id
+      WHERE u.email LIKE '%@hybridpos.pk'
+      ORDER BY o.industry
     `)
 
-    console.log('\n📊 Current users in database:')
-    result.rows.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.email} - ${user.full_name} (${user.role}) ${user.is_active ? '✅' : '❌'}`)
+    console.log('\n📊 Seeded Industry Users:')
+    result.rows.forEach((row, index) => {
+      console.log(`${index + 1}. ${row.email} -> ${row.organization} (${row.industry}) - ${row.role}`)
     })
 
     console.log(`\n✅ Total users: ${result.rows.length}`)

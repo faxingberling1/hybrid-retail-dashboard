@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Shield, Store, ShoppingCart, User, ArrowRight, Sparkles,
   Lock, AlertTriangle, Building, Users, Activity,
-  Timer, Rocket, Globe, Zap, Database
+  Timer, Rocket, Globe, Zap, Database, Pill, Utensils, Factory, ShoppingBag, Stethoscope, GraduationCap, Briefcase
 } from "lucide-react"
 import Link from "next/link"
 
@@ -119,6 +119,16 @@ export default function LoginPage() {
       color: "emerald",
       redirect: "/user/inventory"
     }
+  ]
+
+  const industryTestRoles = [
+    { id: "PHARMACY", name: "Pharmacy", email: "pharmacy@hybridpos.pk", icon: <Pill className="h-5 w-5" />, color: "blue" },
+    { id: "RESTAURANT", name: "Restaurant", email: "restaurant@hybridpos.pk", icon: <Utensils className="h-5 w-5" />, color: "orange" },
+    { id: "MANUFACTURING", name: "Manufacturing", email: "manufacturing@hybridpos.pk", icon: <Factory className="h-5 w-5" />, color: "amber" },
+    { id: "RETAIL", name: "Retail", email: "retail@hybridpos.pk", icon: <ShoppingBag className="h-5 w-5" />, color: "sky" },
+    { id: "HEALTHCARE", name: "Healthcare", email: "healthcare@hybridpos.pk", icon: <Stethoscope className="h-5 w-5" />, color: "red" },
+    { id: "EDUCATION", name: "Education", email: "education@hybridpos.pk", icon: <GraduationCap className="h-5 w-5" />, color: "emerald" },
+    { id: "CORPORATE", name: "Corporate", email: "corporate@hybridpos.pk", icon: <Briefcase className="h-5 w-5" />, color: "indigo" },
   ]
 
   const handleLogin = async (creds: { email: string; password?: string; redirect?: string }) => {
@@ -319,6 +329,27 @@ export default function LoginPage() {
                         <ArrowRight className="h-5 w-5 text-slate-200 group-hover:text-slate-900 transition-colors" />
                       </MotionButton>
                     ))}
+
+                    {/* Industry Specific Logins */}
+                    <div className="mt-4 pt-4 border-t border-slate-50">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 ml-2">Industry Test Access</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        {industryTestRoles.map((role) => (
+                          <MotionButton
+                            key={role.id}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleLogin({ email: role.email, redirect: role.id === 'RETAIL' ? '/admin' : '/admin' })} // All point to admin for now as requested by user's hybrid setup
+                            className={`flex items-center space-x-3 p-3 rounded-2xl border-2 border-slate-50 hover:border-slate-100 hover:bg-slate-50 transition-all text-left ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+                          >
+                            <div className={`p-2 rounded-lg bg-${role.color}-50 text-${role.color}-600`}>
+                              {role.icon}
+                            </div>
+                            <span className="text-xs font-bold text-slate-700">{role.name}</span>
+                          </MotionButton>
+                        ))}
+                      </div>
+                    </div>
                   </MotionDiv>
                 ) : (
                   <MotionDiv
