@@ -18,7 +18,8 @@ export function SiteHeader({ cms }: { cms?: any }) {
         links: [
             { label: "Features", href: "/features" },
             { label: "Pricing", href: "/pricing" },
-            { label: "Blog", href: "/blog" }
+            { label: "Blog", href: "/blog" },
+            { label: "Storefront", href: "/storefront" }
         ],
         ctaText: "Login",
         ctaHref: "/login",
@@ -38,7 +39,7 @@ export function SiteHeader({ cms }: { cms?: any }) {
 
     return (
         <>
-            <header className={`fixed top-0 inset-x-0 z-[100] transition-all duration-500 ${scrolled ? 'py-4' : 'py-8'}`}>
+            <header className={`sticky top-0 inset-x-0 z-[100] transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'}`}>
                 <nav className="container mx-auto px-6">
                     <div className={`p-4 md:px-8 rounded-[2rem] transition-all duration-500 flex items-center justify-between ${scrolled ? (isDark ? 'bg-black/60 backdrop-blur-2xl border border-white/10' : 'bg-white/80 backdrop-blur-2xl border border-slate-100 shadow-[0_8px_32px_rgba(0,0,0,0.03)]') : 'bg-transparent'}`}>
                         <Link href="/" className="flex items-center space-x-3 group transition-transform hover:scale-105">
@@ -68,8 +69,8 @@ export function SiteHeader({ cms }: { cms?: any }) {
                                 {isMounted && (isDark ? <Moon className="h-5 w-5 fill-current" /> : <Sun className="h-5 w-5 fill-current" />)}
                             </button>
 
-                            <div className="flex items-center gap-3">
-                                <Link href="/call-us" className="hidden lg:flex px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all items-center gap-2">
+                            <div className="hidden lg:flex items-center gap-3">
+                                <Link href="/call-us" className="flex px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all items-center gap-2">
                                     <Smartphone className="h-4 w-4" />
                                     <span>Call Us</span>
                                 </Link>
@@ -132,12 +133,20 @@ export function SiteHeader({ cms }: { cms?: any }) {
                                 {link.label}
                             </Link>
                         ))}
-                        <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href={header.ctaHref} onClick={() => setMobileMenuOpen(false)}>
                             <MotionButton
                                 whileTap={{ scale: 0.95 }}
-                                className={`px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl ${isDark ? 'bg-white text-black' : 'bg-slate-900 text-white'}`}
+                                className={`px-10 py-4 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-xl border-2 ${isDark ? 'bg-transparent border-white/20 text-white' : 'bg-white text-slate-900 border-slate-200'}`}
                             >
-                                Get Started
+                                {header.ctaText}
+                            </MotionButton>
+                        </Link>
+                        <Link href={header.ctaSecondaryHref || "/auth/signup"} onClick={() => setMobileMenuOpen(false)}>
+                            <MotionButton
+                                whileTap={{ scale: 0.95 }}
+                                className={`px-10 py-4 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-xl ${isDark ? 'bg-white text-black' : 'bg-slate-900 text-white'}`}
+                            >
+                                {header.ctaSecondaryText || "Get Started"}
                             </MotionButton>
                         </Link>
                     </motion.div>

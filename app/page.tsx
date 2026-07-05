@@ -29,9 +29,9 @@ export default function LandingPage() {
 
     useEffect(() => {
         setIsMounted(true)
-        fetch('/api/super-admin/cms')
-            .then(res => res.json())
-            .then(data => setCmsContent(data))
+        fetch('/api/super-admin/cms', { cache: 'no-store' })
+            .then(res => res.ok ? res.json() : null)
+            .then(data => { if (data) setCmsContent(data) })
             .catch(err => console.error("CMS Load Error:", err))
     }, [])
 
@@ -88,7 +88,7 @@ export default function LandingPage() {
 
 
     return (
-        <div className={`min-h-screen font-sans selection:bg-sky-500/10 overflow-x-hidden transition-colors duration-500 ${isDark ? 'bg-[#020412] text-white selection:bg-violet-500/20' : 'bg-white text-slate-900'}`}>
+        <div className={`min-h-screen font-sans selection:bg-sky-500/10 transition-colors duration-500 ${isDark ? 'bg-[#020412] text-white selection:bg-violet-500/20' : 'bg-white text-slate-900'}`}>
 
             {/* Backgrounds */}
             <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -161,7 +161,7 @@ export default function LandingPage() {
             {/* Hero Section */}
 
             {/* Hero Section */}
-            <section className="relative pt-64 pb-32 overflow-hidden">
+            <section className="relative pt-24 pb-32 overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <div className="space-y-12 max-w-5xl mx-auto">
                         <MotionDiv

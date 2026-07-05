@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic';
+
 const SETTINGS_KEY = 'landing_page_content'
 
 // Default content to seed if none exists
@@ -69,7 +71,8 @@ const defaultContent = {
         links: [
             { label: "Features", href: "/features" },
             { label: "Pricing", href: "/pricing" },
-            { label: "Blog", href: "/blog" }
+            { label: "Blog", href: "/blog" },
+            { label: "Storefront", href: "/storefront" }
         ],
         ctaText: "Login",
         ctaHref: "/login"
