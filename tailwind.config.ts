@@ -78,6 +78,8 @@ const config: Config = {
         'slide-in-from-bottom': 'slideInFromBottom 0.2s ease-out',
         'slide-in-from-left': 'slideInFromLeft 0.2s ease-out',
         'slide-in-from-right': 'slideInFromRight 0.2s ease-out',
+        'marquee': 'marquee 25s linear infinite',
+        'marquee-reverse': 'marquee 25s linear infinite reverse',
       },
       keyframes: {
         'accordion-down': {
@@ -143,6 +145,10 @@ const config: Config = {
             transform: 'translateY(0)',
             opacity: '1',
           },
+        },
+        'marquee': {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
         },
         'slideInFromLeft': {
           from: {

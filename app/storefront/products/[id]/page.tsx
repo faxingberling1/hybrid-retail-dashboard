@@ -6,6 +6,7 @@ import { AddToCartButton } from "@/components/storefront/add-to-cart-button"
 import { BackButton } from "@/components/storefront/back-button"
 import { ShareButton } from "@/components/storefront/share-button"
 import { WishlistButton } from "@/components/storefront/wishlist-button"
+import { RecentlyViewedTracker } from "@/components/storefront/recently-viewed-tracker"
 import ReactMarkdown from "react-markdown"
 
 export default async function ProductDetailsPage({
@@ -49,6 +50,15 @@ export default async function ProductDetailsPage({
 
   return (
     <div className="pt-8 pb-24">
+      <RecentlyViewedTracker 
+        product={{
+          id: product.id,
+          name: product.name,
+          price: Number(product.price),
+          compareAtPrice: product.compare_at_price ? Number(product.compare_at_price) : null,
+          imageUrl: product.image_url
+        }} 
+      />
       <div className="container mx-auto px-4 max-w-7xl">
           {/* Breadcrumb & Back */}
           <div className="mb-8">
