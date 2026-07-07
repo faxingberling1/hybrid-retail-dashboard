@@ -41,6 +41,8 @@ export async function middleware(request: NextRequest) {
     '/blog', // Public blog page
     '/api/blog', // Public blog API (GET)
     '/api/super-admin/cms', // Public CMS content for landing page
+    '/storefront', // Storefront UI
+    '/api/storefront', // Storefront API
   ]
 
 
