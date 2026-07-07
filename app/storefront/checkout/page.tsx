@@ -498,15 +498,17 @@ export default function CheckoutPage() {
                   
                   {!appliedCoupon ? (
                     <div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-3">
                         <input 
                           type="text" 
                           placeholder="e.g. WELCOME10" 
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
-                          className="flex-1 p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm uppercase font-bold text-gray-700" 
+                          className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm uppercase font-bold text-gray-700 bg-white" 
                         />
-                        <button onClick={handleApplyCoupon} className="px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">Apply</button>
+                        <button onClick={handleApplyCoupon} className="w-full py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">
+                          Apply
+                        </button>
                       </div>
                       {couponError && <p className="text-rose-500 text-xs font-bold mt-2">{couponError}</p>}
                       <p className="text-xs text-gray-500 mt-2">Try <span className="font-bold text-emerald-600">WELCOME10</span> or <span className="font-bold text-emerald-600">FREEDEL</span></p>
