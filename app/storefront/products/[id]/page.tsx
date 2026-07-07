@@ -80,7 +80,7 @@ export default async function ProductDetailsPage({
               {/* Optional: Additional Images thumbnails */}
               {product.images && product.images.length > 0 && (
                 <div className="grid grid-cols-4 gap-4">
-                  {product.images.map((img, idx) => (
+                  {product.images.map((img: string, idx: number) => (
                     <button key={idx} className="aspect-square rounded-2xl overflow-hidden border-2 border-transparent hover:border-indigo-500 transition-colors bg-white dark:bg-slate-800">
                       <img src={img} alt={`${product?.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
                     </button>
@@ -234,17 +234,15 @@ export default async function ProductDetailsPage({
                       <h3 className="font-bold text-base text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-indigo-500 transition-colors line-clamp-2">{related.name}</h3>
                       <div className="mt-auto flex flex-col pt-2">
                         <span className="text-lg font-black text-slate-900 dark:text-white mb-2 block">Rs. {Number(related.price).toLocaleString()}</span>
-                        <div onClick={(e) => e.preventDefault()}>
                           <AddToCartButton 
                             product={{
                               id: related.id, 
                               name: related.name, 
-                              price: related.price, 
+                              price: Number(related.price), 
                               image_url: related.image_url ?? null
                             }} 
                             variant="card" 
                           />
-                        </div>
                       </div>
                     </div>
                   </Link>

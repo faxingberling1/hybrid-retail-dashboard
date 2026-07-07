@@ -10,9 +10,9 @@ interface AddToCartButtonProps {
     name: string;
     price: number | string;
     image_url: string | null;
-    stock: number;
+    stock?: number;
   };
-  variant?: "icon" | "full";
+  variant?: "icon" | "full" | "card";
 }
 
 export function AddToCartButton({ product, variant = "full" }: AddToCartButtonProps) {
@@ -51,7 +51,7 @@ export function AddToCartButton({ product, variant = "full" }: AddToCartButtonPr
 
   if (variant === "card") {
     return (
-      <div className="flex flex-col gap-2 w-full mt-2">
+      <div className="flex flex-col gap-2 w-full mt-2" onClick={(e) => e.preventDefault()}>
         <div className="flex items-center justify-between border border-gray-200 rounded-xl overflow-hidden bg-gray-50/50">
           <button 
             onClick={(e) => { e.preventDefault(); setQuantity(Math.max(1, quantity - 1)); }}
@@ -103,7 +103,7 @@ export function AddToCartButton({ product, variant = "full" }: AddToCartButtonPr
   }
 
   return (
-    <div className="flex gap-4 w-full">
+    <div className="flex gap-4 w-full" onClick={(e) => e.preventDefault()}>
       {variant === "full" && (
         <div className="hidden w-32 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 sm:flex items-center justify-between p-2 shadow-sm">
           <button 

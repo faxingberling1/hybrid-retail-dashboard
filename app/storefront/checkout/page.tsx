@@ -422,6 +422,115 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Promotions & Rewards Card (Moved to Left Column) */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-emerald-500" />
+                  Promotions & Rewards
+                </h2>
+                <span className="text-xs font-bold bg-[#ffc000]/10 text-yellow-700 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                  <Trophy className="w-4 h-4" />
+                  {loyaltyStore.points} Points Available
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Vouchers & Rewards */}
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-[#ffc000]" /> Attach a Voucher
+                  </h3>
+                  
+                  {activeRewards.length > 0 ? (
+                    <div className="space-y-3 mb-4">
+                      {activeRewards.map(reward => (
+                        <label key={reward.id} className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-colors ${appliedRewardId === reward.id ? 'border-[#ffc000] bg-[#ffc000]/10' : 'border-gray-100 hover:bg-gray-50'}`}>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-900 text-sm">{reward.name}</span>
+                            <span className="text-xs text-gray-500">Apply {reward.discount}% discount</span>
+                          </div>
+                          <input 
+                            type="checkbox" 
+                            checked={appliedRewardId === reward.id}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setAppliedRewardId(reward.id)
+                                handleRemoveCoupon() // Clear coupon if reward is applied
+                              } else {
+                                setAppliedRewardId(null)
+                              }
+                            }}
+                            className="w-5 h-5 accent-[#ffc000] rounded" 
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">No active vouchers available.</p>
+                  )}
+
+                  {/* Redeem Points UI */}
+                  {loyaltyStore.points >= 100 && (
+                    <div className="bg-gradient-to-r from-gray-900 to-slate-800 p-4 rounded-xl border border-gray-800 flex items-center justify-between text-white shadow-lg">
+                      <div className="flex flex-col">
+                        <span className="font-black text-sm flex items-center gap-1.5"><Tag className="w-3.5 h-3.5 text-[#ffc000]" /> 10% Off Voucher</span>
+                        <span className="text-xs text-gray-400 mt-0.5">Redeem for 100 points</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                           e.preventDefault()
+                           loyaltyStore.claimReward(100, "10% Checkout Voucher", 10)
+                        }}
+                        className="px-4 py-2 bg-[#ffc000] text-slate-900 font-bold text-xs rounded-lg shadow-sm hover:bg-[#e5ac00] transition-colors whitespace-nowrap"
+                      >
+                        Redeem
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Promo Codes */}
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                    <Tag className="w-4 h-4 text-emerald-500" /> Apply Promo Code
+                  </h3>
+                  
+                  {!appliedCoupon ? (
+                    <div>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          placeholder="e.g. WELCOME10" 
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          className="flex-1 p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm uppercase font-bold text-gray-700" 
+                        />
+                        <button onClick={handleApplyCoupon} className="px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">Apply</button>
+                      </div>
+                      {couponError && <p className="text-rose-500 text-xs font-bold mt-2">{couponError}</p>}
+                      <p className="text-xs text-gray-500 mt-2">Try <span className="font-bold text-emerald-600">WELCOME10</span> or <span className="font-bold text-emerald-600">FREEDEL</span></p>
+                    </div>
+                  ) : (
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex justify-between items-center">
+                      <div className="flex items-center gap-3 text-emerald-700">
+                        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                          <Tag className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-black uppercase">{appliedCoupon.code} Applied!</p>
+                          <p className="text-xs text-emerald-600">
+                            {appliedCoupon.type === 'percent' ? `${appliedCoupon.discount}% off your order` : `Free delivery applied`}
+                          </p>
+                        </div>
+                      </div>
+                      <button onClick={handleRemoveCoupon} className="text-xs font-bold text-emerald-700 hover:text-rose-500 underline">Remove</button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Right Column - Order Summary */}
@@ -452,73 +561,6 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Rewards Section */}
-              {activeRewards.length > 0 && (
-                <div className="mb-6 pt-4 border-t border-gray-100">
-                  <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
-                    <Trophy className="w-4 h-4 text-[#ffc000]" /> Available Rewards
-                  </h3>
-                  <div className="space-y-3">
-                    {activeRewards.map(reward => (
-                      <label key={reward.id} className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-colors ${appliedRewardId === reward.id ? 'border-[#ffc000] bg-[#ffc000]/10' : 'border-gray-100 hover:bg-gray-50'}`}>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-gray-900 text-sm">{reward.name}</span>
-                          <span className="text-xs text-gray-500">Apply {reward.discount}% discount</span>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={appliedRewardId === reward.id}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setAppliedRewardId(reward.id)
-                              handleRemoveCoupon() // Clear coupon if reward is applied
-                            } else {
-                              setAppliedRewardId(null)
-                            }
-                          }}
-                          className="w-5 h-5 accent-[#ffc000] rounded" 
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Coupon Section */}
-              <div className="mb-6 pt-4 border-t border-gray-100">
-                {!appliedCoupon ? (
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-2">
-                      <Tag className="w-4 h-4 text-emerald-500" /> Apply Promo Code
-                    </h3>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text" 
-                        placeholder="e.g. WELCOME10" 
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm uppercase font-bold text-gray-700" 
-                      />
-                      <button onClick={handleApplyCoupon} className="px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">Apply</button>
-                    </div>
-                    {couponError && <p className="text-rose-500 text-xs font-bold mt-2">{couponError}</p>}
-                    <p className="text-xs text-gray-500 mt-2">Try <span className="font-bold text-emerald-600">WELCOME10</span> or <span className="font-bold text-emerald-600">FREEDEL</span></p>
-                  </div>
-                ) : (
-                  <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-emerald-700">
-                      <Tag className="w-4 h-4" />
-                      <div>
-                        <p className="text-xs font-black uppercase">{appliedCoupon.code} Applied!</p>
-                        <p className="text-xs text-emerald-600">
-                          {appliedCoupon.type === 'percent' ? `${appliedCoupon.discount}% off your order` : `Free delivery applied`}
-                        </p>
-                      </div>
-                    </div>
-                    <button onClick={handleRemoveCoupon} className="text-xs font-bold text-emerald-700 hover:text-rose-500 underline">Remove</button>
-                  </div>
-                )}
-              </div>
 
               <div className="border-t border-gray-100 pt-4 space-y-3 mb-6">
                 <div className="flex justify-between text-sm font-bold text-gray-600">
