@@ -5,7 +5,7 @@ import { ChevronRight, ShoppingBag, Zap, Award } from "lucide-react"
 import { HeroCarousel } from "@/components/storefront/hero-carousel"
 import { FlashDealsTimer } from "@/components/storefront/flash-deals-timer"
 import { AddToCartButton } from "@/components/storefront/add-to-cart-button"
-import { WishlistButton } from "@/components/storefront/wishlist-button"
+import { ProductCard } from "@/components/storefront/product-card"
 
 export const revalidate = 60 // revalidate every minute
 
@@ -136,39 +136,16 @@ export default async function StorefrontShopPage() {
 
             <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {flashDeals.map((product: any) => (
-                <div key={product.id} className="bg-white rounded-xl md:rounded-2xl p-2 md:p-3 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full border border-gray-100 group relative">
-                  <Link href={`/storefront/products/${product.id}`} className="relative aspect-square w-full mb-2 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 block">
-                    {product.image_url ? (
-                      <Image src={product.image_url} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center"><ShoppingBag className="w-8 h-8 text-gray-300" /></div>
-                    )}
-                    <div className="absolute top-2 left-2 bg-rose-500 text-white text-[10px] font-black px-2 py-1 rounded-md z-10 shadow-sm animate-pulse">
-                      -{Math.round((1 - Number(product.price)/Number(product.compare_at_price)) * 100)}%
-                    </div>
-                  </Link>
-                  <div className="absolute top-2 right-2 z-20">
-                    <WishlistButton product={{ id: product.id, name: product.name, price: Number(product.price), image_url: product.image_url }} />
-                  </div>
-                  <div className="flex flex-col flex-1 mt-2">
-                    <Link href={`/storefront/products/${product.id}`} className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-rose-500 transition-colors">
-                      {product.name}
-                    </Link>
-                    <div className="mt-auto flex items-end justify-between">
-                      <div>
-                        {product.compare_at_price && (
-                          <div className="text-[10px] md:text-xs text-gray-400 line-through font-bold">
-                            Rs. {parseFloat(product.compare_at_price).toFixed(0)}
-                          </div>
-                        )}
-                        <div className="text-sm md:text-base font-black text-rose-500">
-                          Rs. {parseFloat(product.price).toFixed(0)}
-                        </div>
-                      </div>
-                      <AddToCartButton product={{...product, price: Number(product.price)}} variant="icon" />
-                    </div>
-                  </div>
-                </div>
+                <ProductCard 
+                  key={product.id}
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    compareAtPrice: product.compare_at_price,
+                    imageUrl: product.image_url
+                  }}
+                />
               ))}
             </div>
           </div>
@@ -247,35 +224,16 @@ export default async function StorefrontShopPage() {
             
             <div className="flex overflow-x-auto pb-6 gap-4 md:gap-6 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
               {section.products.slice(0, 8).map((product: any) => (
-                <div key={product.id} className="w-[180px] md:w-[220px] flex-shrink-0 bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition-all flex flex-col h-full border border-gray-100 group">
-                  <Link href={`/storefront/products/${product.id}`} className="relative aspect-square w-full mb-3 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 block">
-                    {product.image_url ? (
-                      <Image src={product.image_url} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center"><ShoppingBag className="w-8 h-8 text-gray-300" /></div>
-                    )}
-                  </Link>
-                  <div className="absolute top-5 right-5 z-20">
-                    <WishlistButton product={{ id: product.id, name: product.name, price: Number(product.price), image_url: product.image_url }} />
-                  </div>
-                  <div className="flex flex-col flex-1 mt-2">
-                    <Link href={`/storefront/products/${product.id}`} className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
-                      {product.name}
-                    </Link>
-                    <div className="mt-auto pt-2 border-t border-gray-50 flex items-end justify-between">
-                      <div>
-                        {product.compare_at_price && (
-                          <div className="text-[10px] text-gray-400 line-through font-bold">
-                            Rs. {parseFloat(product.compare_at_price).toFixed(0)}
-                          </div>
-                        )}
-                        <div className="text-sm md:text-base font-black text-gray-900">
-                          Rs. {parseFloat(product.price).toFixed(0)}
-                        </div>
-                      </div>
-                      <AddToCartButton product={{...product, price: Number(product.price)}} variant="icon" />
-                    </div>
-                  </div>
+                <div key={product.id} className="w-[180px] md:w-[220px] flex-shrink-0 h-full">
+                  <ProductCard 
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      compareAtPrice: product.compare_at_price,
+                      imageUrl: product.image_url
+                    }}
+                  />
                 </div>
               ))}
             </div>

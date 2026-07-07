@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Filter, Search, ShoppingBag, ArrowRight, ArrowDownUp, X } from "lucide-react"
 import { BackButton } from "@/components/storefront/back-button"
 import { WishlistButton } from "@/components/storefront/wishlist-button"
+import { AddToCartButton } from "@/components/storefront/add-to-cart-button"
 
 interface Product {
   id: string
@@ -240,15 +241,23 @@ export function ProductListingClient({
                 <div className="p-6 flex-grow flex flex-col">
                   <div className="text-xs font-bold text-indigo-500 mb-2 uppercase tracking-widest">{product.category.name}</div>
                   <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-indigo-500 transition-colors">{product.name}</h3>
-                  <div className="mt-auto flex items-end justify-between">
-                    <div className="flex flex-col">
+                  <div className="mt-auto flex flex-col">
+                    <div className="mb-2">
                       {product.compare_at_price && (
-                        <span className="text-sm text-slate-400 line-through">Rs. {Number(product.compare_at_price).toLocaleString()}</span>
+                        <span className="text-sm text-slate-400 line-through block">Rs. {Number(product.compare_at_price).toLocaleString()}</span>
                       )}
-                      <span className="text-xl font-black text-slate-900 dark:text-white">Rs. {Number(product.price).toLocaleString()}</span>
+                      <span className="text-xl font-black text-slate-900 dark:text-white block">Rs. {Number(product.price).toLocaleString()}</span>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover:bg-[#ffc000] group-hover:text-gray-900 transition-colors shadow-sm">
-                      <ArrowRight className="w-4 h-4" />
+                    <div onClick={(e) => e.preventDefault()}>
+                      <AddToCartButton 
+                        product={{
+                          id: product.id, 
+                          name: product.name, 
+                          price: product.price, 
+                          image_url: product.image_url ?? null
+                        }} 
+                        variant="card" 
+                      />
                     </div>
                   </div>
                 </div>

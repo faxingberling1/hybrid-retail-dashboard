@@ -31,11 +31,12 @@ export default async function StorefrontProductsPage({
   });
 
   // Convert Decimal to Number for Client Component Serialization
+  const parsePrice = (p: any) => typeof p === 'string' ? Number(p.replace(/,/g, '')) : Number(p);
   const serializedProducts = products.map(p => ({
     id: p.id,
     name: p.name,
-    price: Number(p.price),
-    compare_at_price: p.compare_at_price ? Number(p.compare_at_price) : null,
+    price: parsePrice(p.price),
+    compare_at_price: p.compare_at_price ? parsePrice(p.compare_at_price) : null,
     image_url: p.image_url,
     category: { 
       name: p.category.name,

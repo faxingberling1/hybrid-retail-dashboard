@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma"
 import Link from "next/link"
+import { ProductCard } from "@/components/storefront/product-card"
 import Image from "next/image"
 import { ChevronRight, ChevronLeft, ShoppingBag, Heart, ArrowRight } from "lucide-react"
 import { WishlistButton } from "@/components/storefront/wishlist-button"
@@ -125,41 +126,16 @@ export default async function CategoryLandingPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {catProducts.map(product => (
-                  <div key={product.id} className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition-all flex flex-col h-full border border-gray-100 group relative">
-                    <Link href={`/storefront/products/${product.id}`} className="relative aspect-square w-full mb-3 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 block">
-                      {product.image_url ? (
-                        <Image src={product.image_url} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"><ShoppingBag className="w-8 h-8 text-gray-300" /></div>
-                      )}
-                      {product.compare_at_price && (
-                        <div className="absolute top-2 left-2 bg-rose-500 text-white text-[10px] font-black px-2 py-1 rounded-md z-10 shadow-sm animate-pulse">
-                          Sale
-                        </div>
-                      )}
-                    </Link>
-                    <div className="absolute top-5 right-5 z-20">
-                      <WishlistButton product={{ id: product.id, name: product.name, price: Number(product.price), image_url: product.image_url }} />
-                    </div>
-                    <div className="flex flex-col flex-1 mt-2">
-                      <Link href={`/storefront/products/${product.id}`} className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
-                        {product.name}
-                      </Link>
-                      <div className="mt-auto flex items-end justify-between">
-                        <div>
-                          {product.compare_at_price && (
-                            <div className="text-[10px] md:text-xs text-gray-400 line-through font-bold">
-                              Rs. {parseFloat(product.compare_at_price).toFixed(0)}
-                            </div>
-                          )}
-                          <div className="text-sm md:text-base font-black text-rose-500">
-                            Rs. {parseFloat(product.price).toFixed(0)}
-                          </div>
-                        </div>
-                        <AddToCartButton product={{...product, price: Number(product.price)}} variant="icon" />
-                      </div>
-                    </div>
-                  </div>
+                  <ProductCard 
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      compareAtPrice: product.compare_at_price,
+                      imageUrl: product.image_url
+                    }}
+                  />
                 ))}
               </div>
             </div>

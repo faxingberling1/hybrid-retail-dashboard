@@ -1,6 +1,7 @@
 import { StoreHeader } from "@/components/storefront/store-header"
 import { StoreFooter } from "@/components/storefront/store-footer"
 import { AuthModal } from "@/components/storefront/auth-modal"
+import { AddressModal } from "@/components/storefront/address-modal"
 import { MobileNav } from "@/components/storefront/mobile-nav"
 import { db, queryAll } from "@/lib/db"
 
@@ -27,6 +28,7 @@ export default async function StorefrontLayout({
       </div>
       <StoreFooter />
       <MobileNav />
+      <AddressModal />
     </div>
   )
 }

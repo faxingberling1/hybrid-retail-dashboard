@@ -20,7 +20,7 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
   const getPoints = useLoyaltyStore((state) => state.getPoints)
   
   const [mounted, setMounted] = React.useState(false)
-  const { isSidebarOpen, setSidebarOpen, isCartOpen, setCartOpen, setAuthModalOpen } = useUIStore()
+  const { isSidebarOpen, setSidebarOpen, isCartOpen, setCartOpen, setAuthModalOpen, setAddressModalOpen } = useUIStore()
   const { user, isAuthenticated, logout } = useAuthStore()
   const { address, isLoading, fetchLocation } = useLocationStore()
   const [searchValue, setSearchValue] = useState("")
@@ -126,7 +126,7 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
           </div>
 
           <button 
-            onClick={() => fetchLocation()}
+            onClick={() => setAddressModalOpen(true)}
             className="hidden lg:flex flex-col items-start px-3 py-1 hover:bg-black/5 rounded-xl transition-colors shrink-0"
           >
             <span className="text-[10px] text-gray-700 font-bold leading-tight">Delivering to</span>
@@ -168,7 +168,7 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
                           </div>
                           <div className="flex-1 text-left">
                             <h4 className="text-sm font-bold text-gray-900 line-clamp-1">{product.name}</h4>
-                            <span className="text-xs font-black text-rose-500">Rs. {parseFloat(product.price).toFixed(0)}</span>
+                            <span className="text-xs font-black text-rose-500">Rs. {Number(typeof product.price === 'string' ? product.price.replace(/,/g, '') : product.price).toFixed(0)}</span>
                           </div>
                         </Link>
                      ))}
@@ -278,7 +278,7 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
                         </div>
                         <div className="flex-1 text-left">
                           <h4 className="text-sm font-bold text-gray-900 line-clamp-1">{product.name}</h4>
-                          <span className="text-xs font-black text-rose-500">Rs. {parseFloat(product.price).toFixed(0)}</span>
+                          <span className="text-xs font-black text-rose-500">Rs. {Number(typeof product.price === 'string' ? product.price.replace(/,/g, '') : product.price).toFixed(0)}</span>
                         </div>
                       </Link>
                    ))}

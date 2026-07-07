@@ -232,10 +232,18 @@ export default async function ProductDetailsPage({
                     </div>
                     <div className="p-5 flex-grow flex flex-col">
                       <h3 className="font-bold text-base text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-indigo-500 transition-colors line-clamp-2">{related.name}</h3>
-                      <div className="mt-auto flex items-end justify-between pt-2">
-                        <span className="text-lg font-black text-slate-900 dark:text-white">Rs. {Number(related.price).toLocaleString()}</span>
-                        <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                          <ShoppingBag className="w-3.5 h-3.5" />
+                      <div className="mt-auto flex flex-col pt-2">
+                        <span className="text-lg font-black text-slate-900 dark:text-white mb-2 block">Rs. {Number(related.price).toLocaleString()}</span>
+                        <div onClick={(e) => e.preventDefault()}>
+                          <AddToCartButton 
+                            product={{
+                              id: related.id, 
+                              name: related.name, 
+                              price: related.price, 
+                              image_url: related.image_url ?? null
+                            }} 
+                            variant="card" 
+                          />
                         </div>
                       </div>
                     </div>

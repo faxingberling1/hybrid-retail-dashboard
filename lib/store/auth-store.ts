@@ -6,6 +6,7 @@ export interface UserProfile {
   email: string
   points: number
   joinedDate: string
+  avatarUrl?: string
 }
 
 export interface Order {
@@ -22,6 +23,7 @@ interface AuthStore {
   isAuthenticated: boolean
   login: (email: string, name: string) => void
   logout: () => void
+  updateProfile: (data: Partial<UserProfile>) => void
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -48,5 +50,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       isAuthenticated: true
     })
   },
-  logout: () => set({ user: null, orders: [], isAuthenticated: false })
+  logout: () => set({ user: null, orders: [], isAuthenticated: false }),
+  updateProfile: (data) => set((state) => ({
+    user: state.user ? { ...state.user, ...data } : null
+  }))
 }))

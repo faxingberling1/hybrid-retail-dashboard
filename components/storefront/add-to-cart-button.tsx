@@ -26,8 +26,9 @@ export function AddToCartButton({ product, variant = "full" }: AddToCartButtonPr
     setMounted(true)
   }, [])
 
+  const stockLimit = product.stock ?? 99
   const cartItem = items.find(i => i.id === product.id)
-  const isOutOfStock = product.stock <= 0 || (cartItem && cartItem.quantity >= product.stock)
+  const isOutOfStock = stockLimit <= 0 || (cartItem && cartItem.quantity >= stockLimit)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -36,10 +37,10 @@ export function AddToCartButton({ product, variant = "full" }: AddToCartButtonPr
     addItem({
       id: product.id,
       name: product.name,
-      price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+      price: typeof product.price === 'string' ? Number(product.price.replace(/,/g, '')) : product.price,
       image_url: product.image_url,
-      stock: product.stock
-    }, quantity) // Add item with specified quantity (need to verify if addItem supports quantity, but I can just call addItem multiple times or update the store to accept quantity)
+      stock: stockLimit
+    }, quantity)
 
     setJustAdded(true)
     setTimeout(() => setJustAdded(false), 2000)
@@ -47,6 +48,41 @@ export function AddToCartButton({ product, variant = "full" }: AddToCartButtonPr
   }
 
   if (!mounted) return null
+
+  if (variant === "card") {
+    return (
+      <div className="flex flex-col gap-2 w-full mt-2">
+        <div className="flex items-center justify-between border border-gray-200 rounded-xl overflow-hidden bg-gray-50/50">
+          <button 
+            onClick={(e) => { e.preventDefault(); setQuantity(Math.max(1, quantity - 1)); }}
+            className="w-8 h-8 flex items-center justify-center font-black text-gray-600 hover:bg-gray-200 transition-colors"
+          >
+            -
+          </button>
+          <span className="font-bold text-sm text-gray-900">{quantity}</span>
+          <button 
+            onClick={(e) => { e.preventDefault(); setQuantity(Math.min(stockLimit, quantity + 1)); }}
+            className="w-8 h-8 flex items-center justify-center font-black text-gray-600 hover:bg-gray-200 transition-colors"
+          >
+            +
+          </button>
+        </div>
+        <button 
+          onClick={handleAddToCart}
+          disabled={!!isOutOfStock}
+          className={`w-full py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
+            justAdded
+              ? "bg-emerald-500 text-white"
+              : isOutOfStock
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-gray-900 text-white hover:bg-rose-500"
+          }`}
+        >
+          {justAdded ? "Added" : isOutOfStock ? "Out of Stock" : "Add to Cart"}
+        </button>
+      </div>
+    )
+  }
 
   if (variant === "icon") {
     return (
@@ -71,14 +107,14 @@ export function AddToCartButton({ product, variant = "full" }: AddToCartButtonPr
       {variant === "full" && (
         <div className="hidden w-32 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 sm:flex items-center justify-between p-2 shadow-sm">
           <button 
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            onClick={(e) => { e.preventDefault(); setQuantity(Math.max(1, quantity - 1)); }}
             className="w-10 h-10 flex items-center justify-center font-bold text-xl hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
           >
             -
           </button>
           <span className="font-black text-lg">{quantity}</span>
           <button 
-            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+            onClick={(e) => { e.preventDefault(); setQuantity(Math.min(stockLimit, quantity + 1)); }}
             className="w-10 h-10 flex items-center justify-center font-bold text-xl hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
           >
             +

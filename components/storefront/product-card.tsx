@@ -16,8 +16,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const price = Number(product.price)
-  const compareAtPrice = product.compareAtPrice ? Number(product.compareAtPrice) : null
+  const parsePrice = (p: any) => typeof p === 'string' ? Number(p.replace(/,/g, '')) : Number(p);
+  const price = parsePrice(product.price);
+  const compareAtPrice = product.compareAtPrice ? parsePrice(product.compareAtPrice) : null;
 
   return (
     <div className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition-all flex flex-col h-full border border-gray-100 group relative">
@@ -56,8 +57,8 @@ export function ProductCard({ product }: ProductCardProps) {
         <Link href={`/storefront/products/${product.id}`} className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
           {product.name}
         </Link>
-        <div className="mt-auto pt-2 border-t border-gray-50 flex items-end justify-between">
-          <div>
+        <div className="mt-auto pt-2 border-t border-gray-50 flex flex-col">
+          <div className="mb-2">
             {compareAtPrice && (
               <div className="text-[10px] text-gray-400 line-through font-bold">
                 Rs. {compareAtPrice.toFixed(0)}
@@ -74,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
               price: price, 
               image_url: product.imageUrl ?? null
             }} 
-            variant="icon" 
+            variant="card" 
           />
         </div>
       </div>

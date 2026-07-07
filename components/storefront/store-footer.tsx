@@ -14,7 +14,7 @@ export function StoreFooter() {
               <div className="p-1.5 bg-rose-500 rounded-lg">
                 <Store className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-black tracking-tight text-gray-900">KraveDemo</span>
+              <span className="text-xl font-black tracking-tight text-gray-900">HybridRetail</span>
             </Link>
             <p className="text-sm text-gray-500">
               Your daily essentials, delivered in minutes. Groceries, snacks, baby care, and more at your fingertips.
@@ -61,7 +61,7 @@ export function StoreFooter() {
         </div>
 
         <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-400">© 2026 KraveDemo Retail. All rights reserved.</p>
+          <p className="text-sm text-gray-400">© 2026 HybridRetail. All rights reserved.</p>
           <div className="flex gap-4 text-sm text-gray-400">
             <Link href="#" className="hover:text-gray-900">Privacy Policy</Link>
             <Link href="#" className="hover:text-gray-900">Terms of Service</Link>

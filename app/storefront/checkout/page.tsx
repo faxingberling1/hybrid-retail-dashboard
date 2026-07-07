@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from "react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useLoyaltyStore } from "@/lib/store/loyalty-store"
-import { ArrowLeft, CreditCard, Banknote, Truck, CheckCircle2, ChevronRight, Loader2, MapPin, Tag, Clock, Save, Edit3, ShoppingBag, Trophy } from "lucide-react"
+import { useLocationStore } from "@/lib/store/location-store"
+import { useUIStore } from "@/lib/store/ui-store"
+import { usePaymentStore } from "@/lib/store/payment-store"
+import { ArrowLeft, CreditCard, Banknote, Truck, CheckCircle2, ChevronRight, Loader2, MapPin, Tag, Clock, Edit3, ShoppingBag, Trophy, Smartphone } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -15,15 +18,9 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
 
   // Address State
-  const [isEditingAddress, setIsEditingAddress] = useState(false)
-  const [address, setAddress] = useState({
-    street: "House L-52, Block 3, Gulshan-e-Iqbal",
-    city: "Karachi",
-    state: "Sindh",
-    postalCode: "75300",
-    phone: "0300 1234567"
-  })
-  const [tempAddress, setTempAddress] = useState({...address})
+  const { addresses, selectedAddressId, address: locationString } = useLocationStore()
+  const { setAddressModalOpen } = useUIStore()
+  const selectedAddress = addresses.find(a => a.id === selectedAddressId)
 
   // Delivery Schedule State
   const [deliverySchedule, setDeliverySchedule] = useState("asap")
@@ -34,7 +31,15 @@ export default function CheckoutPage() {
   ]
 
   // Payment Method State
-  const [paymentMethod, setPaymentMethod] = useState("cod")
+  const { methods: savedPaymentMethods } = usePaymentStore()
+  
+  // Set default payment method if available, else 'cod'
+  const defaultMethod = savedPaymentMethods.find(m => m.isDefault)?.id || (savedPaymentMethods.length > 0 ? savedPaymentMethods[0].id : "cod")
+  
+  const [paymentMethod, setPaymentMethod] = useState(defaultMethod)
+  const [isAddingNewPayment, setIsAddingNewPayment] = useState(false)
+  const [newPaymentMethodType, setNewPaymentMethodType] = useState("cod")
+  
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: "",
     expiry: "",
@@ -42,10 +47,17 @@ export default function CheckoutPage() {
     mobileNumber: ""
   })
 
+  const loyaltyStore = useLoyaltyStore()
+  const { activeRewards } = loyaltyStore
+  
   // Coupon State
   const [couponCode, setCouponCode] = useState("")
   const [appliedCoupon, setAppliedCoupon] = useState<{code: string, discount: number, type: 'percent' | 'fixed'} | null>(null)
   const [couponError, setCouponError] = useState("")
+
+  // Reward State
+  const [appliedRewardId, setAppliedRewardId] = useState<string | null>(null)
+  const appliedReward = activeRewards.find(r => r.id === appliedRewardId)
 
   useEffect(() => {
     setMounted(true)
@@ -67,6 +79,8 @@ export default function CheckoutPage() {
     } else {
       discountAmount = appliedCoupon.discount
     }
+  } else if (appliedReward) {
+    discountAmount = subtotal * (appliedReward.discount / 100)
   }
 
   const total = Math.max(0, subtotal + deliveryFee - discountAmount)
@@ -79,8 +93,10 @@ export default function CheckoutPage() {
     const code = couponCode.trim().toUpperCase()
     if (code === "WELCOME10") {
       setAppliedCoupon({ code, discount: 10, type: 'percent' })
+      setAppliedRewardId(null) // Clear reward if coupon is applied
     } else if (code === "FREEDEL") {
       setAppliedCoupon({ code, discount: 0, type: 'fixed' })
+      setAppliedRewardId(null) // Clear reward if coupon is applied
     } else if (code === "") {
       setCouponError("Please enter a code.")
     } else {
@@ -93,13 +109,10 @@ export default function CheckoutPage() {
     setCouponCode("")
   }
 
-  const handleSaveAddress = () => {
-    setAddress({...tempAddress})
-    setIsEditingAddress(false)
-  }
+
 
   const handlePlaceOrder = async () => {
-    if (!address.street || !address.city || !address.phone) {
+    if (!selectedAddress) {
       alert("Please provide a complete delivery address.")
       return
     }
@@ -135,7 +148,12 @@ export default function CheckoutPage() {
           delivery_fee: deliveryFee,
           discount_amount: discountAmount,
           payment_method: paymentMethod,
-          shipping_address: address,
+          shipping_address: {
+            street: selectedAddress.street,
+            city: selectedAddress.city,
+            phone: selectedAddress.phone,
+            label: selectedAddress.label
+          },
           scheduled_for: scheduledDate.toISOString(),
           coupon_code: appliedCoupon?.code
         })
@@ -146,7 +164,12 @@ export default function CheckoutPage() {
       const order = await response.json()
       
       // Award Points
-      useLoyaltyStore.getState().addPoints(pointsEarned)
+      loyaltyStore.addPoints(pointsEarned)
+
+      // Remove used reward
+      if (appliedRewardId) {
+        loyaltyStore.removeReward(appliedRewardId)
+      }
       
       clearCart()
       router.push(`/storefront/thank-you/${order.id}`)
@@ -193,46 +216,31 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-rose-500" /> Delivery Address
                 </h2>
-                {!isEditingAddress && (
-                  <button onClick={() => setIsEditingAddress(true)} className="text-sm font-bold text-rose-500 hover:underline flex items-center gap-1">
-                    <Edit3 className="w-4 h-4" /> Change
-                  </button>
-                )}
+                <button onClick={() => setAddressModalOpen(true)} className="text-sm font-bold text-rose-500 hover:underline flex items-center gap-1">
+                  <Edit3 className="w-4 h-4" /> Change
+                </button>
               </div>
               
-              {isEditingAddress ? (
-                <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Street Address</label>
-                    <input type="text" value={tempAddress.street} onChange={e => setTempAddress({...tempAddress, street: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">City</label>
-                      <input type="text" value={tempAddress.city} onChange={e => setTempAddress({...tempAddress, city: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Phone Number</label>
-                      <input type="text" value={tempAddress.phone} onChange={e => setTempAddress({...tempAddress, phone: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none" />
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-3 mt-4">
-                    <button onClick={() => setIsEditingAddress(false)} className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100">Cancel</button>
-                    <button onClick={handleSaveAddress} className="px-6 py-2 bg-rose-500 text-white rounded-xl text-sm font-bold shadow-md shadow-rose-500/30 flex items-center gap-2 hover:bg-rose-600">
-                      <Save className="w-4 h-4" /> Save
-                    </button>
-                  </div>
-                </div>
-              ) : (
+              {selectedAddress ? (
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 mb-1">Home</p>
-                    <p className="text-sm text-gray-600 mb-1">{address.street}, {address.city}</p>
-                    <p className="text-sm text-gray-600 font-medium">{address.phone}</p>
+                    <p className="font-bold text-gray-900 mb-1">{selectedAddress.label}</p>
+                    <p className="text-sm text-gray-600 mb-1">{selectedAddress.street}, {selectedAddress.city}</p>
+                    <p className="text-sm text-gray-600 font-medium">{selectedAddress.phone}</p>
                   </div>
+                </div>
+              ) : (
+                <div className="bg-rose-50 rounded-xl p-4 border border-rose-100 flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-gray-900 mb-1">No Address Selected</p>
+                    <p className="text-sm text-gray-600">{locationString !== 'Select Location' ? `Using: ${locationString}` : 'Please add a delivery address'}</p>
+                  </div>
+                  <button onClick={() => setAddressModalOpen(true)} className="px-4 py-2 bg-rose-500 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-rose-600 transition-colors flex-shrink-0">
+                    Add Address
+                  </button>
                 </div>
               )}
             </div>
@@ -266,92 +274,151 @@ export default function CheckoutPage() {
 
             {/* Payment Method */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-indigo-500" /> Payment Method
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-indigo-500" /> Payment Method
+                </h2>
+                {!isAddingNewPayment && (
+                  <button onClick={() => { setIsAddingNewPayment(true); setPaymentMethod("new"); }} className="text-sm font-bold text-indigo-600 hover:underline">
+                    + Add New
+                  </button>
+                )}
+              </div>
               
               <div className="space-y-3">
-                <label className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
-                      <Banknote className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900">Cash on Delivery</p>
-                      <p className="text-xs text-gray-500">Pay when you receive</p>
-                    </div>
-                  </div>
-                  <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 accent-indigo-500" />
-                </label>
-
-                <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'easypaisa' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
-                  <div className="flex items-center justify-between">
+                
+                {/* Saved Payment Methods */}
+                {!isAddingNewPayment && savedPaymentMethods.map(method => (
+                  <label key={method.id} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === method.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-black text-xs">EP</div>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs ${
+                        method.type === 'credit_card' ? 'bg-slate-900 text-white' :
+                        method.type === 'jazzcash' ? 'bg-red-500 text-white' :
+                        'bg-green-500 text-white'
+                      }`}>
+                        {method.type === 'credit_card' ? <CreditCard className="w-5 h-5" /> : method.type === 'jazzcash' ? 'JC' : 'EP'}
+                      </div>
                       <div>
-                        <p className="font-bold text-gray-900">Easypaisa</p>
-                        <p className="text-xs text-gray-500">Mobile Wallet</p>
+                        <p className="font-bold text-gray-900">{method.label}</p>
+                        <p className="text-xs text-gray-500 font-mono">
+                          {method.type === 'credit_card' ? `•••• ${method.cardNumber}` : `+92 ${method.mobileNumber}`}
+                        </p>
                       </div>
                     </div>
-                    <input type="radio" name="payment" value="easypaisa" checked={paymentMethod === 'easypaisa'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 accent-indigo-500" />
-                  </div>
-                  {paymentMethod === 'easypaisa' && (
-                    <div className="mt-4 pt-4 border-t border-indigo-100 animate-in fade-in">
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mobile Number</label>
-                      <input type="text" placeholder="03xx xxxxxxx" value={paymentDetails.mobileNumber} onChange={e => setPaymentDetails({...paymentDetails, mobileNumber: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-                    </div>
-                  )}
-                </label>
+                    <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+                  </label>
+                ))}
 
-                <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'jazzcash' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
-                  <div className="flex items-center justify-between">
+                {!isAddingNewPayment && (
+                  <label className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-black text-xs">JC</div>
+                      <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                        <Banknote className="h-5 w-5" />
+                      </div>
                       <div>
-                        <p className="font-bold text-gray-900">JazzCash</p>
-                        <p className="text-xs text-gray-500">Mobile Wallet</p>
+                        <p className="font-bold text-gray-900">Cash on Delivery</p>
+                        <p className="text-xs text-gray-500">Pay when you receive</p>
                       </div>
                     </div>
-                    <input type="radio" name="payment" value="jazzcash" checked={paymentMethod === 'jazzcash'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 accent-indigo-500" />
-                  </div>
-                  {paymentMethod === 'jazzcash' && (
-                    <div className="mt-4 pt-4 border-t border-indigo-100 animate-in fade-in">
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mobile Number</label>
-                      <input type="text" placeholder="03xx xxxxxxx" value={paymentDetails.mobileNumber} onChange={e => setPaymentDetails({...paymentDetails, mobileNumber: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-                    </div>
-                  )}
-                </label>
+                    <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+                  </label>
+                )}
 
-                <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
-                        <CreditCard className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-900">Credit/Debit Card</p>
-                        <p className="text-xs text-gray-500">Visa, Mastercard</p>
-                      </div>
+                {/* New Payment Method Section */}
+                {isAddingNewPayment && (
+                  <div className="animate-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                      <p className="font-bold text-gray-900">Select New Method</p>
+                      <button onClick={() => setIsAddingNewPayment(false)} className="text-sm text-gray-500 hover:text-gray-900 font-bold">Cancel</button>
                     </div>
-                    <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+
+                    <div className="space-y-3">
+                      <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${newPaymentMethodType === 'cod' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                              <Banknote className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-900">Cash on Delivery</p>
+                              <p className="text-xs text-gray-500">Pay when you receive</p>
+                            </div>
+                          </div>
+                          <input type="radio" name="new_payment" value="cod" checked={newPaymentMethodType === 'cod'} onChange={(e) => setNewPaymentMethodType(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+                        </div>
+                      </label>
+
+                      <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${newPaymentMethodType === 'easypaisa' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-black text-xs">EP</div>
+                            <div>
+                              <p className="font-bold text-gray-900">Easypaisa</p>
+                              <p className="text-xs text-gray-500">Mobile Wallet</p>
+                            </div>
+                          </div>
+                          <input type="radio" name="new_payment" value="easypaisa" checked={newPaymentMethodType === 'easypaisa'} onChange={(e) => setNewPaymentMethodType(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+                        </div>
+                        {newPaymentMethodType === 'easypaisa' && (
+                          <div className="mt-4 pt-4 border-t border-indigo-100 animate-in fade-in">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mobile Number</label>
+                            <input type="text" placeholder="03xx xxxxxxx" value={paymentDetails.mobileNumber} onChange={e => setPaymentDetails({...paymentDetails, mobileNumber: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white" />
+                          </div>
+                        )}
+                      </label>
+
+                      <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${newPaymentMethodType === 'jazzcash' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-black text-xs">JC</div>
+                            <div>
+                              <p className="font-bold text-gray-900">JazzCash</p>
+                              <p className="text-xs text-gray-500">Mobile Wallet</p>
+                            </div>
+                          </div>
+                          <input type="radio" name="new_payment" value="jazzcash" checked={newPaymentMethodType === 'jazzcash'} onChange={(e) => setNewPaymentMethodType(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+                        </div>
+                        {newPaymentMethodType === 'jazzcash' && (
+                          <div className="mt-4 pt-4 border-t border-indigo-100 animate-in fade-in">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mobile Number</label>
+                            <input type="text" placeholder="03xx xxxxxxx" value={paymentDetails.mobileNumber} onChange={e => setPaymentDetails({...paymentDetails, mobileNumber: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-white" />
+                          </div>
+                        )}
+                      </label>
+
+                      <label className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-colors ${newPaymentMethodType === 'card' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                              <CreditCard className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-900">Credit/Debit Card</p>
+                              <p className="text-xs text-gray-500">Visa, Mastercard</p>
+                            </div>
+                          </div>
+                          <input type="radio" name="new_payment" value="card" checked={newPaymentMethodType === 'card'} onChange={(e) => setNewPaymentMethodType(e.target.value)} className="w-5 h-5 accent-indigo-500" />
+                        </div>
+                        {newPaymentMethodType === 'card' && (
+                          <div className="mt-4 pt-4 border-t border-indigo-100 grid grid-cols-2 gap-3 animate-in fade-in">
+                            <div className="col-span-2">
+                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Card Number</label>
+                              <input type="text" placeholder="1234 5678 9101 1121" value={paymentDetails.cardNumber} onChange={e => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono bg-white" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Expiry</label>
+                              <input type="text" placeholder="MM/YY" value={paymentDetails.expiry} onChange={e => setPaymentDetails({...paymentDetails, expiry: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono bg-white" />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">CVV</label>
+                              <input type="password" placeholder="123" value={paymentDetails.cvv} onChange={e => setPaymentDetails({...paymentDetails, cvv: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono bg-white" />
+                            </div>
+                          </div>
+                        )}
+                      </label>
+                    </div>
                   </div>
-                  {paymentMethod === 'card' && (
-                    <div className="mt-4 pt-4 border-t border-indigo-100 grid grid-cols-2 gap-3 animate-in fade-in">
-                      <div className="col-span-2">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Card Number</label>
-                        <input type="text" placeholder="1234 5678 9101 1121" value={paymentDetails.cardNumber} onChange={e => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Expiry</label>
-                        <input type="text" placeholder="MM/YY" value={paymentDetails.expiry} onChange={e => setPaymentDetails({...paymentDetails, expiry: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">CVV</label>
-                        <input type="text" placeholder="123" value={paymentDetails.cvv} onChange={e => setPaymentDetails({...paymentDetails, cvv: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono" />
-                      </div>
-                    </div>
-                  )}
-                </label>
+                )}
               </div>
             </div>
 
@@ -384,6 +451,38 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Rewards Section */}
+              {activeRewards.length > 0 && (
+                <div className="mb-6 pt-4 border-t border-gray-100">
+                  <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                    <Trophy className="w-4 h-4 text-[#ffc000]" /> Available Rewards
+                  </h3>
+                  <div className="space-y-3">
+                    {activeRewards.map(reward => (
+                      <label key={reward.id} className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-colors ${appliedRewardId === reward.id ? 'border-[#ffc000] bg-[#ffc000]/10' : 'border-gray-100 hover:bg-gray-50'}`}>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-gray-900 text-sm">{reward.name}</span>
+                          <span className="text-xs text-gray-500">Apply {reward.discount}% discount</span>
+                        </div>
+                        <input 
+                          type="checkbox" 
+                          checked={appliedRewardId === reward.id}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setAppliedRewardId(reward.id)
+                              handleRemoveCoupon() // Clear coupon if reward is applied
+                            } else {
+                              setAppliedRewardId(null)
+                            }
+                          }}
+                          className="w-5 h-5 accent-[#ffc000] rounded" 
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Coupon Section */}
               <div className="mb-6 pt-4 border-t border-gray-100">
