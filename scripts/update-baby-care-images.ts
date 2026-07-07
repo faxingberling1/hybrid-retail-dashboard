@@ -1,8 +1,10 @@
 import prisma from '../lib/prisma'
 
 async function updateBabyCareImages() {
+  const babyCareCategories = ["Baby Food", "Formula Milk", "Diapers", "Baby Wipes", "Baby Skincare", "Baby Bath", "Feeding Accessories"]
+  
   const categories = await prisma.storefrontCategory.findMany({
-    where: { slug: { contains: 'baby' } }
+    where: { name: { in: babyCareCategories } }
   })
   
   if (!categories || categories.length === 0) {

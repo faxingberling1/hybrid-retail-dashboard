@@ -54,16 +54,14 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
       
       <div className="flex flex-col flex-1 mt-2">
-        <Link href={`/storefront/products/${product.id}`} className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors">
+        <Link href={`/storefront/products/${product.id}`} className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-indigo-600 transition-colors min-h-[32px] md:min-h-[40px]">
           {product.name}
         </Link>
         <div className="mt-auto pt-2 border-t border-gray-50 flex flex-col">
           <div className="mb-2">
-            {compareAtPrice && (
-              <div className="text-[10px] text-gray-400 line-through font-bold">
-                Rs. {compareAtPrice.toFixed(0)}
-              </div>
-            )}
+            <div className={`text-[10px] font-bold ${compareAtPrice ? 'text-gray-400 line-through' : 'text-transparent select-none'}`}>
+              {compareAtPrice ? `Rs. ${compareAtPrice.toFixed(0)}` : 'Rs. 0'}
+            </div>
             <div className="text-sm md:text-base font-black text-gray-900">
               Rs. {price.toFixed(0)}
             </div>

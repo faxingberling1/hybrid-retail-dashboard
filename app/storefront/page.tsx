@@ -28,7 +28,7 @@ export default async function StorefrontShopPage() {
   const sections = parentCategories.map((parent: any) => {
     const children = childCategories.filter((child: any) => child.parent_id === parent.id)
     const childIds = children.map((c: any) => c.id)
-    const products = allProducts.filter((p: any) => childIds.includes(p.category_id))
+    const products = allProducts.filter((p: any) => childIds.includes(p.category_id) || p.category_id === parent.id)
     return {
       ...parent,
       children,
@@ -36,9 +36,20 @@ export default async function StorefrontShopPage() {
     }
   }).filter((s: any) => s.products.length > 0)
 
-  // Fetch some top products for "Flash Deals" (pretend the first 4 are flash deals)
+  // Fetch some top products for "Flash Deals" from Featured Brands
   const flashDeals = await queryAll(
-    'SELECT * FROM storefront_products WHERE is_active = true AND compare_at_price IS NOT NULL ORDER BY created_at DESC LIMIT 4'
+    `SELECT * FROM storefront_products 
+     WHERE is_active = true 
+       AND compare_at_price IS NOT NULL 
+       AND (
+         name ILIKE '%K&N%' OR 
+         name ILIKE '%Dawn%' OR 
+         name ILIKE '%Sabroso%' OR 
+         name ILIKE '%Nestl%' OR 
+         name ILIKE '%National%'
+       )
+     ORDER BY created_at DESC 
+     LIMIT 4`
   )
 
   // Fetch "Trending Now" products
@@ -64,16 +75,16 @@ export default async function StorefrontShopPage() {
     'frozen-foods': 'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&w=600&q=80',
     'baby-care': 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
     'grocery': 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
-    'snacks-confectionery': 'https://images.unsplash.com/photo-1582223945937-230303ba6512?auto=format&fit=crop&w=600&q=80',
+    'snacks-confectionery': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80',
     'beverages': 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80',
     'pantry-staples': 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80',
     'breakfast-cereals': 'https://images.unsplash.com/photo-1521483451569-e33803c0330c?auto=format&fit=crop&w=600&q=80',
     'personal-care': 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80',
-    'health-pharmacy': 'https://images.unsplash.com/photo-1584308666744-24d5e4a0d9b4?auto=format&fit=crop&w=600&q=80',
-    'household-essentials': 'https://images.unsplash.com/photo-1584824486509-112e4181f1ce?auto=format&fit=crop&w=600&q=80',
+    'health-pharmacy': 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80',
+    'household-essentials': 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80',
     'cleaning-laundry': 'https://images.unsplash.com/photo-1585421514738-01798e348b17?auto=format&fit=crop&w=600&q=80',
     'pet-supplies': 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=600&q=80',
-    'flowers-gifts': 'https://images.unsplash.com/photo-1563241598-a28f89e414c1?auto=format&fit=crop&w=600&q=80',
+    'flowers-gifts': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=600&q=80',
     'electronics-accessories': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=80',
     'stationery-office-supplies': 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=600&q=80',
     'home-kitchen': 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80',
@@ -82,7 +93,7 @@ export default async function StorefrontShopPage() {
     'desserts-ice-cream': 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=600&q=80',
     'convenience-store': 'https://images.unsplash.com/photo-1601598851547-4302969d0614?auto=format&fit=crop&w=600&q=80',
     'organic-healthy-foods': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80',
-    'tobacco': 'https://images.unsplash.com/photo-1533604100062-3bf9798544bb?auto=format&fit=crop&w=600&q=80',
+    'tobacco': 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
   };
 
   const getCategoryImage = (slug: string) => {
@@ -146,6 +157,36 @@ export default async function StorefrontShopPage() {
                     imageUrl: product.image_url
                   }}
                 />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section: Trending Now */}
+        {trendingProducts.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                Trending Now
+              </h2>
+              <Link href="/storefront/products" className="text-sm font-bold text-indigo-500 hover:text-indigo-600 flex items-center px-4 py-2 bg-indigo-50 rounded-full transition-colors">
+                View All <ChevronRight className="w-4 h-4 ml-1" />
+              </Link>
+            </div>
+            
+            <div className="flex overflow-x-auto pb-6 gap-4 md:gap-6 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+              {trendingProducts.map((product: any) => (
+                <div key={product.id} className="w-[180px] md:w-[220px] flex-shrink-0 h-full">
+                  <ProductCard 
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      compareAtPrice: product.compare_at_price,
+                      imageUrl: product.image_url
+                    }}
+                  />
+                </div>
               ))}
             </div>
           </div>
