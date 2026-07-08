@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
     Package, Search, Filter, ArrowUpDown, MoreVertical, AlertCircle, Tag, Box, Plus, Download, History, TrendingUp, BarChart3, ArrowRight, CheckCircle2, Clock, LayoutGrid, List, Layers, Warehouse, RefreshCw, X, Trash2
 } from "lucide-react"
+import { useSession } from "next-auth/react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 const MotionTr = motion.create('tr');
 
 export default function UserInventoryPage() {
+    const { data: session } = useSession()
     const queryClient = useQueryClient()
     const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
     const [searchQuery, setSearchQuery] = useState("")
@@ -176,6 +178,39 @@ export default function UserInventoryPage() {
                 </div>
             </div>
 
+            {session?.user?.industry?.toLowerCase() === 'grocery' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-[2rem] border border-emerald-100">
+                    <div className="flex flex-col items-start space-y-4">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-3 bg-emerald-500 rounded-xl">
+                                <Box className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900">POS Weigh Scale Entry</h3>
+                                <p className="text-sm text-slate-500">Quickly process unbarcoded produce by weight</p>
+                            </div>
+                        </div>
+                        <button className="px-6 py-3 bg-white text-emerald-600 font-bold rounded-xl border border-emerald-200 shadow-sm hover:bg-emerald-50 transition-colors">
+                            Open Scale Interface
+                        </button>
+                    </div>
+                    <div className="flex flex-col items-start space-y-4">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-3 bg-rose-500 rounded-xl">
+                                <AlertCircle className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900">Daily Expiry Audit</h3>
+                                <p className="text-sm text-slate-500">Check shelves for expiring perishables</p>
+                            </div>
+                        </div>
+                        <button className="px-6 py-3 bg-white text-rose-600 font-bold rounded-xl border border-rose-200 shadow-sm hover:bg-rose-50 transition-colors">
+                            Start Audit Checklist
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Stats Dashboard */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, i) => (
@@ -232,7 +267,7 @@ export default function UserInventoryPage() {
                     ))}
                 </div>
 
-                <div className="flex items-center gap-2 border-l border-gray-200 pl-4 ml-auto hidden lg:flex">
+                <div className="hidden lg:flex items-center gap-2 border-l border-gray-200 pl-4 ml-auto">
                     <button
                         onClick={() => setViewMode('table')}
                         className={`p-2.5 rounded-xl transition-all ${viewMode === 'table' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}

@@ -129,6 +129,7 @@ export default function LoginPage() {
     { id: "HEALTHCARE", name: "Healthcare", email: "healthcare@hybridpos.pk", icon: <Stethoscope className="h-5 w-5" />, color: "red" },
     { id: "EDUCATION", name: "Education", email: "education@hybridpos.pk", icon: <GraduationCap className="h-5 w-5" />, color: "emerald" },
     { id: "CORPORATE", name: "Corporate", email: "corporate@hybridpos.pk", icon: <Briefcase className="h-5 w-5" />, color: "indigo" },
+    { id: "GROCERY", name: "Grocery Store", email: "grocery@hybridpos.pk", icon: <ShoppingCart className="h-5 w-5" />, color: "teal" },
   ]
 
   const handleLogin = async (creds: { email: string; password?: string; redirect?: string }) => {
@@ -260,6 +261,14 @@ export default function LoginPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-[480px] space-y-10"
         >
+          {/* Header */}
+          <div className="absolute top-8 right-8 z-50">
+            <Link href="/home" className="flex items-center space-x-2 text-sm font-bold text-slate-500 hover:text-sky-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+              <Store className="h-4 w-4" />
+              <span>Back To Home</span>
+            </Link>
+          </div>
+
           {/* Header Mobile Only */}
           <div className="lg:hidden flex justify-center mb-12">
             <Link href="/" className="flex items-center space-x-3 group">

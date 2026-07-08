@@ -93,7 +93,8 @@ async function seed() {
       'corporate',
       'retail',
       'restaurant',
-      'manufacturing'
+      'manufacturing',
+      'grocery'
     ]
 
     console.log('📝 Seeding industry-specific organizations and users...')
@@ -158,11 +159,12 @@ async function seed() {
         } else {
           await client.query(`
             INSERT INTO users (
-              email, first_name, last_name, role, password_hash,
+              id, email, first_name, last_name, role, password_hash,
               organization_id, is_active, is_verified
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
           `, [
+            crypto.randomUUID(),
             email,
             industry.charAt(0).toUpperCase() + industry.slice(1),
             'Admin',

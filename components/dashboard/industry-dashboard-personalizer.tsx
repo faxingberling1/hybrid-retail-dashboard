@@ -51,6 +51,14 @@ export default function IndustryDashboardPersonalizer({ industry }: IndustryDash
                         <IndustryStatCard title="Online Orders" value="24" change="+18%" icon={<ShoppingCart className="h-5 w-5" />} color="bg-blue-100 text-blue-600" />
                     </>
                 )
+            case 'grocery':
+                return (
+                    <>
+                        <IndustryStatCard title="Expiring Today" value="12 Items" change="Urgent" icon={<AlertCircle className="h-5 w-5" />} color="bg-rose-100 text-rose-600" />
+                        <IndustryStatCard title="Fresh Produce Sales" value="₨ 45,200" change="+12%" icon={<Utensils className="h-5 w-5" />} color="bg-emerald-100 text-emerald-600" />
+                        <IndustryStatCard title="Online Deliveries" value="38" change="+5" icon={<ShoppingCart className="h-5 w-5" />} color="bg-sky-100 text-sky-600" />
+                    </>
+                )
             default:
                 return null;
         }
