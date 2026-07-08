@@ -19,10 +19,23 @@ export interface PaymentMethod {
   isDefault: boolean
 }
 
+export type TransactionType = 'top_up' | 'refund' | 'purchase'
+
+export interface WalletTransaction {
+  id: string
+  type: TransactionType
+  amount: number
+  date: string
+  description: string
+}
+
 interface PaymentStore {
   walletBalance: number
+  transactions: WalletTransaction[]
   methods: PaymentMethod[]
-  topUpWallet: (amount: number) => void
+  topUpWallet: (amount: number, description?: string) => void
+  refundToWallet: (amount: number, description: string) => void
+  spendFromWallet: (amount: number, description: string) => void
   addMethod: (method: Omit<PaymentMethod, 'id'>) => void
   removeMethod: (id: string) => void
   setDefaultMethod: (id: string) => void
@@ -32,9 +45,59 @@ export const usePaymentStore = create<PaymentStore>()(
   persist(
     (set) => ({
       walletBalance: 0,
-      methods: [],
+      transactions: [],
+      methods: [
+        {
+          id: 'demo-mc-1',
+          type: 'credit_card',
+          cardNumber: '8888',
+          expiry: '12/28',
+          label: 'Mastercard',
+          isDefault: true
+        }
+      ],
       
-      topUpWallet: (amount) => set((state) => ({ walletBalance: state.walletBalance + amount })),
+      topUpWallet: (amount, description = 'Topped up via Credit Card') => set((state) => {
+        const newTransaction: WalletTransaction = {
+          id: Math.random().toString(36).substring(2, 9),
+          type: 'top_up',
+          amount,
+          date: new Date().toISOString(),
+          description
+        }
+        return { 
+          walletBalance: state.walletBalance + amount,
+          transactions: [newTransaction, ...state.transactions]
+        }
+      }),
+
+      refundToWallet: (amount, description) => set((state) => {
+        const newTransaction: WalletTransaction = {
+          id: Math.random().toString(36).substring(2, 9),
+          type: 'refund',
+          amount,
+          date: new Date().toISOString(),
+          description
+        }
+        return { 
+          walletBalance: state.walletBalance + amount,
+          transactions: [newTransaction, ...state.transactions]
+        }
+      }),
+
+      spendFromWallet: (amount, description) => set((state) => {
+        const newTransaction: WalletTransaction = {
+          id: Math.random().toString(36).substring(2, 9),
+          type: 'purchase',
+          amount: -amount,
+          date: new Date().toISOString(),
+          description
+        }
+        return { 
+          walletBalance: Math.max(0, state.walletBalance - amount),
+          transactions: [newTransaction, ...state.transactions]
+        }
+      }),
       
       addMethod: (method) => set((state) => {
         const id = Math.random().toString(36).substring(2, 9)
@@ -69,7 +132,7 @@ export const usePaymentStore = create<PaymentStore>()(
       }))
     }),
     {
-      name: 'hybrid-retail-payment-store'
+      name: 'hybrid-retail-payment-store-v2'
     }
   )
 )

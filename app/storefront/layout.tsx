@@ -1,5 +1,4 @@
 import { StoreHeader } from "@/components/storefront/store-header"
-import { StoreFooter } from "@/components/storefront/store-footer"
 import { AuthModal } from "@/components/storefront/auth-modal"
 import { AddressModal } from "@/components/storefront/address-modal"
 import { MobileNav } from "@/components/storefront/mobile-nav"
@@ -26,7 +25,6 @@ export default async function StorefrontLayout({
       <div className="flex-1">
         {children}
       </div>
-      <StoreFooter />
       <MobileNav />
       <AddressModal />
     </div>

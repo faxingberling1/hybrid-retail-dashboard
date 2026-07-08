@@ -3,14 +3,14 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Search, ShoppingBag, MapPin, Menu, User, Store, Globe, X, ChevronRight, Heart, Trophy, Gift, Carrot, Fish, Milk, Croissant, Snowflake, Baby, Coffee, Pill, Package, Droplet, Smartphone, Home, Flower2 } from "lucide-react"
+import { Search, ShoppingBag, MapPin, Menu, User, Store, Globe, X, ChevronRight, Heart, Trophy, Gift, Carrot, Fish, Milk, Croissant, Snowflake, Baby, Coffee, Pill, Package, Droplet, Smartphone, Home, Flower2, List, Wallet, Ticket, CreditCard, HelpCircle, LifeBuoy, FileText, Shield, LogOut } from "lucide-react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useLoyaltyStore } from "@/lib/store/loyalty-store"
 import { useUIStore } from "@/lib/store/ui-store"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useLocationStore } from "@/lib/store/location-store"
-
+import { toast } from "sonner"
 export function StoreHeader({ categories = [] }: { categories?: any[] }) {
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const getItemCount = useCartStore((state) => state.getItemCount)
@@ -79,32 +79,7 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
     }
   }
 
-  const getCategoryIcon = (slug: string) => {
-    let Icon = Package;
-    let colorClass = 'text-gray-500';
-    let bgClass = 'bg-gray-100';
 
-    switch (slug) {
-      case 'fresh-produce': Icon = Carrot; colorClass = 'text-orange-600'; bgClass = 'bg-orange-100/50 border-orange-200/50'; break;
-      case 'meat-seafood': Icon = Fish; colorClass = 'text-rose-600'; bgClass = 'bg-rose-100/50 border-rose-200/50'; break;
-      case 'dairy-eggs': Icon = Milk; colorClass = 'text-blue-600'; bgClass = 'bg-blue-100/50 border-blue-200/50'; break;
-      case 'bakery': Icon = Croissant; colorClass = 'text-amber-700'; bgClass = 'bg-amber-100/50 border-amber-200/50'; break;
-      case 'frozen-foods': Icon = Snowflake; colorClass = 'text-sky-500'; bgClass = 'bg-sky-100/50 border-sky-200/50'; break;
-      case 'baby-care': Icon = Baby; colorClass = 'text-pink-600'; bgClass = 'bg-pink-100/50 border-pink-200/50'; break;
-      case 'health-pharmacy': Icon = Pill; colorClass = 'text-emerald-600'; bgClass = 'bg-emerald-100/50 border-emerald-200/50'; break;
-      case 'beverages': Icon = Coffee; colorClass = 'text-amber-800'; bgClass = 'bg-amber-100/50 border-amber-200/50'; break;
-      case 'cleaning-laundry': Icon = Droplet; colorClass = 'text-cyan-600'; bgClass = 'bg-cyan-100/50 border-cyan-200/50'; break;
-      case 'electronics-accessories': Icon = Smartphone; colorClass = 'text-indigo-600'; bgClass = 'bg-indigo-100/50 border-indigo-200/50'; break;
-      case 'home-kitchen': Icon = Home; colorClass = 'text-violet-600'; bgClass = 'bg-violet-100/50 border-violet-200/50'; break;
-      case 'flowers-gifts': Icon = Flower2; colorClass = 'text-fuchsia-600'; bgClass = 'bg-fuchsia-100/50 border-fuchsia-200/50'; break;
-    }
-
-    return (
-      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm border ${bgClass}`}>
-        <Icon className={`w-5 h-5 ${colorClass}`} />
-      </div>
-    );
-  }
 
   return (
     <>
@@ -301,40 +276,84 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
 
       {/* Mobile Sidebar Drawer */}
       <div 
-        className={`fixed top-0 left-0 h-full w-[280px] bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl flex flex-col ${
+        className={`fixed top-0 left-0 h-full w-[300px] bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-4 bg-[#ffc000] flex items-center justify-between">
-          <span className="text-xl font-black text-gray-900">Categories</span>
+        <div className="p-6 flex items-center justify-between">
+          <span className="text-sm text-gray-400 italic font-serif">Version 1.2 (084)</span>
           <button 
             onClick={() => setSidebarOpen(false)}
             className="p-2 -mr-2 text-gray-900 hover:bg-black/5 rounded-full transition-colors"
           >
-            <X className="h-6 w-6" />
+            <X className="h-6 w-6 stroke-[2.5]" />
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto py-2">
-          {categories.map((category) => {
-            const cleanName = category.name.replace(/[^\w\s&,-]/g, '')
-            return (
-              <Link 
-                key={category.id} 
-                href={`/storefront/${category.slug}`}
-                onClick={() => setSidebarOpen(false)}
-                className="group flex items-center justify-between px-4 py-3 hover:bg-indigo-50/50 border-b border-gray-50 last:border-0 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  {getCategoryIcon(category.slug)}
-                  <span className="font-bold text-gray-800 text-sm md:text-base group-hover:text-indigo-600 transition-colors">{cleanName}</span>
-                </div>
-                <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-indigo-500 transition-colors" />
-              </Link>
-            )
-          })}
-        </div>
+        <div className="flex-1 overflow-y-auto pb-6">
+          {isAuthenticated && (
+            <>
+              <div className="flex flex-col">
+                <Link href="/storefront/account?tab=profile" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <User className="w-6 h-6 text-gray-900 stroke-[2]" />
+                  <span className="font-bold text-gray-900 text-[15px]">Profile</span>
+                </Link>
+                <Link href="/storefront/account?tab=orders" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <List className="w-6 h-6 text-gray-900 stroke-[2]" />
+                  <span className="font-bold text-gray-900 text-[15px]">Orders & Reordering</span>
+                </Link>
+                <Link href="/storefront/account?tab=addresses" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <MapPin className="w-6 h-6 text-gray-900 stroke-[2]" />
+                  <span className="font-bold text-gray-900 text-[15px]">Address</span>
+                </Link>
+                <Link href="/storefront/account?tab=wallet" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <Wallet className="w-6 h-6 text-gray-900 stroke-[2]" />
+                  <span className="font-bold text-gray-900 text-[15px]">Your Wallet</span>
+                </Link>
+                <Link href="/storefront/account?tab=vouchers" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <Ticket className="w-6 h-6 text-gray-900 stroke-[2]" />
+                  <span className="font-bold text-gray-900 text-[15px]">Vouchers</span>
+                </Link>
+                <Link href="/storefront/account?tab=payments" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <CreditCard className="w-6 h-6 text-gray-900 stroke-[2]" />
+                  <span className="font-bold text-gray-900 text-[15px]">Payments</span>
+                </Link>
+              </div>
+              <div className="my-2 border-t border-gray-200/60"></div>
+            </>
+          )}
 
+          <div className="flex flex-col">
+            <Link href="/storefront/help" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+              <HelpCircle className="w-6 h-6 text-gray-900 stroke-[2]" />
+              <span className="font-bold text-gray-900 text-[15px]">Help Center</span>
+            </Link>
+            <Link href="/storefront/support" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+              <LifeBuoy className="w-6 h-6 text-gray-900 stroke-[2]" />
+              <span className="font-bold text-gray-900 text-[15px]">My Support Requests</span>
+            </Link>
+            <Link href="/storefront/terms" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+              <FileText className="w-6 h-6 text-gray-900 stroke-[2]" />
+              <span className="font-bold text-gray-900 text-[15px]">Terms & Conditions</span>
+            </Link>
+            <Link href="/storefront/privacy" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+              <Shield className="w-6 h-6 text-gray-900 stroke-[2]" />
+              <span className="font-bold text-gray-900 text-[15px]">Privacy Policy</span>
+            </Link>
+            
+            {isAuthenticated ? (
+              <button onClick={() => { setSidebarOpen(false); logout(); toast.success("Logged out successfully"); }} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors text-left">
+                <LogOut className="w-6 h-6 text-gray-900 stroke-[2]" />
+                <span className="font-bold text-gray-900 text-[15px]">Logout</span>
+              </button>
+            ) : (
+              <button onClick={() => { setSidebarOpen(false); setAuthModalOpen(true); }} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors text-left">
+                <User className="w-6 h-6 text-gray-900 stroke-[2]" />
+                <span className="font-bold text-gray-900 text-[15px]">Login</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Cart Overlay */}

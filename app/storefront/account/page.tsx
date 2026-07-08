@@ -1,28 +1,35 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { useAuthStore } from '@/lib/store/auth-store'
 import { useLocationStore } from '@/lib/store/location-store'
 import { useUIStore } from '@/lib/store/ui-store'
 import { useLoyaltyStore } from '@/lib/store/loyalty-store'
 import { useCartStore } from '@/lib/store/cart-store'
-import { Package, User, MapPin, Heart, Trophy, LogOut, ChevronRight, CreditCard, Briefcase, Home, CheckCircle2, Camera, ChevronDown, ChevronUp, RefreshCw, Clock, Users, Share2, Copy } from 'lucide-react'
+import { Package, User, MapPin, Heart, Trophy, LogOut, ChevronRight, CreditCard, Briefcase, Home, CheckCircle2, Camera, ChevronDown, ChevronUp, RefreshCw, Clock, Users, Share2, Copy, Wallet, Ticket, ArrowDownRight, ArrowUpRight, Activity, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { PaymentMethodsTab } from '@/components/storefront/payment-methods-tab'
+import { usePaymentStore } from '@/lib/store/payment-store'
 
-type Tab = 'orders' | 'profile' | 'addresses' | 'payments' | 'referrals'
+type Tab = 'orders' | 'profile' | 'addresses' | 'payments' | 'referrals' | 'vouchers' | 'wallet'
 
-export default function AccountPage() {
+function AccountPageContent() {
   const { user, orders, isAuthenticated, logout, updateProfile } = useAuthStore()
   const locationStore = useLocationStore()
   const uiStore = useUIStore()
   const loyaltyStore = useLoyaltyStore()
   const { addItem } = useCartStore()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { walletBalance, transactions, topUpWallet, methods } = usePaymentStore()
   
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('orders')
+  const [topUpAmount, setTopUpAmount] = useState('1000')
+  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false)
+  const [selectedTopUpMethodId, setSelectedTopUpMethodId] = useState<string | null>(null)
 
   // Profile Form State
   const [isEditingProfile, setIsEditingProfile] = useState(false)
@@ -44,7 +51,13 @@ export default function AccountPage() {
     } else if (user) {
       setProfileForm({ name: user.name, email: user.email, phone: '0300 1234567' })
     }
-  }, [isAuthenticated, router, user])
+    
+    // React to URL changes gracefully via searchParams
+    const tab = searchParams.get('tab') as Tab
+    if (tab) setActiveTab(tab)
+  }, [isAuthenticated, router, user, searchParams])
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   if (!mounted || !isAuthenticated || !user) return null
 
@@ -54,9 +67,21 @@ export default function AccountPage() {
     setIsEditingProfile(false)
   }
 
-  const handleAvatarUpload = () => {
-    // Mock upload for frontend demo
-    updateProfile({ avatarUrl: 'https://i.pravatar.cc/150?img=12' })
+
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        updateProfile({ avatarUrl: reader.result as string })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemoveAvatar = () => {
+    updateProfile({ avatarUrl: undefined })
   }
 
   const handleBuyAgain = (orderId: string) => {
@@ -269,7 +294,14 @@ export default function AccountPage() {
             
             <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm">
               <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 pb-8 border-b border-gray-100">
-                <div className="relative group cursor-pointer" onClick={handleAvatarUpload}>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleAvatarUpload} 
+                  accept="image/*" 
+                  className="hidden" 
+                />
+                <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt={user.name} className="w-24 h-24 rounded-2xl object-cover shadow-sm group-hover:opacity-75 transition-opacity" />
                   ) : (
@@ -281,10 +313,17 @@ export default function AccountPage() {
                     <Camera className="w-8 h-8" />
                   </div>
                 </div>
-                <div className="text-center sm:text-left">
-                  <h3 className="text-xl font-black text-gray-900">{user.name}</h3>
-                  <p className="text-gray-500 mb-2">Joined {new Date(user.joinedDate).toLocaleDateString()}</p>
-                  <button onClick={handleAvatarUpload} className="text-sm font-bold text-indigo-600 hover:underline">Change Picture</button>
+                <div className="text-center sm:text-left flex flex-col items-center sm:items-start gap-1">
+                  <div>
+                    <h3 className="text-xl font-black text-gray-900">{user.name}</h3>
+                    <p className="text-gray-500 text-sm mb-1">Joined {new Date(user.joinedDate).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => fileInputRef.current?.click()} className="text-sm font-bold text-indigo-600 hover:text-indigo-700 hover:underline">Change Picture</button>
+                    {user.avatarUrl && (
+                      <button onClick={handleRemoveAvatar} className="text-sm font-bold text-rose-500 hover:text-rose-600 hover:underline">Remove</button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -465,6 +504,119 @@ export default function AccountPage() {
           </div>
         )
 
+      case 'vouchers':
+        return (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center">
+              <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Ticket className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black text-gray-900 mb-2">My Vouchers</h3>
+              <p className="text-gray-500 mb-6 max-w-md mx-auto">You don't have any active vouchers right now. Keep shopping to earn exciting discounts!</p>
+            </div>
+          </div>
+        )
+
+      case 'wallet':
+        return (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6">
+            <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-3xl p-8 border border-gray-100 shadow-xl text-center relative overflow-hidden text-white">
+              <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-500 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 opacity-20"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-white/10 text-indigo-300 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <Wallet className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-2 tracking-tight">Hybrid Wallet</h3>
+                <p className="text-indigo-200 mb-2 max-w-md mx-auto text-sm font-medium">Use wallet balance for instant, 1-click checkouts.</p>
+                <h4 className="text-5xl font-black text-white mb-8 mt-4">
+                  <span className="text-2xl text-indigo-300 mr-2">Rs.</span>
+                  {walletBalance.toLocaleString()}
+                </h4>
+                
+                <div className="max-w-xs mx-auto flex flex-col gap-3">
+                  <div className="relative">
+                    <span className="absolute left-4 top-4 text-indigo-900 font-black">Rs.</span>
+                    <input 
+                      type="number"
+                      value={topUpAmount}
+                      onChange={(e) => setTopUpAmount(e.target.value)}
+                      className="w-full bg-white text-indigo-900 font-black text-lg p-3 pl-12 rounded-xl outline-none"
+                    />
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const amount = parseInt(topUpAmount)
+                      if (!isNaN(amount) && amount > 0) {
+                        if (methods.length > 0) {
+                          setSelectedTopUpMethodId(methods.find(m => m.isDefault)?.id || methods[0].id)
+                        } else {
+                          setSelectedTopUpMethodId(null)
+                        }
+                        setIsTopUpModalOpen(true)
+                      }
+                    }}
+                    className="w-full py-4 bg-indigo-500 text-white font-black rounded-xl hover:bg-indigo-600 transition-colors shadow-lg"
+                  >
+                    Top Up Wallet
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm">
+              <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                <Activity className="w-6 h-6 text-indigo-500" /> Wallet History
+              </h3>
+              
+              {transactions.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Clock className="w-8 h-8 text-gray-300" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 mb-1">No transactions yet</h4>
+                  <p className="text-gray-500 text-sm">Your wallet history will appear here once you make a top-up or purchase.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {transactions.map(tx => (
+                    <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-100">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          tx.type === 'purchase' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'
+                        }`}>
+                          {tx.type === 'purchase' ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownRight className="w-6 h-6" />}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900 leading-tight">
+                            {tx.type === 'top_up' ? 'Top Up' : tx.type === 'refund' ? 'Reimbursed / Refund' : 'Purchase'}
+                          </h4>
+                          <p className="text-xs text-gray-500 mt-1">{new Date(tx.date).toLocaleString(undefined, {
+                            dateStyle: 'medium',
+                            timeStyle: 'short'
+                          })}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{tx.description}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <h4 className={`font-black ${tx.type === 'purchase' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          {tx.type === 'purchase' ? '-' : '+'} Rs. {Math.abs(tx.amount).toLocaleString()}
+                        </h4>
+                        <span className={`inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                          tx.type === 'top_up' ? 'bg-indigo-50 text-indigo-600' : 
+                          tx.type === 'refund' ? 'bg-amber-50 text-amber-600' : 
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {tx.type.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+
       default:
         return null
     }
@@ -541,6 +693,24 @@ export default function AccountPage() {
               </div>
               <ChevronRight className={`w-4 h-4 ${activeTab === 'referrals' ? 'text-[#ffc000]' : 'text-gray-300'}`} />
             </button>
+            <button 
+              onClick={() => setActiveTab('vouchers')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-colors ${activeTab === 'vouchers' ? 'bg-[#ffc000]/10 text-slate-900' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+              <div className="flex items-center gap-3">
+                <Ticket className="w-5 h-5" /> Vouchers
+              </div>
+              <ChevronRight className={`w-4 h-4 ${activeTab === 'vouchers' ? 'text-[#ffc000]' : 'text-gray-300'}`} />
+            </button>
+            <button 
+              onClick={() => setActiveTab('wallet')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-colors ${activeTab === 'wallet' ? 'bg-[#ffc000]/10 text-slate-900' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+              <div className="flex items-center gap-3">
+                <Wallet className="w-5 h-5" /> Your Wallet
+              </div>
+              <ChevronRight className={`w-4 h-4 ${activeTab === 'wallet' ? 'text-[#ffc000]' : 'text-gray-300'}`} />
+            </button>
             <Link href="/storefront/wishlist" className="w-full flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-bold transition-colors">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5" /> Wishlist
@@ -598,10 +768,10 @@ export default function AccountPage() {
               Are you sure you want to sign out of your account? You will need to log back in to access your orders and rewards.
             </p>
             
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <button 
                 onClick={() => setIsLogoutModalOpen(false)}
-                className="flex-1 py-3 px-4 rounded-xl font-bold text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="flex-1 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
               >
                 Cancel
               </button>
@@ -609,9 +779,8 @@ export default function AccountPage() {
                 onClick={() => {
                   setIsLogoutModalOpen(false)
                   logout()
-                  router.push('/storefront')
                 }}
-                className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-md shadow-rose-500/20 transition-all"
+                className="flex-1 py-3 px-4 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold transition-colors shadow-md shadow-rose-500/20"
               >
                 Sign Out
               </button>
@@ -620,6 +789,92 @@ export default function AccountPage() {
         </div>
       )}
 
+      {/* Top Up Wallet Modal */}
+      {isTopUpModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
+            <h3 className="text-2xl font-black text-center text-gray-900 mb-2">Select Payment Method</h3>
+            <p className="text-center text-gray-500 font-medium mb-6">
+              Choose a card to top up Rs. {parseInt(topUpAmount || '0').toLocaleString()}
+            </p>
+            
+            <div className="space-y-3 mb-6">
+              {methods.length === 0 ? (
+                <div className="p-4 bg-gray-50 rounded-xl text-center border border-gray-100 mb-2">
+                  <p className="text-gray-500 text-sm">No saved cards.</p>
+                </div>
+              ) : (
+                methods.map(m => (
+                  <button 
+                    key={m.id}
+                    onClick={() => setSelectedTopUpMethodId(m.id)}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${selectedTopUpMethodId === m.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-100 hover:border-indigo-200'}`}
+                  >
+                    <CreditCard className={`w-5 h-5 ${selectedTopUpMethodId === m.id ? 'text-indigo-600' : 'text-gray-400'}`} />
+                    <div className="text-left flex-1">
+                      <p className={`font-bold leading-tight ${selectedTopUpMethodId === m.id ? 'text-indigo-900' : 'text-gray-900'}`}>{m.label}</p>
+                      <p className={`text-xs font-mono tracking-widest mt-0.5 ${selectedTopUpMethodId === m.id ? 'text-indigo-600/70' : 'text-gray-500'}`}>
+                        •••• {m.cardNumber}
+                      </p>
+                    </div>
+                    {selectedTopUpMethodId === m.id && (
+                      <CheckCircle2 className="w-5 h-5 text-indigo-600 ml-auto" />
+                    )}
+                  </button>
+                ))
+              )}
+              
+              <button 
+                onClick={() => {
+                  setIsTopUpModalOpen(false)
+                  setActiveTab('payments')
+                }}
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-gray-200 text-indigo-600 font-bold hover:bg-indigo-50 hover:border-indigo-200 transition-colors"
+              >
+                <Plus className="w-5 h-5" /> Add New Card
+              </button>
+            </div>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setIsTopUpModalOpen(false)}
+                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  if (methods.length > 0 && selectedTopUpMethodId) {
+                    const amount = parseInt(topUpAmount)
+                    if (!isNaN(amount) && amount > 0) {
+                      topUpWallet(amount, `Topped up via ${methods.find(m => m.id === selectedTopUpMethodId)?.label} ending in ${methods.find(m => m.id === selectedTopUpMethodId)?.cardNumber}`);
+                      setToastMessage({ title: "Wallet Topped Up", desc: `Added Rs. ${amount.toLocaleString()} to your wallet`, type: "success" });
+                      setTopUpAmount('1000');
+                      setIsTopUpModalOpen(false);
+                      setTimeout(() => setToastMessage(null), 3000);
+                    }
+                  } else if (methods.length === 0) {
+                    setIsTopUpModalOpen(false)
+                    setActiveTab('payments')
+                  }
+                }}
+                className={`flex-1 py-3 font-bold rounded-xl transition-colors ${methods.length === 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50'}`}
+                disabled={methods.length > 0 && !selectedTopUpMethodId}
+              >
+                {methods.length === 0 ? 'Add Card' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccountPageContent />
+    </Suspense>
   )
 }

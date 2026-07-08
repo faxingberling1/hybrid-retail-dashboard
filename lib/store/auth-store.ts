@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export interface UserProfile {
   id: string
@@ -26,7 +27,9 @@ interface AuthStore {
   updateProfile: (data: Partial<UserProfile>) => void
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
   user: null,
   orders: [],
   isAuthenticated: false,
@@ -54,4 +57,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   updateProfile: (data) => set((state) => ({
     user: state.user ? { ...state.user, ...data } : null
   }))
-}))
+    }),
+    {
+      name: 'auth-store'
+    }
+  )
+)

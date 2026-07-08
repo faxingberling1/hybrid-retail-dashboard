@@ -60,13 +60,10 @@ pool.on('error', (err) => {
 
 export async function query(text: string, params?: any[]) {
   const start = Date.now();
-  const client = await pool.connect();
-  try {
-    const res = await client.query(text, params);
-    return res;
-  } finally {
-    client.release();
-  }
+  // Using pool.query directly handles checkout and release automatically
+  // and recovers better from dropped connections/Neon scale-to-zero than manual connect()
+  const res = await pool.query(text, params);
+  return res;
 }
 
 // Helper for backward compatibility
