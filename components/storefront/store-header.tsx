@@ -220,8 +220,23 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
           </div>
         </div>
 
-        {/* Mobile Search Bar (shows below header on mobile) */}
+        {/* Mobile Search Bar & Address (shows below header on mobile) */}
         <div className="md:hidden container mx-auto px-4 pb-3 relative" ref={mobileSearchRef}>
+          {/* Mobile Address Button */}
+          <button 
+            onClick={() => setAddressModalOpen(true)}
+            className="flex w-full items-center justify-between py-2 mb-2 hover:bg-black/5 rounded-xl transition-colors text-left"
+          >
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] text-gray-700 font-bold leading-tight">Delivering to</span>
+              <span className="text-sm font-black text-gray-900 flex items-center gap-1 leading-tight">
+                <MapPin className="w-3 h-3 text-gray-900" />
+                <span className="max-w-[250px] truncate">{isLoading ? "Locating..." : address}</span>
+              </span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </button>
+
           <div className="relative w-full">
             <input 
               type="text" 
