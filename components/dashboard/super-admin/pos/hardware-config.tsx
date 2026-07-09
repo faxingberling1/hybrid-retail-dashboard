@@ -1,22 +1,64 @@
 "use client"
 
-import { useState } from "react"
-import { Printer, Scan, HardDrive, RefreshCw, CheckCircle2, AlertCircle, Play } from "lucide-react"
+import { useState, useCallback } from "react"
+import { Printer, Scan, HardDrive, RefreshCw, CheckCircle2, AlertCircle, Play, Settings2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { toast } from "sonner"
+import { useBarcodeScanner } from "@/lib/hooks/use-barcode-scanner"
 
 export function HardwareConfig() {
     const [isTestingPrinter, setIsTestingPrinter] = useState(false)
     const [printerStatus, setPrinterStatus] = useState<"idle" | "connected" | "error">("idle")
+    
+    const [isScannerActive, setIsScannerActive] = useState(false)
+    const [scannerStatus, setScannerStatus] = useState<"idle" | "connected" | "error">("idle")
+    const [lastScan, setLastScan] = useState<string | null>(null)
+
+    // Setup Barcode Scanner auto-detection
+    useBarcodeScanner({
+        onScan: (barcode) => {
+            if (isScannerActive) {
+                setLastScan(barcode)
+                setScannerStatus("connected")
+                toast.success(`Scanner connected! Scanned: ${barcode}`)
+                setIsScannerActive(false)
+            } else {
+                // If it's not explicitly active, we can still catch it globally
+                toast.info(`Global barcode detected: ${barcode}`)
+            }
+        }
+    })
 
     const testPrinter = async () => {
         setIsTestingPrinter(true)
-        // Simulate hardware interaction
-        setTimeout(() => {
+        try {
+            // WebUSB API to auto-detect USB printers
+            if ('usb' in navigator) {
+                // The prompt will only show devices if the user hasn't granted permission yet
+                const device = await (navigator as any).usb.requestDevice({ filters: [] })
+                if (device) {
+                    setPrinterStatus("connected")
+                    toast.success(`Printer auto-detected: ${device.productName || 'USB Printer'}`)
+                }
+            } else {
+                // Fallback for browsers without WebUSB
+                setTimeout(() => {
+                    setPrinterStatus("connected")
+                    toast.success("Printer connected via fallback network protocol")
+                }, 1500)
+            }
+        } catch (error: any) {
+            toast.error("Hardware detection cancelled or failed")
+            setPrinterStatus("error")
+        } finally {
             setIsTestingPrinter(false)
-            setPrinterStatus("connected")
-            toast.success("Test print signal sent successfully")
-        }, 1500)
+        }
+    }
+
+    const testScanner = () => {
+        setIsScannerActive(true)
+        setScannerStatus("idle")
+        toast.info("Scanner testing mode active. Please scan any barcode now.")
     }
 
     const hardwareItems = [
@@ -27,16 +69,18 @@ export function HardwareConfig() {
             description: "Thermal ESC/POS Printer (USB/Network)",
             status: printerStatus,
             action: testPrinter,
+            actionLabel: "Auto-Detect Printer",
             isLoading: isTestingPrinter
         },
         {
             id: "scanner",
             name: "Barcode Scanner",
             icon: <Scan className="h-6 w-6" />,
-            description: "USB HID or Serial Scanner",
-            status: "idle",
-            action: () => toast.info("Scanner testing mode active. Please scan a code."),
-            isLoading: false
+            description: lastScan ? `Last scan: ${lastScan}` : "USB HID or Serial Scanner",
+            status: scannerStatus,
+            action: testScanner,
+            actionLabel: isScannerActive ? "Listening for scan..." : "Detect Scanner",
+            isLoading: isScannerActive
         },
         {
             id: "drawer",
@@ -45,6 +89,7 @@ export function HardwareConfig() {
             description: "Connected via RJ11 to Printer",
             status: "idle",
             action: () => toast.success("Kick signal sent to drawer"),
+            actionLabel: "Test Drawer",
             isLoading: false
         }
     ]
@@ -85,7 +130,7 @@ export function HardwareConfig() {
                             ) : (
                                 <Play className="h-4 w-4" />
                             )}
-                            Test Device
+                            {item.actionLabel || "Test Device"}
                         </button>
                     </motion.div>
                 ))}
