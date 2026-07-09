@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma"
 import { ProductListingClient } from "@/components/storefront/product-listing-client"
+import { getStorefrontOrg } from "@/lib/storefront-utils"
 
 export const dynamic = 'force-dynamic';
 
@@ -11,9 +12,15 @@ export default async function StorefrontProductsPage({
   const categoryParam = searchParams.category as string | undefined;
   const searchParam = searchParams.q as string | undefined;
   
+  const orgStorefront = await getStorefrontOrg();
+  const orgId = orgStorefront?.organization_id;
+
   // Fetch all active products
   const products = await prisma.storefrontProduct.findMany({
-    where: { is_active: true },
+    where: { 
+      is_active: true,
+      ...(orgId ? { organization_id: orgId } : { organization_id: null })
+    },
     include: {
       category: true
     },
@@ -24,7 +31,10 @@ export default async function StorefrontProductsPage({
 
   // Fetch all active categories
   const categories = await prisma.storefrontCategory.findMany({
-    where: { is_active: true },
+    where: { 
+      is_active: true,
+      ...(orgId ? { organization_id: orgId } : { organization_id: null })
+    },
     orderBy: {
       name: 'asc'
     }

@@ -1,8 +1,10 @@
 
 "use client"
 
+import { useState } from "react"
 import { Shield, Lock, Smartphone, Key, History } from "lucide-react"
 import { motion } from "framer-motion"
+import { ChangePasswordModal } from "./change-password-modal"
 
 interface SecuritySettingsProps {
     data: any
@@ -10,6 +12,8 @@ interface SecuritySettingsProps {
 }
 
 export function SecuritySettings({ data, onChange }: SecuritySettingsProps) {
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -29,10 +33,13 @@ export function SecuritySettings({ data, onChange }: SecuritySettingsProps) {
                         <div className="p-3 bg-white text-emerald-600 w-fit rounded-2xl mb-6 shadow-sm">
                             <Lock className="h-5 w-5" />
                         </div>
-                        <h3 className="text-sm font-black text-gray-900 mb-2">Password Policy</h3>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-6">Require 12+ characters and symbols</p>
-                        <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-50 transition-colors">
-                            Update Policy
+                        <h3 className="text-sm font-black text-gray-900 mb-2">Account Password</h3>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-6">Keep your account secure</p>
+                        <button 
+                            onClick={() => setIsPasswordModalOpen(true)}
+                            className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                            Change Password
                         </button>
                     </div>
 
@@ -71,6 +78,11 @@ export function SecuritySettings({ data, onChange }: SecuritySettingsProps) {
                     ))}
                 </div>
             </div>
+
+            <ChangePasswordModal 
+                isOpen={isPasswordModalOpen} 
+                onClose={() => setIsPasswordModalOpen(false)} 
+            />
         </motion.div>
     )
 }

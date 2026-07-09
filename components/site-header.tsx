@@ -17,7 +17,6 @@ export function SiteHeader({ cms }: { cms?: any }) {
         logoSubtext: "Enterprise Unified",
         links: [
             { label: "Features", href: "/features" },
-            { label: "Pricing", href: "/pricing" },
             { label: "Blog", href: "/blog" },
             { label: "Storefront", href: "/storefront" }
         ],

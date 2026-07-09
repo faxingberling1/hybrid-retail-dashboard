@@ -30,17 +30,44 @@ export async function POST(request: NextRequest) {
                 'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
                 [token, expiry, user.id]
             );
-            await sendPasswordResetEmail(user.email, token);
+            // In a real environment, this would send an email
+            try {
+                await sendPasswordResetEmail(user.email, token);
+            } catch (e) {
+                console.warn('Email sending failed (normal for demo mode).');
+            }
+            
+            const resetLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/reset-password?token=${token}`;
+            console.log("====================================");
+            console.log("DEMO FORGOT PASSWORD LINK:");
+            console.log(resetLink);
+            console.log("====================================");
+
+            return NextResponse.json({ 
+                message: 'Reset instruction sent successfully.',
+                _demoLink: resetLink 
+            });
         } else {
             const otp = Math.floor(100000 + Math.random() * 900000).toString();
             await db.query(
                 'UPDATE users SET otp_code = $1, otp_expires = $2 WHERE id = $3',
                 [otp, expiry, user.id]
             );
-            await sendPasswordResetSMS(user.phone, otp);
-        }
+            try {
+                await sendPasswordResetSMS(user.phone, otp);
+            } catch (e) {
+                console.warn('SMS sending failed (normal for demo mode).');
+            }
 
-        return NextResponse.json({ message: 'Reset instruction sent successfully.' });
+            console.log("====================================");
+            console.log("DEMO OTP:", otp);
+            console.log("====================================");
+
+            return NextResponse.json({ 
+                message: 'Reset instruction sent successfully.',
+                _demoOtp: otp
+            });
+        }
     } catch (error: any) {
         console.error('❌ Forgot Password API Error:', error);
         return NextResponse.json({ error: 'Request failed. Please try again later.' }, { status: 500 });

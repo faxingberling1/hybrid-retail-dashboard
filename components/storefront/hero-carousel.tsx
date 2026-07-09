@@ -4,7 +4,17 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 
-const slides = [
+export interface Banner {
+  id: string | number
+  title?: string
+  subtitle?: string
+  link?: string
+  image_url?: string
+  bgClass?: string
+  buttonText?: string
+}
+
+const defaultSlides: Banner[] = [
   {
     id: 1,
     title: "FREE DELIVERY",
@@ -31,8 +41,10 @@ const slides = [
   }
 ]
 
-export function HeroCarousel() {
+export function HeroCarousel({ banners }: { banners?: Banner[] }) {
   const [currentSlide, setCurrentSlide] = useState(0)
+  
+  const slides = banners && banners.length > 0 ? banners : defaultSlides
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,23 +61,39 @@ export function HeroCarousel() {
       {slides.map((slide, index) => (
         <div
           key={slide.id}
-          className={`absolute inset-0 bg-gradient-to-r ${slide.bgClass} transition-opacity duration-1000 flex items-center px-6 md:px-12 ${
+          className={`absolute inset-0 transition-opacity duration-1000 flex items-center px-6 md:px-12 ${
+            slide.bgClass ? "bg-gradient-to-r " + slide.bgClass : 'bg-slate-900'
+          } ${
             index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         >
+          {slide.image_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img 
+              src={slide.image_url} 
+              alt={slide.title || "Banner"} 
+              className="absolute inset-0 w-full h-full object-cover opacity-60" 
+            />
+          )}
           <div className="relative z-10 text-white max-w-xl">
-            <h1 className="text-3xl md:text-5xl font-black mb-2 leading-tight tracking-tight drop-shadow-sm translate-y-0 opacity-100 transition-all duration-700 delay-100">{slide.title}</h1>
-            <p className="text-white/90 font-bold text-sm md:text-lg mb-4 drop-shadow-sm">{slide.subtitle}</p>
-            <Link 
-              href={slide.link} 
-              className="inline-block px-6 py-2 bg-white text-slate-900 rounded-full font-black text-xs md:text-sm shadow-md hover:scale-105 transition-transform"
-            >
-              {slide.buttonText}
-            </Link>
+            {slide.title && <h1 className="text-3xl md:text-5xl font-black mb-2 leading-tight tracking-tight drop-shadow-sm translate-y-0 opacity-100 transition-all duration-700 delay-100">{slide.title}</h1>}
+            {slide.subtitle && <p className="text-white/90 font-bold text-sm md:text-lg mb-4 drop-shadow-sm">{slide.subtitle}</p>}
+            {(slide.buttonText || slide.link) && (
+              <Link 
+                href={slide.link || "#"} 
+                className="inline-block px-6 py-2 bg-white text-slate-900 rounded-full font-black text-xs md:text-sm shadow-md hover:scale-105 transition-transform"
+              >
+                {slide.buttonText || "Shop Now"}
+              </Link>
+            )}
           </div>
-          {/* Decorative circles */}
-          <div className="absolute right-0 top-0 w-48 h-48 md:w-64 md:h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
-          <div className="absolute left-1/2 bottom-0 w-32 h-32 bg-black/10 rounded-full blur-2xl translate-y-1/2"></div>
+          {/* Decorative circles - only show if no image to avoid clutter */}
+          {!slide.image_url && (
+            <>
+              <div className="absolute right-0 top-0 w-48 h-48 md:w-64 md:h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+              <div className="absolute left-1/2 bottom-0 w-32 h-32 bg-black/10 rounded-full blur-2xl translate-y-1/2"></div>
+            </>
+          )}
         </div>
       ))}
 

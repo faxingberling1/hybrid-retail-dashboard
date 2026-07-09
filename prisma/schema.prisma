@@ -109,8 +109,21 @@ model organizations {
   analytics_data analytics_data[]
   api_keys       api_keys[]
   invoices       invoices[]
-  subscriptions  subscriptions[]
-  transactions   transactions[]
+  subscriptions            subscriptions[]
+  transactions             transactions[]
+  organization_storefronts organization_storefronts?
+}
+
+model organization_storefronts {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organization_id String         @unique
+  subdomain       String?        @unique @db.VarChar(255)
+  theme_config    Json?
+  created_at      DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?      @default(now()) @db.Timestamptz(6)
+  organization    organizations  @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@map("organization_storefronts")
 }
 
 model system_settings {
@@ -262,6 +275,7 @@ model role_permissions {
 model subscriptions {
   id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   organization_id      String?
+  addon_id             String?        @db.Uuid
   plan                 String         @db.VarChar(50)
   status               String?        @default("active") @db.VarChar(20)
   current_period_start DateTime       @db.Timestamptz(6)
@@ -275,6 +289,7 @@ model subscriptions {
   add_ons              Json?
   invoices             invoices[]
   organizations        organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  addon                Addon?         @relation(fields: [addon_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([organization_id], map: "idx_subscriptions_organization")
   @@index([status], map: "idx_subscriptions_status")
@@ -367,6 +382,7 @@ model Addon {
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
   interval    String   @default("month")
+  subscriptions subscriptions[]
 
   @@map("addons")
 }
@@ -392,6 +408,7 @@ model StorefrontCategory {
   description String?
   image_url   String?
   is_active   Boolean              @default(true)
+  organization_id String?
   parent_id   String?              @db.Uuid
   parent      StorefrontCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
   children    StorefrontCategory[] @relation("CategoryHierarchy")
@@ -413,6 +430,7 @@ model StorefrontProduct {
   images              String[]             @default([])
   stock               Int                  @default(0)
   is_active           Boolean              @default(true)
+  organization_id     String?
   category_id         String               @db.Uuid
   category            StorefrontCategory   @relation(fields: [category_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
   created_at          DateTime             @default(now()) @db.Timestamptz(6)
@@ -495,4 +513,17 @@ model StorefrontWishlist {
 
   @@unique([user_id, product_id])
   @@map("storefront_wishlists")
+}
+
+model Equipment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  type        String?  @default("Hardware")
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("equipments")
 }

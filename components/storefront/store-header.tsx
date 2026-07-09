@@ -11,7 +11,7 @@ import { useUIStore } from "@/lib/store/ui-store"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useLocationStore } from "@/lib/store/location-store"
 import { toast } from "sonner"
-export function StoreHeader({ categories = [] }: { categories?: any[] }) {
+export function StoreHeader({ categories = [], customLogoUrl }: { categories?: any[], customLogoUrl?: string }) {
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const getItemCount = useCartStore((state) => state.getItemCount)
   const { items, updateQuantity, removeItem } = useCartStore()
@@ -94,9 +94,13 @@ export function StoreHeader({ categories = [] }: { categories?: any[] }) {
               <Menu className="h-6 w-6" />
             </button>
             <Link href="/storefront" className="flex items-center gap-2">
-              <span className="text-xl font-black tracking-tighter text-gray-900">
-                Storefront
-              </span>
+              {customLogoUrl ? (
+                <img src={customLogoUrl} alt="Store Logo" className="h-8 max-w-[120px] object-contain" />
+              ) : (
+                <span className="text-xl font-black tracking-tighter text-gray-900">
+                  Storefront
+                </span>
+              )}
             </Link>
           </div>
 

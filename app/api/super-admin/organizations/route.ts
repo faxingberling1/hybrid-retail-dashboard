@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
                 (SELECT current_period_end FROM subscriptions s WHERE s.organization_id = o.id AND s.status = 'active' LIMIT 1) as subscription_end,
                 (SELECT SUM(amount) FROM transactions t WHERE t.organization_id = o.id AND t.status = 'success') as total_revenue,
                 (SELECT created_at FROM activity_logs al WHERE al.organization_id = o.id ORDER BY created_at DESC LIMIT 1) as last_activity,
+                (SELECT subdomain FROM organization_storefronts os WHERE os.organization_id = o.id LIMIT 1) as storefront_subdomain,
                 EXISTS (
                     SELECT 1 FROM notifications n 
                     WHERE n.user_id = $1 
@@ -118,6 +119,16 @@ export async function POST(request: NextRequest) {
         )
 
         console.log('✅ Organization created:', newOrg?.id)
+
+        // Create storefront config for the organization
+        if (newOrg) {
+            const subdomain = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            await db.query(
+                `INSERT INTO organization_storefronts (organization_id, subdomain) VALUES ($1, $2)`,
+                [newOrg.id, subdomain]
+            );
+            console.log('✅ Organization storefront created with subdomain:', subdomain);
+        }
 
         // Create subscription if plan is provided
         if (plan && newOrg) {

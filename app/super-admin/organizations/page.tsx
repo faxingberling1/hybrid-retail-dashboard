@@ -7,8 +7,9 @@ import {
   Building2, Users, DollarSign, TrendingUp,
   Eye, ArrowUpRight, Globe, Mail, Phone,
   MapPin, Calendar, Activity, Package, Shield,
-  Trash2, AlertTriangle, UserPlus, Key
+  Trash2, AlertTriangle, UserPlus, Key, X
 } from "lucide-react"
+import { StorefrontConfigForm } from "@/components/super-admin/storefront-config-form"
 import AddOnsBadge from "@/components/dashboard/super-admin/shared/add-ons-badge"
 import { toast } from "sonner"
 
@@ -42,6 +43,8 @@ export default function OrganizationsPage() {
 
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [isEnrolling, setIsEnrolling] = useState(false)
+  const [isGeneratingDemo, setIsGeneratingDemo] = useState(false)
+  const [generatedDemoCredentials, setGeneratedDemoCredentials] = useState<{email: string, password: string} | null>(null)
   const [addUserFormData, setAddUserFormData] = useState({
     email: '',
     first_name: '',
@@ -164,6 +167,31 @@ export default function OrganizationsPage() {
       toast.error(error.message || 'Failed to create organization')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleGenerateDemo = async () => {
+    if (!selectedOrganization) return;
+    setIsGeneratingDemo(true);
+    setGeneratedDemoCredentials(null);
+    try {
+      const res = await fetch(`/api/super-admin/organizations/${selectedOrganization.id}/demo-credentials`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to generate');
+      setGeneratedDemoCredentials(data.credentials);
+      toast.success('Demo credentials generated successfully!');
+      
+      // refresh details
+      const detailsRes = await fetch(`/api/super-admin/organizations/${selectedOrganization.id}`);
+      if (detailsRes.ok) {
+        setDeepDetails(await detailsRes.json());
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsGeneratingDemo(false);
     }
   }
 
@@ -639,23 +667,21 @@ export default function OrganizationsPage() {
               className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"
             >
               {/* Modal Header */}
-              <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between grad-dark-indigo">
+              <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="h-14 w-14 grad-indigo p-0.5 rounded-2xl flex-shrink-0">
-                    <div className="h-full w-full bg-white dark:bg-slate-900 rounded-[0.9rem] flex items-center justify-center">
-                      {(() => {
-                        const Icon = INDUSTRY_ICONS[selectedOrganization.industry?.toLowerCase()] || Building2;
-                        return <Icon className="h-6 w-6 text-indigo-500" />;
-                      })()}
-                    </div>
+                  <div className="h-14 w-14 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 p-0.5 rounded-2xl flex-shrink-0 flex items-center justify-center">
+                    {(() => {
+                      const Icon = INDUSTRY_ICONS[selectedOrganization.industry?.toLowerCase()] || Building2;
+                      return <Icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />;
+                    })()}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-white tracking-tight">{selectedOrganization.name}</h2>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{selectedOrganization.name}</h2>
                     <div className="flex items-center space-x-2 mt-1">
-                      <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-widest rounded-md border ${getStatusColor(selectedOrganization.status)} bg-white/10`}>
+                      <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-widest rounded-md border ${getStatusColor(selectedOrganization.status)}`}>
                         {selectedOrganization.status}
                       </span>
-                      <span className="text-xs font-bold text-indigo-200 uppercase tracking-widest">
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                         EST. {new Date(selectedOrganization.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -663,9 +689,9 @@ export default function OrganizationsPage() {
                 </div>
                 <button
                   onClick={() => setShowDetailModal(false)}
-                  className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors"
+                  className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl transition-colors"
                 >
-                  <RefreshCw className="h-5 w-5" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
@@ -675,7 +701,8 @@ export default function OrganizationsPage() {
                   { id: "overview", label: "Overview", icon: Building2 },
                   { id: "subscription", label: "Subscription & Billing", icon: DollarSign },
                   { id: "users", label: "Users Registry", icon: Users },
-                  { id: "activity", label: "Audit Log", icon: Activity }
+                  { id: "activity", label: "Audit Log", icon: Activity },
+                  { id: "storefront", label: "Storefront Config", icon: Globe }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -744,6 +771,41 @@ export default function OrganizationsPage() {
 
                         <section className="space-y-6">
                           <div>
+                            <h4 className="text-xs font-black text-indigo-500 uppercase tracking-[0.2em] mb-4 flex items-center">
+                              <Globe className="h-3 w-3 mr-2" />
+                              Storefront Access
+                            </h4>
+                            <div className="bg-indigo-50/50 dark:bg-indigo-500/5 rounded-[2rem] border border-indigo-100 dark:border-indigo-500/20 p-6 shadow-sm">
+                              <div className="flex flex-col space-y-4">
+                                <div className="flex items-center space-x-4">
+                                  <div className="p-3 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl">
+                                    <Globe className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Storefront Subdomain</p>
+                                    <p className="font-bold text-slate-900 dark:text-white truncate">
+                                      {selectedOrganization.storefront_subdomain ? `${selectedOrganization.storefront_subdomain}` : 'Not Configured'}
+                                    </p>
+                                  </div>
+                                </div>
+                                {selectedOrganization.storefront_subdomain && (
+                                  <a
+                                    href={`http://${selectedOrganization.storefront_subdomain}.${typeof window !== 'undefined' ? window.location.host : 'localhost:3000'}/storefront`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+                                  >
+                                    <Globe className="h-4 w-4 mr-2" />
+                                    Visit Storefront
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </section>
+
+                        <section className="space-y-6">
+                          <div>
                             <h4 className="text-xs font-black text-rose-500 uppercase tracking-[0.2em] mb-4 flex items-center">
                               <AlertTriangle className="h-3 w-3 mr-2" />
                               Danger Zone
@@ -765,6 +827,15 @@ export default function OrganizationsPage() {
                             </div>
                           </div>
                         </section>
+                      </div>
+                    )}
+
+                    {activeTab === "storefront" && (
+                      <div className="max-w-4xl mx-auto">
+                        <StorefrontConfigForm 
+                          organizationId={selectedOrganization.id} 
+                          initialSubdomain={selectedOrganization.storefront_subdomain || ''} 
+                        />
                       </div>
                     )}
 
@@ -835,14 +906,40 @@ export default function OrganizationsPage() {
                             <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Affiliated Personnel</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Found {deepDetails.users.length} active members</p>
                           </div>
-                          <button
-                            onClick={() => setShowAddUserModal(true)}
-                            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center"
-                          >
-                            <Plus className="h-3.5 w-3.5 mr-2" />
-                            Add Member
-                          </button>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={handleGenerateDemo}
+                              disabled={isGeneratingDemo}
+                              className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center disabled:opacity-50"
+                            >
+                              <Key className="h-3.5 w-3.5 mr-2" />
+                              {isGeneratingDemo ? 'Generating...' : 'Demo Admin'}
+                            </button>
+                            <button
+                              onClick={() => setShowAddUserModal(true)}
+                              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center"
+                            >
+                              <Plus className="h-3.5 w-3.5 mr-2" />
+                              Add Member
+                            </button>
+                          </div>
                         </div>
+                        
+                        {generatedDemoCredentials && (
+                          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-bold text-emerald-800">Demo Admin Created!</p>
+                              <p className="text-[10px] font-medium text-emerald-600 mt-1">
+                                Email: <span className="font-bold select-all">{generatedDemoCredentials.email}</span>
+                                <br />
+                                Password: <span className="font-bold select-all">{generatedDemoCredentials.password}</span>
+                              </p>
+                            </div>
+                            <button onClick={() => setGeneratedDemoCredentials(null)} className="p-2 text-emerald-500 hover:bg-emerald-100 rounded-lg">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
                           <table className="w-full text-left">
                             <thead>

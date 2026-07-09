@@ -1,4 +1,5 @@
 import { db, queryAll } from "@/lib/db"
+import { getStorefrontOrg } from "@/lib/storefront-utils"
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronRight, ShoppingBag, Zap, Award } from "lucide-react"
@@ -57,9 +58,13 @@ const getCategoryImage = (slug: string) => {
 }
 
 async function FlashDeals() {
+  const orgStorefront = await getStorefrontOrg();
+  const orgId = orgStorefront?.organization_id;
+  
   const flashDeals = await queryAll(
     `SELECT * FROM storefront_products 
      WHERE is_active = true 
+       ${orgId ? 'AND organization_id = $1' : 'AND organization_id IS NULL'}
        AND compare_at_price IS NOT NULL 
        AND (
          name ILIKE '%K&N%' OR 
@@ -69,7 +74,8 @@ async function FlashDeals() {
          name ILIKE '%National%'
        )
      ORDER BY created_at DESC 
-     LIMIT 4`
+     LIMIT 4`,
+    orgId ? [orgId] : []
   )
 
   if (flashDeals.length === 0) return null;
@@ -107,8 +113,12 @@ async function FlashDeals() {
 }
 
 async function TrendingNow() {
+  const orgStorefront = await getStorefrontOrg();
+  const orgId = orgStorefront?.organization_id;
+
   const trendingProducts = await queryAll(
-    'SELECT * FROM storefront_products WHERE is_active = true ORDER BY created_at ASC LIMIT 8'
+    `SELECT * FROM storefront_products WHERE is_active = true ${orgId ? 'AND organization_id = $1' : 'AND organization_id IS NULL'} ORDER BY created_at ASC LIMIT 8`,
+    orgId ? [orgId] : []
   )
 
   if (trendingProducts.length === 0) return null;
@@ -144,15 +154,20 @@ async function TrendingNow() {
 }
 
 async function DiscoverCategories() {
+  const orgStorefront = await getStorefrontOrg();
+  const orgId = orgStorefront?.organization_id;
+
   const allCategories = await queryAll(
-    'SELECT * FROM storefront_categories WHERE is_active = true ORDER BY name ASC'
+    `SELECT * FROM storefront_categories WHERE is_active = true ${orgId ? 'AND organization_id = $1' : 'AND organization_id IS NULL'} ORDER BY name ASC`,
+    orgId ? [orgId] : []
   )
 
   const parentCategories = allCategories.filter((c: any) => c.parent_id === null)
   const childCategories = allCategories.filter((c: any) => c.parent_id !== null)
 
   const allProducts = await queryAll(
-    'SELECT * FROM storefront_products WHERE is_active = true ORDER BY created_at DESC'
+    `SELECT * FROM storefront_products WHERE is_active = true ${orgId ? 'AND organization_id = $1' : 'AND organization_id IS NULL'} ORDER BY created_at DESC`,
+    orgId ? [orgId] : []
   )
 
   const sections = parentCategories.map((parent: any) => {
@@ -179,7 +194,7 @@ async function DiscoverCategories() {
             >
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-50">
                 <Image 
-                  src={getCategoryImage(parent.slug)} 
+                  src={parent.image_url || getCategoryImage(parent.slug)} 
                   alt={parent.name} 
                   fill 
                   className="object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -233,7 +248,7 @@ async function DiscoverCategories() {
 
           <div className="relative w-full h-32 md:h-40 rounded-3xl overflow-hidden mb-6 shadow-sm flex items-center p-6 md:p-10 group">
             <Image 
-              src={getCategoryImage(section.slug)}
+              src={section.image_url || getCategoryImage(section.slug)}
               alt={section.name}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -276,13 +291,24 @@ async function DiscoverCategories() {
 }
 
 
-export default function StorefrontShopPage() {
+export default async function StorefrontShopPage() {
+  const orgStorefront = await getStorefrontOrg();
+  let heroBanners: any[] = [];
+  
+  if (orgStorefront?.theme_config) {
+    let themeConfig = orgStorefront.theme_config;
+    if (typeof themeConfig === 'string') {
+      try { themeConfig = JSON.parse(themeConfig); } catch (e) {}
+    }
+    heroBanners = themeConfig.heroBanners || [];
+  }
+
   return (
     <main className="pb-24 pt-4 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 max-w-lg md:max-w-4xl lg:max-w-6xl">
         
         {/* Dynamic Hero Carousel */}
-        <HeroCarousel />
+        <HeroCarousel banners={heroBanners} />
 
         {/* Section: Top Brands (Horizontal Scroll) */}
         <div className="mb-10">

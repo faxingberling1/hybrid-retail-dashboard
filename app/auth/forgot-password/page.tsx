@@ -7,6 +7,7 @@ import {
     CheckCircle, Sparkles, AlertCircle, RefreshCw
 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 const MotionDiv = motion.div as any;
 const MotionButton = motion.button as any;
@@ -36,6 +37,21 @@ export default function ForgotPasswordPage() {
 
             if (res.ok) {
                 setSuccess(true)
+                if (data._demoLink) {
+                    toast.success('Demo mode: Link generated!', {
+                        description: `Reset Link: ${data._demoLink}`,
+                        duration: 10000,
+                        action: {
+                            label: 'Copy Link',
+                            onClick: () => navigator.clipboard.writeText(data._demoLink)
+                        }
+                    });
+                } else if (data._demoOtp) {
+                    toast.success('Demo mode: OTP generated!', {
+                        description: `OTP: ${data._demoOtp}`,
+                        duration: 10000,
+                    });
+                }
             } else {
                 setError(data.error || "Failed to process request")
             }
