@@ -4,10 +4,10 @@ import { hash } from 'bcryptjs';
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
   try {
-    const organizationId = params.id;
+    const { orgId: organizationId } = await params;
 
     // Verify organization exists
     const org = await prisma.organizations.findUnique({
