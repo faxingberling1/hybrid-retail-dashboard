@@ -11,7 +11,7 @@ import { useUIStore } from "@/lib/store/ui-store"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useLocationStore } from "@/lib/store/location-store"
 import { toast } from "sonner"
-export function StoreHeader({ categories = [], customLogoUrl }: { categories?: any[], customLogoUrl?: string }) {
+export function StoreHeader({ categories = [], customLogoUrl, industry = "grocery" }: { categories?: any[], customLogoUrl?: string, industry?: string }) {
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const getItemCount = useCartStore((state) => state.getItemCount)
   const { items, updateQuantity, removeItem, activeCartType, switchCart, moveItemToCart } = useCartStore()
@@ -73,7 +73,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchValue.trim()) {
-      router.push(`/storefront/products?q=${encodeURIComponent(searchValue.trim())}`)
+      router.push(`/storefront/${industry || "grocery"}/products?q=${encodeURIComponent(searchValue.trim())}`)
       setSidebarOpen(false)
       setSearchResults([])
     }
@@ -93,7 +93,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
             >
               <Menu className="h-6 w-6" />
             </button>
-            <Link href="/storefront" className="flex items-center gap-2">
+            <Link href={`/storefront/${industry || "grocery"}`} className="flex items-center gap-2">
               {customLogoUrl ? (
                 <img src={customLogoUrl} alt="Store Logo" className="h-8 max-w-[120px] object-contain" />
               ) : (
@@ -138,7 +138,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
                      {searchResults.map(product => (
                         <Link 
                           key={product.id} 
-                          href={`/storefront/products/${product.id}`}
+                          href={`/storefront/${industry || "grocery"}/products/${product.id}`}
                           onClick={() => { setSearchValue(''); setSearchResults([]); }}
                           className="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors"
                         >
@@ -165,7 +165,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
               Main Site
             </Link>
 
-            <Link href="/storefront/referral" className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100 font-bold text-sm hover:bg-indigo-100 transition-colors">
+            <Link href={`/storefront/${industry || "grocery"}/referral`} className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100 font-bold text-sm hover:bg-indigo-100 transition-colors">
               <Gift className="h-4 w-4" />
               Refer & Earn
             </Link>
@@ -185,7 +185,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
                   <span className="max-w-[100px] truncate">{user?.name}</span>
                 </button>
                 <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
-                  <Link href="/storefront/account" className="block px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors">
+                  <Link href={`/storefront/${industry || "grocery"}/account`} className="block px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors">
                     My Account
                   </Link>
                   <button onClick={() => logout()} className="w-full text-left px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50 transition-colors border-t border-gray-50">
@@ -200,7 +200,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
               </button>
             )}
 
-            <Link href="/storefront/wishlist" className="relative p-2 text-gray-800 hover:bg-black/5 rounded-full transition-colors flex items-center justify-center">
+            <Link href={`/storefront/${industry || "grocery"}/wishlist`} className="relative p-2 text-gray-800 hover:bg-black/5 rounded-full transition-colors flex items-center justify-center">
               <Heart className="h-5 w-5" />
               {mounted && getWishlistCount() > 0 && (
                 <span className="absolute 0 top-0 right-0 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white">
@@ -263,7 +263,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
                    {searchResults.map(product => (
                       <Link 
                         key={product.id} 
-                        href={`/storefront/products/${product.id}`}
+                        href={`/storefront/${industry || "grocery"}/products/${product.id}`}
                         onClick={() => { setSearchValue(''); setSearchResults([]); }}
                         className="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors"
                       >
@@ -313,27 +313,27 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
           {isAuthenticated && (
             <>
               <div className="flex flex-col">
-                <Link href="/storefront/account?tab=profile" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <Link href={`/storefront/${industry || "grocery"}/account?tab=profile`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <User className="w-6 h-6 text-gray-900 stroke-[2]" />
                   <span className="font-bold text-gray-900 text-[15px]">Profile</span>
                 </Link>
-                <Link href="/storefront/account?tab=orders" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <Link href={`/storefront/${industry || "grocery"}/account?tab=orders`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <List className="w-6 h-6 text-gray-900 stroke-[2]" />
                   <span className="font-bold text-gray-900 text-[15px]">Orders & Reordering</span>
                 </Link>
-                <Link href="/storefront/account?tab=addresses" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <Link href={`/storefront/${industry || "grocery"}/account?tab=addresses`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <MapPin className="w-6 h-6 text-gray-900 stroke-[2]" />
                   <span className="font-bold text-gray-900 text-[15px]">Address</span>
                 </Link>
-                <Link href="/storefront/account?tab=wallet" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <Link href={`/storefront/${industry || "grocery"}/account?tab=wallet`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <Wallet className="w-6 h-6 text-gray-900 stroke-[2]" />
                   <span className="font-bold text-gray-900 text-[15px]">Your Wallet</span>
                 </Link>
-                <Link href="/storefront/account?tab=vouchers" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <Link href={`/storefront/${industry || "grocery"}/account?tab=vouchers`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <Ticket className="w-6 h-6 text-gray-900 stroke-[2]" />
                   <span className="font-bold text-gray-900 text-[15px]">Vouchers</span>
                 </Link>
-                <Link href="/storefront/account?tab=payments" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <Link href={`/storefront/${industry || "grocery"}/account?tab=payments`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
                   <CreditCard className="w-6 h-6 text-gray-900 stroke-[2]" />
                   <span className="font-bold text-gray-900 text-[15px]">Payments</span>
                 </Link>
@@ -343,19 +343,19 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
           )}
 
           <div className="flex flex-col">
-            <Link href="/storefront/help" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+            <Link href={`/storefront/${industry || "grocery"}/help`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
               <HelpCircle className="w-6 h-6 text-gray-900 stroke-[2]" />
               <span className="font-bold text-gray-900 text-[15px]">Help Center</span>
             </Link>
-            <Link href="/storefront/support" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+            <Link href={`/storefront/${industry || "grocery"}/support`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
               <LifeBuoy className="w-6 h-6 text-gray-900 stroke-[2]" />
               <span className="font-bold text-gray-900 text-[15px]">My Support Requests</span>
             </Link>
-            <Link href="/storefront/terms" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+            <Link href={`/storefront/${industry || "grocery"}/terms`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
               <FileText className="w-6 h-6 text-gray-900 stroke-[2]" />
               <span className="font-bold text-gray-900 text-[15px]">Terms & Conditions</span>
             </Link>
-            <Link href="/storefront/privacy" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
+            <Link href={`/storefront/${industry || "grocery"}/privacy`} onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-5 px-6 py-4 hover:bg-gray-50 transition-colors">
               <Shield className="w-6 h-6 text-gray-900 stroke-[2]" />
               <span className="font-bold text-gray-900 text-[15px]">Privacy Policy</span>
             </Link>
@@ -493,7 +493,7 @@ export function StoreHeader({ categories = [], customLogoUrl }: { categories?: a
           </div>
           {mounted && items.length > 0 ? (
             <Link 
-              href="/storefront/checkout"
+              href={`/storefront/${industry || "grocery"}/checkout`}
               onClick={() => setCartOpen(false)}
               className="w-full bg-rose-500 text-white py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-rose-500/30 hover:bg-rose-600 transition-colors flex items-center justify-center gap-2"
             >

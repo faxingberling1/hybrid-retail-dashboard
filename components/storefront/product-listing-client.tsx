@@ -25,12 +25,14 @@ export function ProductListingClient({
   initialProducts, 
   categories, 
   initialCategory,
-  initialSearch
+  initialSearch,
+  industry
 }: { 
   initialProducts: Product[]
   categories: any[]
   initialCategory: string | undefined
   initialSearch: string | undefined
+  industry?: string
 }) {
   const [searchQuery, setSearchQuery] = useState(initialSearch || "")
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(initialCategory)
@@ -121,7 +123,7 @@ export function ProductListingClient({
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="w-full md:w-auto">
             <div className="mb-4">
-              <BackButton label="Back to Store" fallbackHref="/storefront" />
+              <BackButton label="Back to Store" fallbackHref={industry ? `/storefront/${industry}` : "/storefront"} />
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
               {selectedCategory ? `Category: ${categories.find(c => c.slug === selectedCategory)?.name || selectedCategory}` : 'All Products'}

@@ -2,7 +2,7 @@ import React from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
-export function PromoBanner() {
+export function PromoBanner({ industry }: { industry?: string }) {
   return (
     <div className="relative w-full rounded-3xl overflow-hidden mb-12 shadow-xl">
       {/* Background Image with Parallax Effect */}
@@ -31,7 +31,7 @@ export function PromoBanner() {
         </div>
         
         <Link 
-          href="/storefront"
+          href={industry ? `/storefront/${industry}` : "/storefront"}
           className="flex-shrink-0 flex items-center justify-center gap-2 bg-white text-indigo-900 px-8 py-4 rounded-full font-black text-lg shadow-lg hover:shadow-xl hover:scale-105 hover:bg-indigo-50 transition-all group"
         >
           Shop The Sale

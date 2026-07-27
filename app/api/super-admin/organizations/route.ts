@@ -83,14 +83,15 @@ export async function POST(request: NextRequest) {
             city,
             country,
             plan,
-            add_ons
+            add_ons,
+            subdomain
         } = data
 
         // Validate required fields
-        if (!name || !contact_email) {
+        if (!name || !contact_email || !subdomain) {
             console.log('❌ Validation failed: missing required fields')
             return NextResponse.json(
-                { error: 'Organization name and contact email are required' },
+                { error: 'Organization name, contact email, and subdomain are required' },
                 { status: 400 }
             )
         }
@@ -151,6 +152,22 @@ export async function POST(request: NextRequest) {
                 ]
             )
         }
+
+        // Provision the storefront subdomain and default template config
+        const { seedOrganizationStorefront } = await import('@/lib/storefront-seeder');
+        const defaultTheme = {
+            primaryColor: industry === 'restaurant' ? '#d97706' : industry === 'pharmacy' ? '#4338ca' : industry === 'fashion' ? '#e11d48' : '#0ea5e9',
+            fontFamily: 'Inter',
+            layout: 'default'
+        };
+        await db.query(
+            `INSERT INTO organization_storefronts (organization_id, subdomain, theme_config, is_active, created_at, updated_at) 
+             VALUES ($1, $2, $3, true, NOW(), NOW())`,
+            [newOrg.id, subdomain, JSON.stringify(defaultTheme)]
+        );
+
+        // Seed default categories and products
+        await seedOrganizationStorefront(newOrg.id, industry || 'retail');
 
         // Log the action
         await db.query(

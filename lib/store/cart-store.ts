@@ -13,15 +13,21 @@ export interface CartItem {
 export type CartType = 'now' | 'future';
 
 interface CartState {
+  activeIndustry: string;
   activeCartType: CartType;
-  carts: Record<CartType, CartItem[]>;
+  
+  // Mapping of industry -> cartType -> CartItem[]
+  industries: Record<string, Record<CartType, CartItem[]>>;
+  
   items: CartItem[]; // Computed property to maintain backwards compatibility
 
+  setActiveIndustry: (industry: string) => void;
+  
   // Multi-cart actions
   switchCart: (type: CartType) => void;
   moveItemToCart: (itemId: string, targetType: CartType) => void;
 
-  // Existing Actions (operate on activeCartType)
+  // Existing Actions (operate on activeCartType for activeIndustry)
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -30,61 +36,89 @@ interface CartState {
   getItemCount: () => number;
 }
 
+const getDefaultCarts = () => ({
+  now: [],
+  future: []
+});
+
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
+      activeIndustry: 'grocery',
       activeCartType: 'now',
-      carts: {
-        now: [],
-        future: []
+      industries: {},
+      items: [],
+
+      setActiveIndustry: (industry) => {
+        set((state) => {
+          const industryData = state.industries[industry] || getDefaultCarts();
+          return {
+            activeIndustry: industry,
+            industries: {
+              ...state.industries,
+              [industry]: industryData
+            },
+            items: industryData[state.activeCartType]
+          }
+        });
       },
-      items: [], // Always syncs with carts[activeCartType]
 
       switchCart: (type) => {
-        set((state) => ({
-          activeCartType: type,
-          items: state.carts[type] || []
-        }));
+        set((state) => {
+          const industryData = state.industries[state.activeIndustry] || getDefaultCarts();
+          return {
+            activeCartType: type,
+            items: industryData[type]
+          }
+        });
       },
 
       moveItemToCart: (itemId, targetType) => {
         set((state) => {
+          const industry = state.activeIndustry;
+          const industryData = state.industries[industry] || getDefaultCarts();
+          
           const sourceCartType = targetType === 'now' ? 'future' : 'now';
-          const itemToMove = state.carts[sourceCartType].find(i => i.id === itemId);
+          const itemToMove = industryData[sourceCartType].find(i => i.id === itemId);
           if (!itemToMove) return state;
 
-          const newSourceCart = state.carts[sourceCartType].filter(i => i.id !== itemId);
+          const newSourceCart = industryData[sourceCartType].filter(i => i.id !== itemId);
           
           // Check if item already exists in target cart
-          const existingItemInTarget = state.carts[targetType].find(i => i.id === itemId);
+          const existingItemInTarget = industryData[targetType].find(i => i.id === itemId);
           let newTargetCart;
           
           if (existingItemInTarget) {
-            newTargetCart = state.carts[targetType].map(i => 
+            newTargetCart = industryData[targetType].map(i => 
               i.id === itemId 
                 ? { ...i, quantity: Math.min(i.quantity + itemToMove.quantity, i.stock) } 
                 : i
             );
           } else {
-            newTargetCart = [...state.carts[targetType], itemToMove];
+            newTargetCart = [...industryData[targetType], itemToMove];
           }
 
-          const newCarts = {
-            ...state.carts,
+          const newIndustryData = {
+            ...industryData,
             [sourceCartType]: newSourceCart,
             [targetType]: newTargetCart
           };
 
           return {
-            carts: newCarts,
-            items: newCarts[state.activeCartType]
+            industries: {
+              ...state.industries,
+              [industry]: newIndustryData
+            },
+            items: newIndustryData[state.activeCartType]
           };
         });
       },
 
       addItem: (item, quantity = 1) => {
         set((state) => {
-          const currentCartItems = state.carts[state.activeCartType] || [];
+          const industry = state.activeIndustry;
+          const industryData = state.industries[industry] || getDefaultCarts();
+          const currentCartItems = industryData[state.activeCartType] || [];
           const existingItem = currentCartItems.find((i) => i.id === item.id);
           
           let newItems;
@@ -97,22 +131,33 @@ export const useCartStore = create<CartState>()(
             newItems = [...currentCartItems, { ...item, quantity: Math.min(quantity, item.stock) }];
           }
 
-          const newCarts = { ...state.carts, [state.activeCartType]: newItems };
-          return { carts: newCarts, items: newItems };
+          const newIndustryData = { ...industryData, [state.activeCartType]: newItems };
+          return {
+            industries: { ...state.industries, [industry]: newIndustryData },
+            items: newItems
+          };
         });
       },
 
       removeItem: (id) => {
         set((state) => {
-          const newItems = (state.carts[state.activeCartType] || []).filter((i) => i.id !== id);
-          const newCarts = { ...state.carts, [state.activeCartType]: newItems };
-          return { carts: newCarts, items: newItems };
+          const industry = state.activeIndustry;
+          const industryData = state.industries[industry] || getDefaultCarts();
+          const newItems = (industryData[state.activeCartType] || []).filter((i) => i.id !== id);
+          const newIndustryData = { ...industryData, [state.activeCartType]: newItems };
+          
+          return {
+            industries: { ...state.industries, [industry]: newIndustryData },
+            items: newItems
+          };
         });
       },
 
       updateQuantity: (id, quantity) => {
         set((state) => {
-          const currentCartItems = state.carts[state.activeCartType] || [];
+          const industry = state.activeIndustry;
+          const industryData = state.industries[industry] || getDefaultCarts();
+          const currentCartItems = industryData[state.activeCartType] || [];
           const item = currentCartItems.find((i) => i.id === id);
           if (!item) return state;
 
@@ -126,15 +171,24 @@ export const useCartStore = create<CartState>()(
             );
           }
 
-          const newCarts = { ...state.carts, [state.activeCartType]: newItems };
-          return { carts: newCarts, items: newItems };
+          const newIndustryData = { ...industryData, [state.activeCartType]: newItems };
+          return {
+            industries: { ...state.industries, [industry]: newIndustryData },
+            items: newItems
+          };
         });
       },
 
       clearCart: () => {
         set((state) => {
-          const newCarts = { ...state.carts, [state.activeCartType]: [] };
-          return { carts: newCarts, items: [] };
+          const industry = state.activeIndustry;
+          const industryData = state.industries[industry] || getDefaultCarts();
+          const newIndustryData = { ...industryData, [state.activeCartType]: [] };
+          
+          return {
+            industries: { ...state.industries, [industry]: newIndustryData },
+            items: []
+          };
         });
       },
 
@@ -149,7 +203,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: 'storefront-cart-v2', 
+      name: 'storefront-cart-v3', // increment version to clear old cache
     }
   )
 )

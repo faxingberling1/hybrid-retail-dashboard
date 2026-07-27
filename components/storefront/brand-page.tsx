@@ -9,9 +9,10 @@ interface BrandPageProps {
   searchKeyword: string
   logoUrl: string
   bannerBg: string
+  industry?: string
 }
 
-export async function BrandPage({ brandName, searchKeyword, logoUrl, bannerBg }: BrandPageProps) {
+export async function BrandPage({ brandName, searchKeyword, logoUrl, bannerBg, industry }: BrandPageProps) {
   // Fetch all products matching the brand keyword
   const products = await queryAll(`
     SELECT p.id, p.name, p.price, p.compare_at_price, p.image_url, p.category_id,
@@ -84,7 +85,7 @@ export async function BrandPage({ brandName, searchKeyword, logoUrl, bannerBg }:
         <div className="max-w-7xl mx-auto">
           {/* Back Navigation */}
           <Link 
-            href="/storefront" 
+            href={industry ? `/storefront/${industry}` : "/storefront"} 
             className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-10 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 hover:border-gray-200"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -103,8 +104,8 @@ export async function BrandPage({ brandName, searchKeyword, logoUrl, bannerBg }:
                 We are actively working on bringing {brandName} products to our catalog. Please check back later.
               </p>
               <Link 
-                href="/storefront" 
-                className="inline-flex items-center justify-center px-8 py-4 bg-gray-900 text-white rounded-xl font-bold mt-8 hover:bg-black transition-colors"
+                href={industry ? `/storefront/${industry}` : "/storefront"} 
+                className="inline-flex items-center justify-center px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95 mt-8"
               >
                 Continue Shopping
               </Link>

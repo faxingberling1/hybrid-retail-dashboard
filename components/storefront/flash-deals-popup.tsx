@@ -63,11 +63,11 @@ export function FlashDealsPopup() {
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: "spring", damping: 20, stiffness: 300, delay: 1 }}
-          className="md:hidden fixed bottom-[108px] left-4 right-4 z-30"
+          className="md:hidden fixed bottom-[120px] left-4 right-4 z-30"
         >
           <div 
             onClick={() => setIsModalOpen(true)}
-            className="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(200,17,92,0.12)] p-4 cursor-pointer flex items-center justify-between border border-white/60 group"
+            className="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(200,17,92,0.12)] p-4 cursor-pointer flex items-center justify-between border border-black/10 group"
           >
             {/* Decorative background elements */}
             <div className="absolute inset-0 bg-gradient-to-r from-pink-50/50 to-rose-50/50 z-0" />

@@ -18,18 +18,10 @@ export function CategoriesModal({ categories = [] }: { categories: any[] }) {
 
   return (
     <>
-      {/* Overlay */}
-      {isCategoriesOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[60] transition-opacity md:hidden"
-          onClick={() => setCategoriesOpen(false)}
-        />
-      )}
-
-      {/* Bottom Sheet */}
+      {/* Modal Above Navbar */}
       <div 
-        className={`fixed bottom-0 left-0 right-0 w-full max-h-[85vh] h-auto bg-gray-50 rounded-t-[32px] z-[70] transform transition-transform duration-300 ease-out shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col md:hidden ${
-          isCategoriesOpen ? "translate-y-0" : "translate-y-full"
+        className={`fixed bottom-[90px] left-4 right-4 w-auto max-h-[75vh] h-auto bg-gray-50 rounded-[32px] z-[45] transform transition-all duration-300 ease-out shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col md:hidden ${
+          isCategoriesOpen ? "translate-y-0 opacity-100 scale-100 pointer-events-auto" : "translate-y-8 opacity-0 scale-95 pointer-events-none"
         }`}
       >
         <div className="flex items-center justify-between p-6 bg-white rounded-t-[32px] border-b border-gray-100 shrink-0 shadow-sm relative z-10">
