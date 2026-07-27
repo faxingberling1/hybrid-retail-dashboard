@@ -36,7 +36,7 @@ export function CategoriesModal({ categories = [] }: { categories: any[] }) {
           </div>
           <button 
             onClick={() => setCategoriesOpen(false)}
-            className="p-2.5 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 rounded-full transition-colors"
+            className="p-2.5 bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
           >
             <X className="h-5 w-5 stroke-[2.5]" />
           </button>

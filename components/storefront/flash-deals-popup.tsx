@@ -139,20 +139,24 @@ export function FlashDealsPopup() {
                 <X className="w-5 h-5 text-gray-900" />
               </button>
               
-              <div className="flex items-center gap-3 mb-2 mt-4 relative z-10">
-                <div className="bg-gradient-to-br from-[#c8115c]/20 to-[#c8115c]/5 p-2 rounded-xl border border-[#c8115c]/20 shadow-inner">
-                  <motion.div
-                    animate={{ rotate: [0, -15, 15, -15, 15, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.6, repeatDelay: 1.5, ease: "easeInOut" }}
-                  >
-                    <AlarmClock className="w-6 h-6 text-[#c8115c]" />
-                  </motion.div>
+              <div className="flex items-center gap-4 mb-2 mt-4 relative z-10">
+                <motion.div 
+                  className="text-[48px] leading-none drop-shadow-md relative origin-bottom"
+                  animate={{ rotate: [0, -12, 12, -12, 12, 0] }}
+                  transition={{ repeat: Infinity, duration: 0.6, repeatDelay: 2, ease: "easeInOut" }}
+                >
+                  ⏰
+                  <span className="absolute -top-1 -right-2 text-2xl animate-pulse">✨</span>
+                  <span className="absolute -bottom-1 -left-1 text-lg">💫</span>
+                </motion.div>
+                <div>
+                  <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#c8115c] to-[#e63946] tracking-tight drop-shadow-sm leading-tight mb-1">Save 25%</h2>
+                  <p className="text-gray-500 font-bold text-sm flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#c8115c] animate-pulse"></span>
+                    Flash Deals • Ends in <span className="font-mono font-bold text-[#c8115c]">{formattedTime}</span>
+                  </p>
                 </div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 drop-shadow-sm">Flash Deals</h2>
               </div>
-              <p className="text-gray-500 font-medium text-sm flex items-center gap-2 relative z-10">
-                <Clock className="w-4 h-4" /> Ends in <span className="font-mono font-bold text-[#c8115c] text-base">{formattedTime}</span>
-              </p>
 
               {/* Decorative shapes */}
               <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-[#c8115c]/10 rounded-full blur-3xl" />

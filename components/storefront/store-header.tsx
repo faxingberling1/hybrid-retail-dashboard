@@ -251,37 +251,37 @@ export function StoreHeader({ categories = [], customLogoUrl, industry = "grocer
               className="w-full h-10 pl-10 pr-4 rounded-xl bg-white text-gray-900 border-0 outline-none shadow-sm font-medium text-sm"
             />
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          </div>
 
-          {/* Mobile Search Dropdown */}
-          {searchValue.trim().length >= 2 && searchResults !== null && (
-            <div className="absolute top-12 left-4 right-4 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
-              {isSearching ? (
-                 <div className="p-4 text-center text-sm font-bold text-gray-500">Searching...</div>
-              ) : searchResults.length > 0 ? (
-                 <div className="max-h-80 overflow-y-auto">
-                   {searchResults.map(product => (
-                      <Link 
-                        key={product.id} 
-                        href={`/storefront/${industry || "grocery"}/products/${product.id}`}
-                        onClick={() => { setSearchValue(''); setSearchResults([]); }}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors"
-                      >
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" /> : <ShoppingBag className="w-5 h-5 m-2.5 text-gray-400" />}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <h4 className="text-sm font-bold text-gray-900 line-clamp-1">{product.name}</h4>
-                          <span className="text-xs font-black text-rose-500">Rs. {Number(typeof product.price === 'string' ? product.price.replace(/,/g, '') : product.price).toFixed(0)}</span>
-                        </div>
-                      </Link>
-                   ))}
-                 </div>
-              ) : (
-                 <div className="p-4 text-center text-sm font-bold text-gray-500">No products found</div>
-              )}
-            </div>
-          )}
+            {/* Mobile Search Dropdown */}
+            {searchValue.trim().length >= 2 && searchResults !== null && (
+              <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                {isSearching ? (
+                   <div className="p-4 text-center text-sm font-bold text-gray-500">Searching...</div>
+                ) : searchResults.length > 0 ? (
+                   <div className="max-h-80 overflow-y-auto">
+                     {searchResults.map(product => (
+                        <Link 
+                          key={product.id} 
+                          href={`/storefront/${industry || "grocery"}/products/${product.id}`}
+                          onClick={() => { setSearchValue(''); setSearchResults([]); }}
+                          className="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors"
+                        >
+                          <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                            {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" /> : <ShoppingBag className="w-5 h-5 m-2.5 text-gray-400" />}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <h4 className="text-sm font-bold text-gray-900 line-clamp-1">{product.name}</h4>
+                            <span className="text-xs font-black text-rose-500">Rs. {Number(typeof product.price === 'string' ? product.price.replace(/,/g, '') : product.price).toFixed(0)}</span>
+                          </div>
+                        </Link>
+                     ))}
+                   </div>
+                ) : (
+                   <div className="p-4 text-center text-sm font-bold text-gray-500">No products found</div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 

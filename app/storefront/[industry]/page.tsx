@@ -101,12 +101,19 @@ async function FlashDeals({ industry }: { industry: string }) {
       <div className="mb-12 bg-white p-4 md:p-6 rounded-3xl border border-indigo-100 shadow-sm relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20">
-              <Zap className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <div className="text-[32px] leading-none drop-shadow-sm relative origin-bottom">
+                ⏰
+                <span className="absolute -top-1 -right-2 text-sm animate-pulse">✨</span>
+              </div>
+              <div>
+                <h2 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#c8115c] to-[#e63946] text-xl md:text-2xl leading-tight tracking-tight drop-shadow-sm">Save 25%</h2>
+                <p className="text-[12px] font-bold text-gray-500 tracking-tight mt-0 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c8115c] animate-pulse"></span>
+                  Tech Flash Deals
+                </p>
+              </div>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Tech Flash Deals</h2>
-          </div>
           <FlashDealsTimer hours={12} />
         </div>
         <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -139,10 +146,19 @@ async function FlashDeals({ industry }: { industry: string }) {
         <div className="absolute right-0 top-0 w-64 h-64 bg-teal-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-teal-500 text-white rounded-xl flex items-center justify-center shadow-md shadow-teal-500/20">
-              <Zap className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <div className="text-[32px] leading-none drop-shadow-sm relative origin-bottom">
+                ⏰
+                <span className="absolute -top-1 -right-2 text-sm animate-pulse">✨</span>
+              </div>
+              <div>
+                <h2 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#c8115c] to-[#e63946] text-xl md:text-2xl leading-tight tracking-tight drop-shadow-sm">Save 25%</h2>
+                <p className="text-[12px] font-bold text-gray-500 tracking-tight mt-0 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c8115c] animate-pulse"></span>
+                  Health Flash Deals
+                </p>
+              </div>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Health Flash Deals</h2>
           </div>
           <FlashDealsTimer hours={8} />
         </div>
@@ -176,10 +192,19 @@ async function FlashDeals({ industry }: { industry: string }) {
         <div className="absolute right-0 top-0 w-64 h-64 bg-fuchsia-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-fuchsia-500 text-white rounded-xl flex items-center justify-center shadow-md shadow-fuchsia-500/20">
-              <Zap className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <div className="text-[32px] leading-none drop-shadow-sm relative origin-bottom">
+                ⏰
+                <span className="absolute -top-1 -right-2 text-sm animate-pulse">✨</span>
+              </div>
+              <div>
+                <h2 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#c8115c] to-[#e63946] text-xl md:text-2xl leading-tight tracking-tight drop-shadow-sm">Save 25%</h2>
+                <p className="text-[12px] font-bold text-gray-500 tracking-tight mt-0 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c8115c] animate-pulse"></span>
+                  Style Steals
+                </p>
+              </div>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Style Steals</h2>
           </div>
           <FlashDealsTimer hours={5} />
         </div>
@@ -213,10 +238,19 @@ async function FlashDeals({ industry }: { industry: string }) {
         <div className="absolute right-0 top-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20">
-              <Zap className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              <div className="text-[32px] leading-none drop-shadow-sm relative origin-bottom">
+                ⏰
+                <span className="absolute -top-1 -right-2 text-sm animate-pulse">✨</span>
+              </div>
+              <div>
+                <h2 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#c8115c] to-[#e63946] text-xl md:text-2xl leading-tight tracking-tight drop-shadow-sm">Save 25%</h2>
+                <p className="text-[12px] font-bold text-gray-500 tracking-tight mt-0 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c8115c] animate-pulse"></span>
+                  Today's Specials
+                </p>
+              </div>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Today's Specials</h2>
           </div>
           <FlashDealsTimer hours={4} />
         </div>
@@ -266,10 +300,19 @@ async function FlashDeals({ industry }: { industry: string }) {
       
       <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center shadow-md shadow-rose-500/20">
-            <Zap className="w-5 h-5" />
+          <div className="flex items-center gap-3">
+            <div className="text-[32px] leading-none drop-shadow-sm relative origin-bottom">
+              ⏰
+              <span className="absolute -top-1 -right-2 text-sm animate-pulse">✨</span>
+            </div>
+            <div>
+              <h2 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#c8115c] to-[#e63946] text-xl md:text-2xl leading-tight tracking-tight drop-shadow-sm">Save 25%</h2>
+              <p className="text-[12px] font-bold text-gray-500 tracking-tight mt-0 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c8115c] animate-pulse"></span>
+                Flash Deals
+              </p>
+            </div>
           </div>
-          <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Flash Deals</h2>
         </div>
         <FlashDealsTimer hours={3} />
       </div>
