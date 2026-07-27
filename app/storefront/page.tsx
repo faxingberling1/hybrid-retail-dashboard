@@ -317,9 +317,9 @@ export default async function StorefrontShopPage() {
               <Award className="w-5 h-5 text-indigo-500" /> Featured Brands
             </h2>
           </div>
-          <div className="relative overflow-hidden w-full group -mx-4 md:mx-0 flex">
-            <div className="flex gap-4 animate-marquee-reverse group-hover:[animation-play-state:paused] whitespace-nowrap py-2 px-4 md:px-0">
-              {[...topBrands, ...topBrands, ...topBrands, ...topBrands].map((brand, idx) => (
+          <div className="relative overflow-x-auto w-full group -mx-4 md:mx-0 flex custom-scrollbar pb-2">
+            <div className="flex gap-4 whitespace-nowrap py-2 px-4 md:px-0 w-max">
+              {topBrands.map((brand, idx) => (
                 <Link 
                   key={idx} 
                   href={`/storefront/brands/${brand.slug}`}

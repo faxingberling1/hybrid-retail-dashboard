@@ -2,6 +2,9 @@ import { StoreHeader } from "@/components/storefront/store-header"
 import { AuthModal } from "@/components/storefront/auth-modal"
 import { AddressModal } from "@/components/storefront/address-modal"
 import { MobileNav } from "@/components/storefront/mobile-nav"
+import { IndustrySelectorModal } from "@/components/storefront/industry-selector-modal"
+import { FlashDealsPopup } from "@/components/storefront/flash-deals-popup"
+import { CategoriesModal } from "@/components/storefront/categories-modal"
 import { db, queryAll } from "@/lib/db"
 
 import { getStorefrontOrg, hexToHsl } from "@/lib/storefront-utils"
@@ -53,6 +56,9 @@ export default async function StorefrontLayout({
       )}
       <StoreHeader categories={parentCategories} customLogoUrl={themeConfig.logoUrl} />
       <AuthModal />
+      <IndustrySelectorModal />
+      <FlashDealsPopup />
+      <CategoriesModal categories={allCategories} />
       <div className="flex-1">
         {children}
       </div>

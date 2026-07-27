@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run seed && next dev -p 3001 --webpack",
+    "dev": "npm run seed && next dev --webpack",
     "build": "npx prisma generate && next build --webpack",
     "postinstall": "npx prisma generate",
-    "start": "next start -p 3001",
+    "start": "next start",
     "lint": "next lint",
     "migrate": "tsx scripts/migrate.ts",
     "migrate:notifications:complete": "tsx scripts/migrate-notifications-complete.ts",
