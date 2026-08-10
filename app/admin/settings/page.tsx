@@ -15,6 +15,7 @@ import { NotificationSettings } from "@/components/dashboard/settings/notificati
 import { PaymentSettings } from "@/components/dashboard/settings/payment-settings"
 import { SecuritySettings } from "@/components/dashboard/settings/security-settings"
 import { IntegrationSettings } from "@/components/dashboard/settings/integration-settings"
+import { StorefrontSettings } from "@/components/dashboard/settings/storefront-settings"
 import { DeleteAccountModal } from "@/components/dashboard/settings/delete-account-modal"
 import { signOut } from "next-auth/react"
 
@@ -38,6 +39,15 @@ export default function AdminSettingsPage() {
             push_notifications: true,
             desktop_notifications: true,
             digest_frequency: "realtime"
+        },
+        storefront: {
+            subdomain: "",
+            theme_config: {
+                primaryColor: "#ffc000",
+                secondaryColor: "#000000",
+                logoUrl: "",
+                bannerUrl: ""
+            }
         }
     })
 
@@ -52,7 +62,8 @@ export default function AdminSettingsPage() {
             if (resData.error) throw new Error(resData.error)
             setData({
                 organization: resData.organization || data.organization,
-                notifications: resData.notifications || data.notifications
+                notifications: resData.notifications || data.notifications,
+                storefront: resData.storefront || data.storefront
             })
         } catch (error: any) {
             toast.error(`Fetch Failed: ${error.message}`)
@@ -112,6 +123,7 @@ export default function AdminSettingsPage() {
 
     const tabs = [
         { id: "GENERAL", label: "General", icon: <Store className="h-4 w-4" /> },
+        { id: "STOREFRONT", label: "Storefront", icon: <Palette className="h-4 w-4" /> },
         { id: "NOTIFICATIONS", label: "Notifications", icon: <Bell className="h-4 w-4" /> },
         { id: "PAYMENTS", label: "Payments", icon: <CreditCard className="h-4 w-4" /> },
         { id: "SECURITY", label: "Security", icon: <Shield className="h-4 w-4" /> },
@@ -199,6 +211,26 @@ export default function AdminSettingsPage() {
                         >
                             {activeTab === "GENERAL" && (
                                 <GeneralSettings data={data.organization} onChange={handleOrgChange} />
+                            )}
+                            {activeTab === "STOREFRONT" && (
+                                <StorefrontSettings data={data.storefront} onSave={async (sfData: any) => {
+                                    const newData = { ...data, storefront: { ...data.storefront, ...sfData.storefront } }
+                                    setData(newData)
+                                    setIsSaving(true)
+                                    try {
+                                        const response = await fetch("/api/admin/settings", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify(newData)
+                                        })
+                                        if (!response.ok) throw new Error("Failed to save")
+                                        toast.success("Settings saved successfully")
+                                    } catch (err: any) {
+                                        toast.error(err.message)
+                                    } finally {
+                                        setIsSaving(false)
+                                    }
+                                }} isSaving={isSaving} />
                             )}
                             {activeTab === "NOTIFICATIONS" && (
                                 <NotificationSettings data={data.notifications} onChange={handleNotificationChange} />

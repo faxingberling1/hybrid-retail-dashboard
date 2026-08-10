@@ -46,11 +46,17 @@ export async function BrandPage({ brandName, searchKeyword, logoUrl, bannerBg, i
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12">
             <div className="w-32 h-32 md:w-48 md:h-48 bg-white rounded-3xl shadow-xl flex items-center justify-center overflow-hidden flex-shrink-0 border-4 border-white">
-              <img 
-                src={logoUrl} 
-                alt={`${brandName} Logo`} 
-                className="w-full h-full object-contain p-4"
-              />
+              {logoUrl ? (
+                <img 
+                  src={logoUrl} 
+                  alt={`${brandName} Logo`} 
+                  className="w-full h-full object-contain p-4"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-300">
+                  {brandName.charAt(0)}
+                </div>
+              )}
             </div>
             
             <div className="text-center md:text-left flex-1">

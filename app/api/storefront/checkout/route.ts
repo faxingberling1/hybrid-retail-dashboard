@@ -1,8 +1,26 @@
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
 import prisma from "@/lib/prisma"
 
 export async function POST(request: Request) {
   try {
+    const headersList = await headers();
+    const subdomain = headersList.get('x-subdomain');
+
+    if (!subdomain) {
+      return NextResponse.json({ error: 'Missing subdomain context' }, { status: 400 });
+    }
+
+    // Find organization id
+    const orgStorefront = await prisma.organization_storefronts.findFirst({
+      where: { subdomain },
+      select: { organization_id: true }
+    });
+
+    if (!orgStorefront) {
+      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    }
+
     const body = await request.json()
     const { items, total_amount, payment_method, shipping_address, delivery_fee, discount_amount, scheduled_for } = body
 
@@ -38,6 +56,7 @@ export async function POST(request: Request) {
         payment_status: payment_method === "cod" ? "PENDING" : "PAID",
         payment_method: payment_method,
         address_id: address.id,
+        organization_id: orgStorefront.organization_id,
         items: {
           create: items.map((item: any) => ({
             product_id: item.id,
@@ -48,6 +67,25 @@ export async function POST(request: Request) {
         }
       }
     })
+
+    // Deduct stock for linked physical products
+    for (const item of items) {
+      const storefrontProduct = await prisma.storefrontProduct.findUnique({
+        where: { id: item.id }
+      })
+
+      if (storefrontProduct?.pos_product_id) {
+        await prisma.products.update({
+          where: { id: storefrontProduct.pos_product_id },
+          data: { stock: { decrement: item.quantity } }
+        })
+      }
+
+      await prisma.storefrontProduct.update({
+        where: { id: item.id },
+        data: { stock: { decrement: item.quantity } }
+      })
+    }
 
     return NextResponse.json({ 
       success: true, 

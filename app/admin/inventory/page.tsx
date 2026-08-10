@@ -105,6 +105,21 @@ export default function AdminInventoryPage() {
         }
     })
 
+    const publishProductMutation = useMutation({
+        mutationFn: (productId: string) => fetch('/api/inventory/sync', {
+            method: 'POST',
+            body: JSON.stringify({ productId, isPublishing: true })
+        }).then(async res => {
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to publish')
+            return data
+        }),
+        onSuccess: () => {
+            toast.success("Published to Online Storefront!")
+        },
+        onError: (err: any) => toast.error(err.message)
+    })
+
     const filteredInventory = useMemo(() => {
         return products.map((item: any) => {
             let status = 'in-stock'
@@ -347,6 +362,13 @@ export default function AdminInventoryPage() {
                                             </td>
                                             <td className="px-8 py-5 text-right">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <button 
+                                                        onClick={() => publishProductMutation.mutate(item.id)}
+                                                        title="Publish to Online Store"
+                                                        className="p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all shadow-sm border border-transparent hover:border-emerald-100 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 duration-300"
+                                                    >
+                                                        <Box className="h-4 w-4" />
+                                                    </button>
                                                     <button className="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-sm border border-transparent hover:border-blue-100 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 duration-300">
                                                         <History className="h-4 w-4" />
                                                     </button>

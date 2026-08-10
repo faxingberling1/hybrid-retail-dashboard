@@ -1,10 +1,15 @@
-import prisma from '../lib/prisma'
+import { queryAll } from '../lib/db'
 
 async function main() {
-  const prod = await prisma.storefrontProduct.findMany({
-    where: { name: { contains: 'Paratha' } }
-  })
-  console.log(prod)
+  const allProducts = await queryAll(
+    `SELECT count(*) FROM storefront_products`
+  )
+  console.log('Total products:', allProducts)
+  
+  const sample = await queryAll(
+    `SELECT id, name, compare_at_price FROM storefront_products LIMIT 5`
+  )
+  console.log('Sample:', sample)
 }
 
-main().finally(() => prisma.$disconnect())
+main()

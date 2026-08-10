@@ -26,6 +26,12 @@ export async function GET(request: NextRequest) {
             [userId]
         )
 
+        // Fetch storefront settings
+        const storefront = await db.queryOne(
+            'SELECT subdomain, theme_config FROM organization_storefronts WHERE organization_id = $1',
+            [organizationId]
+        )
+
         if (!notifications) {
             // Default preferences if not found
             notifications = {
@@ -38,7 +44,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             organization,
-            notifications
+            notifications,
+            storefront
         })
     } catch (error: any) {
         console.error('❌ Error fetching settings:', error)
@@ -53,7 +60,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { organization, notifications } = await request.json()
+        const { organization, notifications, storefront } = await request.json()
         const organizationId = session.user.organizationId
         const userId = session.user.id
 
@@ -104,6 +111,36 @@ export async function POST(request: NextRequest) {
                     notifications.digest_frequency
                 ]
             )
+        }
+
+        // Update storefront settings
+        if (storefront) {
+            const existingStorefront = await db.queryOne(
+                'SELECT 1 FROM organization_storefronts WHERE organization_id = $1',
+                [organizationId]
+            )
+
+            if (existingStorefront) {
+                await db.query(
+                    `UPDATE organization_storefronts
+                     SET theme_config = $1, updated_at = NOW()
+                     WHERE organization_id = $2`,
+                    [
+                        storefront.theme_config ? JSON.stringify(storefront.theme_config) : null,
+                        organizationId
+                    ]
+                )
+            } else {
+                 await db.query(
+                    `INSERT INTO organization_storefronts (organization_id, subdomain, theme_config)
+                     VALUES ($1, $2, $3)`,
+                    [
+                        organizationId,
+                        storefront.subdomain || `store-${organizationId.substring(0, 8)}`,
+                        storefront.theme_config ? JSON.stringify(storefront.theme_config) : null
+                    ]
+                )
+            }
         }
 
         return NextResponse.json({ success: true, message: 'Settings updated successfully' })

@@ -1,27 +1,65 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from 'react'
 import { X, Mail, Lock, User as UserIcon } from 'lucide-react'
 import { useUIStore } from '@/lib/store/ui-store'
 import { useAuthStore } from '@/lib/store/auth-store'
+import { toast } from 'sonner'
 
-export function AuthModal() {
+export function AuthModal({ organizationId }: { organizationId: string }) {
   const { isAuthModalOpen, setAuthModalOpen } = useUIStore()
-  const { login } = useAuthStore()
+  const { setUser, setOrders } = useAuthStore()
   
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   
   if (!isAuthModalOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock login functionality
-    const displayName = isLogin ? (email.split('@')[0] || 'User') : (name || 'User')
-    login(email, displayName)
-    setAuthModalOpen(false)
+    setIsLoading(true)
+
+    try {
+      const endpoint = isLogin ? '/api/storefront/auth/login' : '/api/storefront/auth/register'
+      const body = isLogin 
+        ? { email, password, organization_id: organizationId }
+        : { name, email, password, organization_id: organizationId }
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed')
+      }
+
+      setUser(data.customer)
+      
+      // If logging in, also fetch latest orders
+      if (isLogin) {
+        const meRes = await fetch('/api/storefront/auth/me')
+        if (meRes.ok) {
+          const meData = await meRes.json()
+          if (meData.orders) {
+            setOrders(meData.orders)
+          }
+        }
+      }
+
+      toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!')
+      setAuthModalOpen(false)
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -106,28 +144,12 @@ export function AuthModal() {
 
             <button 
               type="submit"
-              className="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-colors mt-2"
+              disabled={isLoading}
+              className="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-colors mt-2 disabled:opacity-50"
             >
-              {isLogin ? 'Sign In' : 'Create Account'}
+              {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
             </button>
           </form>
-
-          <div className="mt-4">
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-gray-200"></div>
-              <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase tracking-wider">Or</span>
-              <div className="flex-grow border-t border-gray-200"></div>
-            </div>
-            <button 
-              onClick={() => {
-                login('demo@example.com', 'Demo User')
-                setAuthModalOpen(false)
-              }}
-              className="w-full py-4 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-indigo-100 transition-colors mt-2"
-            >
-              Demo Login
-            </button>
-          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm font-medium text-gray-600">

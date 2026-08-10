@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -11,7 +11,15 @@ import { useUIStore } from "@/lib/store/ui-store"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useLocationStore } from "@/lib/store/location-store"
 import { toast } from "sonner"
-export function StoreHeader({ categories = [], customLogoUrl, industry = "grocery" }: { categories?: any[], customLogoUrl?: string, industry?: string }) {
+
+interface StoreHeaderProps {
+  categories: any[];
+  customLogoUrl?: string | null;
+  industry?: string;
+  themeConfig?: any;
+}
+
+export function StoreHeader({ categories, customLogoUrl, industry, themeConfig = {} }: StoreHeaderProps) {
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const getItemCount = useCartStore((state) => state.getItemCount)
   const { items, updateQuantity, removeItem, activeCartType, switchCart, moveItemToCart } = useCartStore()
@@ -23,6 +31,25 @@ export function StoreHeader({ categories = [], customLogoUrl, industry = "grocer
   const { isSidebarOpen, setSidebarOpen, isCartOpen, setCartOpen, setAuthModalOpen, setAddressModalOpen } = useUIStore()
   const { user, isAuthenticated, logout } = useAuthStore()
   const { address, isLoading, fetchLocation } = useLocationStore()
+    const { setUser, setOrders } = useAuthStore()
+
+    React.useEffect(() => {
+      const verifySession = async () => {
+        try {
+          const res = await fetch('/api/storefront/auth/me')
+          if (res.ok) {
+            const data = await res.json()
+            if (data.authenticated) {
+              setUser(data.customer)
+              if (data.orders) setOrders(data.orders)
+            } else {
+              logout()
+            }
+          }
+        } catch (error) { console.error('Session verify error', error) }
+      }
+      if (mounted) verifySession()
+    }, [mounted, setUser, setOrders, logout])
   const [searchValue, setSearchValue] = useState("")
   const router = useRouter()
   
@@ -83,7 +110,7 @@ export function StoreHeader({ categories = [], customLogoUrl, industry = "grocer
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#ffc000] shadow-sm">
+      <header className="sticky top-0 z-40 w-full bg-primary shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
           
           <div className="flex items-center gap-3">
@@ -188,7 +215,7 @@ export function StoreHeader({ categories = [], customLogoUrl, industry = "grocer
                   <Link href={`/storefront/${industry || "grocery"}/account`} className="block px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors">
                     My Account
                   </Link>
-                  <button onClick={() => logout()} className="w-full text-left px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50 transition-colors border-t border-gray-50">
+                  <button onClick={async () => { await fetch('/api/storefront/auth/logout', { method: 'POST' }); logout(); }} className="w-full text-left px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50 transition-colors border-t border-gray-50">
                     Sign Out
                   </button>
                 </div>
@@ -526,3 +553,4 @@ export function StoreHeader({ categories = [], customLogoUrl, industry = "grocer
     </>
   )
 }
+

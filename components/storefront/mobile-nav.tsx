@@ -30,18 +30,18 @@ export function MobileNav() {
       <div className="flex items-center justify-between">
         <Link 
           href={homeHref} 
-          className={`flex flex-col items-center gap-1 p-2 transition-all relative ${isHomeActive ? 'text-[#ffc000]' : 'text-gray-500 hover:text-[#ffc000]'}`}
+          className={`flex flex-col items-center gap-1 p-2 transition-all relative ${isHomeActive ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}
         >
           <Home className="w-6 h-6" />
           <span className="text-[10px] font-bold">Home</span>
           {isHomeActive && (
-            <span className="absolute top-0 right-1 w-2 h-2 bg-[#ffc000] rounded-full border-2 border-white"></span>
+            <span className="absolute top-0 right-1 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
           )}
         </Link>
         
         <button 
           onClick={() => setCategoriesOpen(!isCategoriesOpen)}
-          className={`flex flex-col items-center gap-1 p-2 transition-all ${isCategoriesOpen ? 'text-[#ffc000]' : 'text-gray-500 hover:text-[#ffc000]'}`}
+          className={`flex flex-col items-center gap-1 p-2 transition-all ${isCategoriesOpen ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}
         >
           <Grid className="w-6 h-6" />
           <span className="text-[10px] font-bold">Categories</span>
@@ -49,7 +49,7 @@ export function MobileNav() {
         
         <button 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="flex flex-col items-center gap-1 p-2 transition-all text-gray-500 hover:text-[#ffc000]"
+          className="flex flex-col items-center gap-1 p-2 transition-all text-gray-500 hover:text-primary"
         >
           <Search className="w-6 h-6" />
           <span className="text-[10px] font-bold">Search</span>
@@ -57,12 +57,12 @@ export function MobileNav() {
         
         <button 
           onClick={() => setCartOpen(!isCartOpen)}
-          className={`flex flex-col items-center gap-1 p-2 transition-all relative ${isCartOpen ? 'text-[#ffc000]' : 'text-gray-500 hover:text-[#ffc000]'}`}
+          className={`flex flex-col items-center gap-1 p-2 transition-all relative ${isCartOpen ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}
         >
           <ShoppingBag className="w-6 h-6" />
           <span className="text-[10px] font-bold">Cart</span>
           {mounted && getItemCount() > 0 && (
-            <span className="absolute -top-1 right-0 bg-[#ffc000] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+            <span className="absolute -top-1 right-0 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
               {getItemCount()}
             </span>
           )}
@@ -71,7 +71,7 @@ export function MobileNav() {
         {isAuthenticated ? (
           <Link 
             href="/storefront/account" 
-            className={`flex flex-col items-center gap-1 p-2 transition-all ${isAccountActive ? 'text-[#ffc000]' : 'text-gray-500 hover:text-[#ffc000]'}`}
+            className={`flex flex-col items-center gap-1 p-2 transition-all ${isAccountActive ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}
           >
             <User className="w-6 h-6" />
             <span className="text-[10px] font-bold">Account</span>
@@ -79,7 +79,7 @@ export function MobileNav() {
         ) : (
           <button 
             onClick={() => setAuthModalOpen(!isAuthModalOpen)}
-            className={`flex flex-col items-center gap-1 p-2 transition-all ${isAuthModalOpen ? 'text-[#ffc000]' : 'text-gray-500 hover:text-[#ffc000]'}`}
+            className={`flex flex-col items-center gap-1 p-2 transition-all ${isAuthModalOpen ? 'text-primary' : 'text-gray-500 hover:text-primary'}`}
           >
             <User className="w-6 h-6" />
             <span className="text-[10px] font-bold">Login</span>

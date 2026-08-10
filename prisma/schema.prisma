@@ -92,36 +92,37 @@ model BlogPost {
 }
 
 model organizations {
-  id             String           @id
-  name           String
-  status         String?          @default("active")
-  industry       String?          @db.VarChar(100)
-  created_at     DateTime?        @default(now())
-  updated_at     DateTime?        @default(now())
-  business_type  String?          @db.VarChar(100)
-  contact_person String?          @db.VarChar(255)
-  contact_email  String?          @db.VarChar(255)
-  contact_phone  String?          @db.VarChar(50)
-  address        String?
-  city           String?          @db.VarChar(100)
-  country        String?          @default("Pakistan") @db.VarChar(100)
-  activity_logs  activity_logs[]
-  analytics_data analytics_data[]
-  api_keys       api_keys[]
-  invoices       invoices[]
+  id                       String                    @id
+  name                     String
+  status                   String?                   @default("active")
+  industry                 String?                   @db.VarChar(100)
+  created_at               DateTime?                 @default(now())
+  updated_at               DateTime?                 @default(now())
+  business_type            String?                   @db.VarChar(100)
+  contact_person           String?                   @db.VarChar(255)
+  contact_email            String?                   @db.VarChar(255)
+  contact_phone            String?                   @db.VarChar(50)
+  address                  String?
+  city                     String?                   @db.VarChar(100)
+  country                  String?                   @default("Pakistan") @db.VarChar(100)
+  activity_logs            activity_logs[]
+  analytics_data           analytics_data[]
+  api_keys                 api_keys[]
+  invoices                 invoices[]
   subscriptions            subscriptions[]
   transactions             transactions[]
   organization_storefronts organization_storefronts?
+  storefrontCustomers      StorefrontCustomer[]
 }
 
 model organization_storefronts {
-  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  organization_id String         @unique
-  subdomain       String?        @unique @db.VarChar(255)
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organization_id String        @unique
+  subdomain       String?       @unique @db.VarChar(255)
   theme_config    Json?
-  created_at      DateTime?      @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime?      @default(now()) @db.Timestamptz(6)
-  organization    organizations  @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  created_at      DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?     @default(now()) @db.Timestamptz(6)
+  organization    organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
 
   @@map("organization_storefronts")
 }
@@ -373,15 +374,15 @@ model Plan {
 }
 
 model Addon {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String   @unique
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  icon        String?  @default("Package")
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-  interval    String   @default("month")
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String          @unique
+  description   String?
+  price         Decimal         @db.Decimal(10, 2)
+  icon          String?         @default("Package")
+  is_active     Boolean         @default(true)
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime        @default(now()) @updatedAt @db.Timestamptz(6)
+  interval      String          @default("month")
   subscriptions subscriptions[]
 
   @@map("addons")
@@ -402,19 +403,19 @@ enum ticket_status {
 }
 
 model StorefrontCategory {
-  id          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  slug        String               @unique
-  description String?
-  image_url   String?
-  is_active   Boolean              @default(true)
+  id              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  slug            String               @unique
+  description     String?
+  image_url       String?
+  is_active       Boolean              @default(true)
   organization_id String?
-  parent_id   String?              @db.Uuid
-  parent      StorefrontCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  children    StorefrontCategory[] @relation("CategoryHierarchy")
-  created_at  DateTime             @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
-  products    StorefrontProduct[]
+  parent_id       String?              @db.Uuid
+  parent          StorefrontCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  children        StorefrontCategory[] @relation("CategoryHierarchy")
+  created_at      DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
+  products        StorefrontProduct[]
 
   @@map("storefront_categories")
 }
@@ -431,6 +432,7 @@ model StorefrontProduct {
   stock               Int                  @default(0)
   is_active           Boolean              @default(true)
   organization_id     String?
+  pos_product_id      String?              @unique @db.Uuid
   category_id         String               @db.Uuid
   category            StorefrontCategory   @relation(fields: [category_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
   created_at          DateTime             @default(now()) @db.Timestamptz(6)
@@ -441,24 +443,28 @@ model StorefrontProduct {
 }
 
 model StorefrontAddress {
-  id         String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id    String? // Can be linked to User id if string, but User.id is String
-  name       String
-  phone      String
-  street     String
-  city       String
-  state      String?
-  zip_code   String?
-  is_default Boolean           @default(false)
-  created_at DateTime          @default(now()) @db.Timestamptz(6)
-  updated_at DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
-  orders     StorefrontOrder[]
+  id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String? // Can be linked to User id if string, but User.id is String
+  customer_id String?             @db.Uuid
+  customer    StorefrontCustomer? @relation("CustomerAddresses", fields: [customer_id], references: [id], onDelete: Cascade)
+  name        String
+  phone       String
+  street      String
+  city        String
+  state       String?
+  zip_code    String?
+  is_default  Boolean             @default(false)
+  created_at  DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  orders      StorefrontOrder[]
 
   @@map("storefront_addresses")
 }
 
 model StorefrontOrder {
   id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id     String?               @db.Uuid
+  customer        StorefrontCustomer?   @relation("CustomerOrders", fields: [customer_id], references: [id], onDelete: SetNull)
   user_id         String?
   user            User?                 @relation(fields: [user_id], references: [id], onDelete: SetNull)
   address_id      String?               @db.Uuid
@@ -526,4 +532,21 @@ model Equipment {
   updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
   @@map("equipments")
+}
+
+model StorefrontCustomer {
+  id              String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organization_id String?
+  organization    organizations?      @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  name            String
+  email           String
+  password_hash   String
+  phone           String?
+  orders          StorefrontOrder[]   @relation("CustomerOrders")
+  addresses       StorefrontAddress[] @relation("CustomerAddresses")
+  created_at      DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([email, organization_id])
+  @@map("storefront_customers")
 }

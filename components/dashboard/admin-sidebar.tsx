@@ -45,6 +45,7 @@ export function AdminSidebar() {
     { name: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" />, href: "/admin" },
     { name: "Inventory Management", icon: <Package className="h-5 w-5" />, href: "/admin/inventory" },
     { name: "Sales", icon: <ShoppingBag className="h-5 w-5" />, href: "/admin/sales" },
+    { name: "Online Orders", icon: <ShoppingBag className="h-5 w-5" />, href: "/admin/online-orders" },
   ]
 
   const industryItems: Record<string, any[]> = {

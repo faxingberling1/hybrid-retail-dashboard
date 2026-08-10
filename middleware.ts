@@ -9,6 +9,45 @@ export async function middleware(request: NextRequest) {
   console.log('\n=== MIDDLEWARE START ===')
   console.log('📁 Path:', pathname)
 
+  // === DYNAMIC SUBDOMAIN ROUTING ===
+  const hostname = request.headers.get('host') || '';
+  let currentHost = '';
+
+  if (process.env.NODE_ENV === 'production') {
+    currentHost = hostname.replace('.hybridpos.com', '').replace('.hybridpos.pk', '');
+  } else {
+    currentHost = hostname.replace('.localhost:3000', '').replace('.localhost', '');
+  }
+
+  // Don't rewrite API routes or static files for subdomains
+  const isApiOrStatic = pathname.startsWith('/api/') || pathname.startsWith('/_next/') || pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|css|js|woff|woff2|ttf|eot)$/);
+
+  if (
+    currentHost && 
+    currentHost !== hostname && 
+    currentHost !== 'localhost:3000' && 
+    currentHost !== 'localhost' &&
+    currentHost !== 'www' &&
+    currentHost !== 'app'
+  ) {
+    const headers = new Headers(request.headers);
+    headers.set('x-subdomain', currentHost);
+    
+    if (!isApiOrStatic) {
+      console.log(`[Middleware] Rewriting subdomain request: ${currentHost} -> /${currentHost}${pathname}`);
+      return NextResponse.rewrite(new URL(`/${currentHost}${pathname}`, request.url), {
+        request: { headers }
+      });
+    } else {
+      // Inject headers into API calls too, but don't rewrite the path
+      // Next.js middleware doesn't easily let us just inject headers and continue 
+      // without using NextResponse.next(), so we do that here.
+      const response = NextResponse.next({ request: { headers } });
+      return response;
+    }
+  }
+  // =================================
+
   // Public paths - allow without authentication
   const publicPaths = [
     '/',

@@ -17,13 +17,22 @@ export async function getStorefrontOrg() {
     subdomain = host.split('.localhost:')[0];
   }
 
-  if (!subdomain || subdomain === 'www' || subdomain === 'localhost') {
+  // Override with middleware header if present
+  const middlewareSubdomain = headersList.get('x-subdomain');
+  if (middlewareSubdomain) {
+    subdomain = middlewareSubdomain;
+  }
+
+  if (!subdomain || subdomain === 'www' || subdomain === 'localhost' || subdomain === 'app') {
     return null;
   }
 
   // Query organization by subdomain
   const orgStorefront = await db.queryOne(
-    `SELECT organization_id, theme_config FROM organization_storefronts WHERE subdomain = $1`,
+    `SELECT s.organization_id, s.theme_config, o.industry 
+     FROM organization_storefronts s
+     JOIN organizations o ON s.organization_id = o.id
+     WHERE s.subdomain = $1`,
     [subdomain]
   );
 
