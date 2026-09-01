@@ -22,8 +22,8 @@ export function SiteHeader({ cms }: { cms?: any }) {
         ],
         ctaText: "Login",
         ctaHref: "/login",
-        ctaSecondaryText: "Get Started",
-        ctaSecondaryHref: "/auth/signup"
+        ctaSecondaryText: "Contact Sales",
+        ctaSecondaryHref: "/contact"
     }
 
     useEffect(() => {
@@ -84,13 +84,13 @@ export function SiteHeader({ cms }: { cms?: any }) {
                                     </MotionButton>
                                 </Link>
 
-                                <Link href={header.ctaSecondaryHref || "/auth/signup"}>
+                                <Link href={header.ctaSecondaryHref || "/contact"}>
                                     <MotionButton
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         className={`px-6 py-2.5 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all items-center flex ${isDark ? 'bg-violet-600 shadow-violet-600/20 hover:bg-violet-500' : 'bg-slate-900 shadow-slate-900/10 hover:bg-slate-800'}`}
                                     >
-                                        {header.ctaSecondaryText || "Get Started"}
+                                        {header.ctaSecondaryText || "Contact Sales"}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </MotionButton>
                                 </Link>
@@ -140,12 +140,12 @@ export function SiteHeader({ cms }: { cms?: any }) {
                                 {header.ctaText}
                             </MotionButton>
                         </Link>
-                        <Link href={header.ctaSecondaryHref || "/auth/signup"} onClick={() => setMobileMenuOpen(false)}>
+                        <Link href={header.ctaSecondaryHref || "/contact"} onClick={() => setMobileMenuOpen(false)}>
                             <MotionButton
                                 whileTap={{ scale: 0.95 }}
                                 className={`px-10 py-4 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-xl ${isDark ? 'bg-white text-black' : 'bg-slate-900 text-white'}`}
                             >
-                                {header.ctaSecondaryText || "Get Started"}
+                                {header.ctaSecondaryText || "Contact Sales"}
                             </MotionButton>
                         </Link>
                     </motion.div>

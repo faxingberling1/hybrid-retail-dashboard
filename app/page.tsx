@@ -47,7 +47,7 @@ export default function LandingPage() {
             badge: "Pakistan's No.1 Retail Management System",
             title: "Retail Perfected.",
             subtitle: "The high-fidelity ecosystem for professional commerce. Real-time synchronization, neural inventory, and zero-latency performance.",
-            ctaPrimary: "Get Started Free",
+            ctaPrimary: "Contact Sales",
             ctaSecondary: "Schedule a Demo"
         },
         branding: {
@@ -198,7 +198,7 @@ export default function LandingPage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
-                            <Link href="/auth/signup">
+                            <Link href="/contact">
                                 <MotionButton
                                     whileHover={{ y: -5, scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}

@@ -25,14 +25,12 @@ function getMonthData(year: number, month: number) {
 }
 
 const timeSlots = [
-    "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
-    "11:00 AM", "11:30 AM", "2:00 PM", "2:30 PM",
-    "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM"
+    "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM",
+    "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
+    "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM", "10:30 PM",
+    "11:00 PM", "11:30 PM", "12:00 AM", "12:30 AM", "1:00 AM", "1:30 AM",
+    "2:00 AM"
 ]
-
-// Simulate some booked slots
-const bookedDays = [3, 7, 14, 21, 28]
-const partialDays = [5, 12, 19, 26]
 
 const salesStats = [
     { value: "500+", label: "Businesses Onboarded", icon: Building },
@@ -95,14 +93,32 @@ export default function ContactSalesPage() {
         return () => clearInterval(timer)
     }, [])
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsSubmitting(true)
-        setTimeout(() => {
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...formData,
+                    selectedDate,
+                    selectedTime,
+                    monthName
+                })
+            })
+            
+            if (res.ok) {
+                setSubmitted(true)
+                toast.success("Demo booked successfully! Check your email for confirmation.")
+            } else {
+                toast.error("Failed to book demo. Please try again.")
+            }
+        } catch (error) {
+            toast.error("An error occurred. Please try again later.")
+        } finally {
             setIsSubmitting(false)
-            setSubmitted(true)
-            toast.success("Demo booked successfully! Check your email for confirmation.")
-        }, 1500)
+        }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -270,17 +286,14 @@ export default function ContactSalesPage() {
                                                 {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
                                                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
                                                     const isPast = isCurrentMonth && day < today.getDate()
-                                                    const isBooked = bookedDays.includes(day)
-                                                    const isPartial = partialDays.includes(day)
                                                     const isSelected = selectedDate === day
                                                     const isWeekend = new Date(currentYear, currentMonth, day).getDay() === 0
 
-                                                    const disabled = isPast || isBooked || isWeekend
+                                                    const disabled = isPast || isWeekend
                                                     let classes = 'aspect-square rounded-2xl flex items-center justify-center text-sm font-bold transition-all cursor-pointer '
 
                                                     if (isSelected) classes += 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-110'
                                                     else if (disabled) classes += 'bg-slate-50 dark:bg-white/5 text-slate-200 dark:text-slate-700 cursor-not-allowed'
-                                                    else if (isPartial) classes += 'bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/20'
                                                     else classes += 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/20'
 
                                                     return (
@@ -301,7 +314,6 @@ export default function ContactSalesPage() {
                                                 <div className="flex items-center gap-5">
                                                     {[
                                                         { color: 'bg-emerald-400', label: 'Available' },
-                                                        { color: 'bg-amber-400', label: 'Limited' },
                                                         { color: 'bg-slate-200 dark:bg-slate-700', label: 'Unavailable' },
                                                     ].map(l => (
                                                         <div key={l.label} className="flex items-center gap-1.5">
@@ -463,25 +475,27 @@ export default function ContactSalesPage() {
                             {/* Quick Contact */}
                             <div className="space-y-4">
                                 {[
-                                    { icon: Phone, title: "Sales Hotline", value: "+92 300 1234567", sub: "Mon–Sat, 9AM–8PM PKT", color: "from-blue-500 to-indigo-600", bg: "bg-blue-50 dark:bg-blue-900/10" },
-                                    { icon: Mail, title: "Email Sales", value: "sales@hybridpos.pk", sub: "Response within 2 hours", color: "from-violet-500 to-purple-600", bg: "bg-violet-50 dark:bg-violet-900/10" },
-                                    { icon: MapPin, title: "Head Office", value: "Arfa Tech Park, Lahore", sub: "Walk-ins welcome", color: "from-emerald-500 to-teal-600", bg: "bg-emerald-50 dark:bg-emerald-900/10" },
+                                    { icon: MessageSquare, title: "WhatsApp Sales", value: "+92 370 1335392", sub: "Message us directly", color: "from-emerald-500 to-green-600", bg: "bg-emerald-50 dark:bg-emerald-900/10", href: "https://wa.me/923701335392" },
+                                    { icon: Phone, title: "Sales Hotline", value: "+92 370 1335392", sub: "Mon–Sat, 9AM–8PM PKT", color: "from-blue-500 to-indigo-600", bg: "bg-blue-50 dark:bg-blue-900/10", href: "tel:+923701335392" },
+                                    { icon: Mail, title: "Email Sales", value: "sales@neogentechnologies.com", sub: "Response within 2 hours", color: "from-violet-500 to-purple-600", bg: "bg-violet-50 dark:bg-violet-900/10", href: "mailto:sales@neogentechnologies.com" },
+                                    { icon: MapPin, title: "Head Office", value: "Karachi", sub: "Walk-ins welcome", color: "from-teal-500 to-cyan-600", bg: "bg-teal-50 dark:bg-teal-900/10", href: "https://maps.google.com/?q=Karachi" },
                                 ].map((c, i) => (
                                     <motion.div
                                         key={i}
                                         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }}
-                                        className={`p-6 rounded-[2rem] ${c.bg} border border-slate-100 dark:border-white/5 group hover:shadow-lg transition-all`}
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                                                <c.icon className="h-5 w-5 text-white" />
+                                        <a href={c.href} target={c.href.startsWith('http') ? "_blank" : undefined} rel="noopener noreferrer" className={`block p-6 rounded-[2rem] ${c.bg} border border-slate-100 dark:border-white/5 group hover:shadow-lg transition-all`}>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                                                    <c.icon className="h-5 w-5 text-white" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">{c.title}</p>
+                                                    <p className="text-sm font-black tracking-tight">{c.value}</p>
+                                                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{c.sub}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">{c.title}</p>
-                                                <p className="text-sm font-black tracking-tight">{c.value}</p>
-                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{c.sub}</p>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </motion.div>
                                 ))}
                             </div>
