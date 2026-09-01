@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         // Send alert email to internal team
         const internalEmail = await resend.emails.send({
             from: 'HybridPOS Sales <sales@neogentechnologies.com>',
-            to: ['arsalan@neogentechnologies.com', 'm.owais@neogentechnologies.com', 'aun@neogentechnologies.com'],
+            to: ['arsalan@neogentechnologies.com', 'm.owais@neogentechnologies.com', 'raza@neogentechnologies.com'],
             subject: `New Demo Booking: ${businessName || name}`,
             html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
