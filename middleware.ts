@@ -58,6 +58,7 @@ export async function middleware(request: NextRequest) {
     '/compliance.html',
     '/login',
     '/contact',
+    '/api/contact',
     '/api/auth',
     '/_next',
     '/favicon.ico',

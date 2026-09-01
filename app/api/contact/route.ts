@@ -25,8 +25,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // Send email via Resend
-        const data = await resend.emails.send({
+        // Send alert email to internal team
+        const internalEmail = await resend.emails.send({
             from: 'HybridPOS Sales <sales@neogentechnologies.com>',
             to: ['arsalan@neogentechnologies.com', 'm.owais@neogentechnologies.com', 'aun@neogentechnologies.com'],
             subject: `New Demo Booking: ${businessName || name}`,
@@ -65,12 +65,42 @@ export async function POST(request: Request) {
             `,
         });
 
-        if (data.error) {
-            console.error("Resend API error:", data.error);
-            return NextResponse.json({ error: 'Failed to send email via Resend' }, { status: 500 });
+        if (internalEmail.error) {
+            console.error("Resend API error (Internal):", internalEmail.error);
+            return NextResponse.json({ error: 'Failed to send internal email via Resend' }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, id: data.data?.id });
+        // Send confirmation email to the customer
+        const customerEmail = await resend.emails.send({
+            from: 'HybridPOS Sales <sales@neogentechnologies.com>',
+            to: [email],
+            subject: `Demo Booking Confirmed - HybridPOS`,
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #4f46e5;">Your Demo is Confirmed!</h2>
+                    <p>Hi ${name},</p>
+                    <p>Thank you for booking a demo with HybridPOS. We have received your request and our sales team will be ready to walk you through our platform.</p>
+                    
+                    <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                        <h3 style="margin-top: 0;">Your Booking Details</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 10px;"><strong>Date:</strong> ${monthName.split(' ')[0]} ${selectedDate}, ${monthName.split(' ')[1]}</li>
+                            <li style="margin-bottom: 10px;"><strong>Time:</strong> ${selectedTime} (Pakistan Standard Time)</li>
+                        </ul>
+                    </div>
+                    
+                    <p style="margin-top: 20px;">If you need to reschedule or have any immediate questions, feel free to reply to this email or reach us on WhatsApp at +92 370 1335392.</p>
+                    <p>Best regards,<br>The HybridPOS Team</p>
+                </div>
+            `,
+        });
+
+        if (customerEmail.error) {
+            console.error("Resend API error (Customer):", customerEmail.error);
+            // We still return success because the internal team got the email, but log the error
+        }
+
+        return NextResponse.json({ success: true, id: internalEmail.data?.id });
     } catch (error) {
         console.error("Contact API Route error:", error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
