@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import prisma from '@/lib/prisma';
 
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -24,6 +25,34 @@ export async function POST(request: Request) {
         if (!name || !email || !phone || !selectedDate || !selectedTime) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
+
+        // Check if the slot is already booked
+        const existingBooking = await prisma.demoBooking.findFirst({
+            where: {
+                selectedDate: String(selectedDate),
+                selectedTime,
+                monthName
+            }
+        });
+
+        if (existingBooking) {
+            return NextResponse.json({ error: 'This time slot is already booked. Please select another.' }, { status: 409 });
+        }
+
+        // Save booking to the database
+        await prisma.demoBooking.create({
+            data: {
+                name,
+                email,
+                phone,
+                businessName: businessName || null,
+                businessType: businessType || null,
+                storeCount: storeCount ? String(storeCount) : null,
+                selectedDate: String(selectedDate),
+                selectedTime,
+                monthName
+            }
+        });
 
         // Send alert email to internal team
         const internalEmail = await resend.emails.send({

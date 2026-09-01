@@ -76,8 +76,21 @@ export default function ContactSalesPage() {
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitted, setSubmitted] = useState(false)
+    const [bookedSlots, setBookedSlots] = useState<{selectedDate: string, selectedTime: string}[]>([])
 
     const { firstDay, daysInMonth, monthName } = getMonthData(currentYear, currentMonth)
+
+    useEffect(() => {
+        // Fetch booked slots for the current month
+        fetch(`/api/contact/bookings?monthName=${encodeURIComponent(monthName)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.bookings) {
+                    setBookedSlots(data.bookings)
+                }
+            })
+            .catch(() => setBookedSlots([]))
+    }, [monthName])
 
     useEffect(() => {
         fetch('/api/super-admin/cms')
@@ -345,14 +358,23 @@ export default function ContactSalesPage() {
                                             <div className="grid grid-cols-3 md:grid-cols-4 gap-3 mb-10">
                                                 {timeSlots.map(slot => {
                                                     const isSelected = selectedTime === slot
+                                                    const isBooked = bookedSlots.some(b => b.selectedDate === String(selectedDate) && b.selectedTime === slot)
+
+                                                    let btnClass = 'py-4 rounded-2xl text-sm font-bold transition-all '
+                                                    if (isSelected) {
+                                                        btnClass += 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                                                    } else if (isBooked) {
+                                                        btnClass += 'bg-slate-50 dark:bg-white/5 text-slate-300 dark:text-slate-600 cursor-not-allowed line-through'
+                                                    } else {
+                                                        btnClass += 'bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5'
+                                                    }
+
                                                     return (
                                                         <button
                                                             key={slot}
+                                                            disabled={isBooked}
                                                             onClick={() => setSelectedTime(slot)}
-                                                            className={`py-4 rounded-2xl text-sm font-bold transition-all ${isSelected
-                                                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                                                                    : 'bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5'
-                                                                }`}
+                                                            className={btnClass}
                                                         >
                                                             {slot}
                                                         </button>

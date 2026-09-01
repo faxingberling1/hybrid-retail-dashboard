@@ -550,3 +550,20 @@ model StorefrontCustomer {
   @@unique([email, organization_id])
   @@map("storefront_customers")
 }
+
+model DemoBooking {
+  id           String   @id @default(uuid())
+  name         String
+  email        String
+  phone        String
+  businessName String?
+  businessType String?
+  storeCount   String?
+  selectedDate String
+  selectedTime String
+  monthName    String
+  createdAt    DateTime @default(now())
+
+  @@map("demo_bookings")
+}
+
